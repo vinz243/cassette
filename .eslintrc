@@ -1,0 +1,45 @@
+---
+env:
+  browser: true
+  node: false
+  worker: false
+  amd: false
+  mocha: false
+  jasmine: false
+  phantomjs: false
+  jquery: false
+  prototypejs: false
+  shelljs: false
+  meteor: false
+  mongo: false
+  applescript: false
+  es6: false
+globals:
+  goog: true
+plugins: []
+rules:
+  no-extra-semi: 1
+  no-inner-declarations: 2
+  curly: 2
+  no-eval: 2
+  no-extend-native: 2
+  no-new-wrappers: 2
+  no-with: 2
+  no-undef: 2
+  array-bracket-spacing:
+  - 2
+  - never
+  indent:
+  - 2
+  - 2
+  no-array-constructor: 2
+  no-mixed-spaces-and-tabs: 2
+  no-new-object: 2
+  object-curly-spacing:
+  - 2
+  - never
+  semi: 2
+  max-len:
+  - 1
+  - 80
+  - 2

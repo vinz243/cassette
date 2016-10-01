@@ -1,0 +1,27 @@
+{
+  "name": "cassette",
+  "version": "0.0.0",
+  "description": "Cassette is a modern music database manager and grabber buit on NodeJS",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "babel-node src/server/server.js --presets es2015,es2016,stage-2"
+  },
+  "author": "vinz243",
+  "license": "MIT",
+  "dependencies": {
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.14.0",
+    "babel-preset-react": "^6.11.1",
+    "file-exists": "^2.0.0",
+    "mkdirp": "^0.5.1",
+    "nedb": "^1.8.0",
+    "webpack": "^1.13.2"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.16.0",
+    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-es2016": "^6.16.0",
+    "babel-preset-stage-2": "^6.16.0"
+  }
+}
