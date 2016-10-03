@@ -1,0 +1,9 @@
+{
+  "dev": {
+    "rootDir": "/home/vincent/.cassette/"
+  },
+  "test": {
+    "rootDir": "/home/vincent/.cassette/"
+  },
+  "env": "test"
+}

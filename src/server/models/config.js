@@ -1,27 +1,65 @@
 import datastore from 'nedb-promise';
-import conf from '../../../config';
+import conf from '../../../config.js';
 import mkdirp from 'mkdirp';
 
+mkdirp.sync(conf.rootDir + '/data/')
 
-mkdirp(conf.baseDir + '/data/')
-const db = new datastore(config.baseDir + '/data/config.db');
+console.log('  Using dir ' + conf.rootDir);
+let db = new datastore(conf.rootDir + '/data/config.db');
+db.loadDatabase();
 
-const config = {
-  get: async (key) => {
+
+const model = {
+
+  getValue: async (key) => {
     const res = await db.find({key: key});
     return {
       key: res[0].key,
       value: res[0].value
     };
   },
-  getValue: async (key, defVal) => {
-    return config.get(key).value || defVal;
+
+  get: async (key, defVal) => {
+    return (await model.get(key)).value || defVal;
   },
-  insert: async (key, value) => {
-    doc = {
+
+  /*
+   Inserts a value to database. Return complex object for API
+   */
+  insertValue: async (key, value) => {
+    let doc = {
       key: key,
       value: value
     };
-    return db.insert(doc);
+    try {
+      if((await db.find({key: key})).length > 0) {
+        return {
+          success: false,
+          status: 400,
+          data: {
+            error_message: 'A config entry already exists with this key',
+            error_code: 'EDUPENTRY'
+          }
+        };
+      }
+      await db.insert(doc);
+      return {
+        status: 201,
+        success: true,
+        data: {}
+      }
+    } catch (err) {
+      console.log(err);
+      return {
+        status: 500,
+        success: false,
+        data: {
+          error_code: 'EINTERNAL',
+          error_message: 'Internal error. Try again later'
+        }
+      }
+    }
+
   }
 }
+export default model;

@@ -1,10 +1,13 @@
-import configController from 'controllers/config';
+import configController from './controllers/config';
 
-let routes = [...configController];
+let routes = {};
+
+Object.assign(routes, configController);
 
 export default function (router) {
   for(let route in routes) {
     for(let verb in routes[route]) {
+      console.log(`Injecting ${verb} ${route}`);
       router[verb](route, routes[route][verb]);
     }
   }

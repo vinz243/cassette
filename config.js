@@ -2,13 +2,14 @@
 import process from 'process';
 import shortid from 'shortid';
 
-import localConfig from './config.json';
+import localConfig from './config.local.json';
 
 if (!process.argv.includes('--dev')) {
   var env = 'test';
 } else {
   var env = 'dev';
 }
+env = localConfig.env || env;
 
 
 
