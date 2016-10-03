@@ -14,6 +14,12 @@ let routes = {
       };
       ctx.status = 200;
       return;
+    },
+    put: async function (ctx, next) {
+      let fields = ctx.request.fields || ctx.request.body || {};
+      // console.log('keys', ctx.params);
+      ctx.body = await config.updateValue(ctx.params.key, fields.value);
+      ctx.status = ctx.body.status;
     }
   },
   '/v1/config': {
@@ -21,7 +27,7 @@ let routes = {
       let fields = ctx.request.fields || ctx.request.body || {};
       ctx.body = await config.insertValue(fields.key,
         fields.value);
-      ctx.status = ctx.body.status
+      ctx.status = ctx.body.status;
     }
   }
 }

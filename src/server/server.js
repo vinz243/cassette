@@ -12,14 +12,13 @@ let app = new Koa();
 let router = koaRouter();
 
 
-// app.use(function *(next) {
-//   let start = new Date();
-//   console.log(chalk.dim(this.url));
-//   yield next;
-//   var ms = new Date() - start;
-//   console.log(`${chalk.green(this.method)} ${chalk.dim(this.url)} - ${chalk.blue(ms + 'ms') }`);
-// });
-
+app.use((ctx, next) => {
+  const start = new Date();
+  return next().then(() => {
+    const ms = new Date() - start;
+    console.log(chalk.dim(`    ${ctx.method} ${ctx.url} - ${ms}ms - ${ctx.status}`));
+  });
+});
 app.use(body());
 
 route(router);

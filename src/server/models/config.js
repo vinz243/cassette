@@ -8,11 +8,26 @@ console.log('  Using dir ' + conf.rootDir);
 let db = new datastore(conf.rootDir + '/data/config.db');
 db.loadDatabase();
 
+const DB_ERROR_STATUS = {
+  status: 500,
+  success: false,
+  data: {
+    error_code: 'EINTERNAL',
+    error_message: 'Internal error. Try again later'
+  }
+};
+
 
 const model = {
 
   getValue: async (key) => {
-    const res = await db.find({key: key});
+
+    const res = await db.find({
+      key: key
+    });
+    if(res.length == 0) {
+      return {};
+    }
     return {
       key: res[0].key,
       value: res[0].value
@@ -22,7 +37,41 @@ const model = {
   get: async (key, defVal) => {
     return (await model.get(key)).value || defVal;
   },
+  updateValue: async (key, value) => {
+    try {
+      // console.log(key);
+      let found = await db.find({key: key});
 
+      // console.log('found', found);
+      if(found.length == 0) {
+        return {
+          success: false,
+          status: 404,
+          data: {
+            error_message: 'Cannot find key',
+            error_code: 'ENOTFOUND'
+          }
+        };
+      }
+
+      await db.update({
+        key: key
+      }, {
+        key: key,
+        value: value
+      });
+
+      return {
+        status: 200,
+        success: true,
+        data: {}
+      }
+
+    } catch (err) {
+      console.log(err);
+      return DB_ERROR_STATUS;
+    }
+  },
   /*
    Inserts a value to database. Return complex object for API
    */
@@ -50,14 +99,7 @@ const model = {
       }
     } catch (err) {
       console.log(err);
-      return {
-        status: 500,
-        success: false,
-        data: {
-          error_code: 'EINTERNAL',
-          error_message: 'Internal error. Try again later'
-        }
-      }
+      return DB_ERROR_STATUS;
     }
 
   }
