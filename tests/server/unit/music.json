@@ -1,0 +1,47 @@
+[
+  {
+    "artist_name": "AC/DC",
+    "genre": "Rock",
+    "artist_id": "1337",
+    "albums": [
+      {
+        "album_id": "42",
+        "artist_id": "1337",
+        "album_name": "Back in Black",
+        "tracks": [
+          {
+            "title": "Hells Bells",
+            "duration": "5:12"
+          }, {
+            "title": "Shoot to Thrill",
+            "duration"  : "5:17"
+          }, {
+            "title": "What Do You Do For Money Honey",
+            "duration": "3:37"
+          }, {
+            "title": "Givin The Dog A Bone",
+            "duration": "3:33"
+          }, {
+            "title": "Let Me Put My Love Into You",
+            "duration": "4:16"
+          }, {
+            "title": "Back in Black",
+            "duration": "4:16"
+          }, {
+            "title": "You Shook Me All Night Long",
+            "duration": "3:32"
+          }, {
+            "title": "Have A Drink On Me",
+            "duration": "3:58"
+          }, {
+            "title": "Shake A Leg",
+            "duration": "4:06"
+          }, {
+            "title": "Rock and Roll Ain't Noise Pollution",
+            "duration": "4:16"
+          }
+         ]
+      }
+    ]
+  }
+]

@@ -1,4 +1,4 @@
-import config from '../models/config';
+ import config from '../models/config';
 
 
 let routes = {
@@ -20,6 +20,7 @@ let routes = {
       // console.log('keys', ctx.params);
       ctx.body = await config.updateValue(ctx.params.key, fields.value);
       ctx.status = ctx.body.status;
+      return;
     }
   },
   '/v1/config': {
@@ -28,6 +29,7 @@ let routes = {
       ctx.body = await config.insertValue(fields.key,
         fields.value);
       ctx.status = ctx.body.status;
+      return;
     }
   }
 }
