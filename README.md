@@ -1,9 +1,12 @@
 # cassette
+
+![](https://travis-ci.org/vinz243/cassette.svg?branch=master)
+
 Cassette is music manager supporting major torrents site to download, sync and stream tracks on-the-go :headphones:
 
 ### Roadmap and planned features
 
-(written for myself) 
+(written for myself)
 
  - Music database provider searching (spotify) for getting correct metadata.
  - Release searching (t411, alphaRatio, Youtube):
