@@ -45,7 +45,7 @@ test.serial('won\'t create two config entry for same key', async t => {
   const res = await request.post('/v1/config').send({
     key: 'foo',
     value: 'Bilbo Baggins'
-  });
+  }).expect(400);
   t.is(res.status, 400);
   t.deepEqual(res.body, {
     success: false,

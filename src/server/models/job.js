@@ -45,11 +45,12 @@ const Controller = {
     let job = new Job(name, func);
     jobs[job.id] = job;
     job.run();
+    return job.id;
   },
 
   getStatus: (id) => {
-
     let job = jobs[id];
+    // console.log('help', id, Object.keys(jobs));
     if(!job) {
       return {
         success: false,
@@ -61,8 +62,8 @@ const Controller = {
       }
     }
     return {
-      status: 'success',
-      code: 200,
+      success: true,
+      status: 200,
       data: {
         job_status: job.status.string,
         job_progress: job.progress,

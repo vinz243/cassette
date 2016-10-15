@@ -25,6 +25,7 @@ let routes = {
   },
   '/v1/config': {
     post: async function (ctx, next) {
+      console.log('posting config');
       let fields = ctx.request.fields || ctx.request.body || {};
       ctx.body = await config.insertValue(fields.key,
         fields.value);

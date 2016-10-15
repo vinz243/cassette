@@ -30,6 +30,7 @@
     "babel-preset-es2015": "^6.16.0",
     "babel-preset-es2016": "^6.16.0",
     "babel-preset-stage-2": "^6.16.0",
+    "chokidar": "^1.6.1",
     "nock": "^8.0.0",
     "supertest": "^2.0.0",
     "supertest-as-promised": "^4.0.0",

@@ -1,5 +1,5 @@
 import configController from './controllers/config';
-import jobController from './controllers/config';
+import jobController from './controllers/job';
 let routes = {};
 
 Object.assign(routes, configController);
