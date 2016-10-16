@@ -8,7 +8,10 @@ if (!process.argv.includes('--dev')) {
 } else {
   var env = 'dev';
 }
-let localConfig = {};
+let localConfig = {
+  dev: {},
+  env: {}
+};
 try {
   localConfig = require('./config.local.json');
 } catch (err) {
