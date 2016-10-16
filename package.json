@@ -17,6 +17,7 @@
     "koa": "^2.0.0",
     "koa-better-body": "^3.0.0",
     "koa-router": "^7.0.1",
+    "lazy.js": "^0.4.2",
     "mkdirp": "^0.5.1",
     "nedb": "^1.8.0",
     "nedb-promise": "^2.0.0",
