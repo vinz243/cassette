@@ -16,7 +16,7 @@ try {
   localConfig = require('./config.local.json');
 } catch (err) {
   if (env !== 'production') {
-    localConfig[env].rootDir = os.homedir();
+    localConfig[env].rootDir = os.homedir() + '/';
   }
 }
 
