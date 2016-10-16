@@ -10,7 +10,7 @@ if (!process.argv.includes('--dev')) {
 }
 let localConfig = {
   dev: {},
-  env: {}
+  test: {}
 };
 try {
   localConfig = require('./config.local.json');
