@@ -7,7 +7,7 @@ import Lazy from 'lazy.js';
 // mkdirp.sync(conf.rootDir + '/data/')
 
 // console.log('  Using dir ' + conf.rootDir);
-let db = new datastore(conf.rootDir + '/data/artists.db');
+let db = new Datastore(conf.rootDir + '/data/artists.db');
 db.loadDatabase();
 
 // ARTIST SCHEMA:
@@ -31,32 +31,32 @@ class Artist {
 
   async getAlbums() {
     if (!this._id) {
-      return new Error('artist is not in database');
+      throw new Error('artist is not in database');
     }
 
     return await Album.get({artistId: this._id});
   }
   async getTracks() {
     if (!this._id) {
-      return new Error('artist is not in database');
+      throw new Error('artist is not in database');
     }
 
     return await Track.get({artistId: this._id});
   }
   async create() {
     if (this._id) {
-      return new Error('Cannot create an artist which is already in database');
+      throw new Error('Cannot create an artist which is already in database');
     }
     if((await db.find({name: this.name})).length > 0 &&
       !(await config.get('model_ignore_dups', false))) {
-      return
-        new Error('Duplicate artist. set model_ignore_dups to true to ignore')
+      throw new Error('Duplicate artist. set model_ignore_dups to true to ignore')
     }
-    await db.insert({
+    let res = await db.insert({
       name: this.name,
       genre: this.genre
-    });
-    return;
+    })
+    this._id = res._id;
+    return new Artist(res);
   }
   static async search(query) {
     throw new Error('Not implemented');
@@ -67,15 +67,18 @@ class Artist {
   static async get(query) {
     let q = Lazy(query).pick([
       'name', '_id', 'genre'
-    ]);
-    if(Object.key(q) === 0) {
+    ]).value();
+    if(Object.keys(q) === 0) {
       throw new Error('No query specified, or wrong one');
     }
+    // console.log('q', q);
     let res = [];
     let docs = await db.find(q);
+    // console.log('doc', docs);
     for(let doc in docs) {
-      res.push(new Artist(doc));
+      res.push(new Artist(docs[doc]));
     }
+
     return res;
   }
 }

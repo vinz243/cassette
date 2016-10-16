@@ -28,4 +28,4 @@ class File {
   }
 }
 
-export default Track;
+export default File;
