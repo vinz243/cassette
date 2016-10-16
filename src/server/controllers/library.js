@@ -2,9 +2,9 @@ import {Controller} from '../models/job';
 
 
 const routes = {
-  '/v1/libraries/scan': {
+  '/v1/libraries/:id/scans': {
     // This post will run a scan job.
-    // This will run a scan on all libraries
+    // This will run a scan on specified libraries
     // This returns an object like this:
     // {
     //   job_id: This is the job id to fetch results
