@@ -77,17 +77,9 @@ test('can fetch several artists', async t => {
 });
 
 test('refuses empty queries', async t => {
-  try {
-    await Artist.get({});
-    t.fail('expected an error');
-  } catch (err) {
-  }
-  try {
-    await Artist.get({foo: 'bar'});
-    t.fail('expected an error');
-  } catch (err) {
-    t.pass();
-  }
+
+  t.throws(Artist.get({}));
+  t.throws(Artist.get({foo: 'bar'}));
 });
 
 test('refuses to create fetched artist', async t => {
@@ -96,23 +88,17 @@ test('refuses to create fetched artist', async t => {
     genre: 'test',
     _id: '1337'
   });
-  try {
-    await foo.create();
-    t.fail('not thrown');
-  } catch (err)  {
-    t.pass();
-  }
+
+  t.throws(foo.create());
+
 });
 
 test('refuses to create twice', async t => {
+
   let davodka = new Artist('Davodka');
   await davodka.create();
-  try {
-    await davodka.create();
-    t.fail('expected an error');
-  } catch (err) {
-    t.pass();
-  }
+
+  t.throws(davodka.create());
 
 });
 
@@ -120,10 +106,5 @@ test('refuses dup artists', async t => {
   let hugoTsr = new Artist('Hugo TSR');
   await hugoTsr.create();
 
-  try {
-    await (new Artist('Hugo TSR')).create();
-    t.fail('expected an error');
-  } catch (err) {
-    t.pass();
-  }
+  t.throws( (new Artist('Hugo TSR')).create());
 });

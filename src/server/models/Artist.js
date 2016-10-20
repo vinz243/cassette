@@ -4,6 +4,8 @@ import conf from '../../../config.js';
 import config from './config.js';
 import mkdirp from 'mkdirp';
 import Lazy from 'lazy.js';
+// import shorti
+
 // mkdirp.sync(conf.rootDir + '/data/')
 
 // console.log('  Using dir ' + conf.rootDir);
@@ -44,13 +46,17 @@ class Artist {
     return await Track.get({artistId: this._id});
   }
   async create() {
+    let str = this.name;
     if (this._id) {
       throw new Error('Cannot create an artist which is already in database');
     }
-    if((await db.find({name: this.name})).length > 0 &&
-      !(await config.get('model_ignore_dups', false))) {
+    let pre = await db.find({name: this.name});
+    let ignore = await config.get('model_ignore_dups', false);
+
+    if(pre.length > 0 && !ignore) {
       throw new Error('Duplicate artist. set model_ignore_dups to true to ignore')
     }
+
     let res = await db.insert({
       name: this.name,
       genre: this.genre
@@ -68,13 +74,11 @@ class Artist {
     let q = Lazy(query).pick([
       'name', '_id', 'genre'
     ]).value();
-    if(Object.keys(q) === 0) {
+    if(Object.keys(q) == 0) {
       throw new Error('No query specified, or wrong one');
     }
-    // console.log('q', q);
     let res = [];
     let docs = await db.find(q);
-    // console.log('doc', docs);
     for(let doc in docs) {
       res.push(new Artist(docs[doc]));
     }

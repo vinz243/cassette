@@ -35,7 +35,7 @@ const model = {
   },
 
   get: async (key, defVal) => {
-    return (await model.get(key)).value || defVal;
+    return (await model.getValue(key)).value || defVal;
   },
   updateValue: async (key, value) => {
     try {
