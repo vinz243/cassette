@@ -68,7 +68,7 @@ class Artist {
     throw new Error('Not implemented');
   }
   static async getById(id) {
-    return Artist.get({_id: id});
+    return (await Artist.get({_id: id}))[0];
   }
   static async get(query) {
     let q = Lazy(query).pick([

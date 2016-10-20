@@ -38,9 +38,8 @@ test('creates an artist and fetch it by id', async t => {
 
   let res = await Artist.getById(eminem._id);
 
-  t.is(res[0].name, 'Eminem');
-  t.is(res[0].genre, 'Rap');
-  t.is(res.length, 1);
+  t.is(res.name, 'Eminem');
+  t.is(res.genre, 'Rap');
 });
 
 test('creates an artist and fetch it by name', async t => {
