@@ -1,6 +1,6 @@
 # cassette
 
-![](https://travis-ci.org/vinz243/cassette.svg?branch=master)
+![](https://travis-ci.org/vinz243/cassette.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/vinz243/cassette/badge.svg?branch=master)](https://coveralls.io/github/vinz243/cassette?branch=master)
 
 Cassette is music manager supporting major torrents site to download, sync and stream tracks on-the-go :headphones:
 
