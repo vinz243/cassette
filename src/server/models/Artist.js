@@ -30,7 +30,22 @@ class Artist {
       this.name = name;
     }
   }
+  static async getAll(query) {
+    let q = Lazy(query).pick([
+      'limit', 'offset', 'sort', 'direction'
+    ]).value();
 
+    if (!q.limit || q.limit > 25) {
+      q.limit = 25;
+    }
+
+    let sort = {};
+    sort[q.sort || 'name'] = q.direction ? (q.direction == 'asc' ? 1 : -1) : 1;
+
+    let res = await db.find({}).sort(sort).skip(q.offset || 0)
+      .limit(q.limit).exec();
+    res.query = query;
+  }
   async getAlbums() {
     if (!this._id) {
       throw new Error('artist is not in database');

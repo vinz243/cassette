@@ -1,10 +1,21 @@
-
-
+import {Artist, Album, Tracks} from '../models';
+import Lazy from 'lazy.js';
 const routes = {
 
   '/v1/artists': {
     // returns a list of artists and their associated metadata
     get: async (ctx, next) => {
+      let res = await Artist.getAll(query);
+      ctx.body = {
+        status: 'success',
+        count: res.length,
+        data: res.map(doc => doc.toObject())
+        payload: {
+          query: res.query,
+          params: {},
+          body: {}
+        }
+      }
 
     }
   },
