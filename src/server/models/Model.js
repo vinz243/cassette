@@ -141,7 +141,9 @@ class Model {
     }
 
     model.prototype.create = async function () {
-      // console.log(this.getPayload());
+      if (this._id || this.data._id)
+        throw new Error('Object is already from database'); 
+
       if (self._noDuplicates) {
         if (!self._default) {
           throw new Error('No dups specified but no default field');
@@ -152,6 +154,7 @@ class Model {
         if (res.length > 0)
           throw new Error('Entry is already existing and dups found');
       }
+
 
       let res = await db.insert(this.getPayload());
 
