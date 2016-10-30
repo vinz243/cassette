@@ -79,17 +79,18 @@ test('should chain calls without Error', t => {
     .field('itemName')
       .required()
       .string()
-      .noDuplicates()
       .done()
     .field('itemCategory')
       .float()
       .notIdentity() // <-- means won't be accepted as a query
       .done()
+    .noDuplicates()
     .acceptsEmptyQuery()
     .done()
 });
 let personModel = (name) => {
   return (new Model(name))
+    .noDuplicates()
     .field('name')
       .required()
       .string()
@@ -199,4 +200,12 @@ test('finds multiple docs', async t => {
 
   t.is((await Person.find({age: 34})).length, 2);
   t.is((await Person.find({age: 42})).length, 1);
+});
+
+test('correct dup check', async t => {
+  let Soul = personModel('soul');
+  let joe = new Soul('joe');
+  await joe.create();
+  let joey = new Soul('joe');
+  t.throws(joey.create());
 });

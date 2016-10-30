@@ -65,10 +65,6 @@ class ModelField {
     this._notIdentity = true;
     return this;
   }
-  noDuplicates() {
-    this._noDuplicates = true;
-    return this;
-  }
   done() {
     return this.model;
   }
@@ -86,6 +82,10 @@ class Model {
     let field = new ModelField(name, this);
     this.fields.push(field);
     return field;
+  }
+  noDuplicates() {
+    this._noDuplicates = true;
+    return this;
   }
   acceptsEmptyQuery() {
     this.acceptsEmptyQuery = true;
@@ -149,7 +149,7 @@ class Model {
         let q = {};
         q[self._default] = this.data[self._default];
         let res = await db.find(q);
-        if (q.length > 0)
+        if (res.length > 0)
           throw new Error('Entry is already existing and dups found');
       }
 
