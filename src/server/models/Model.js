@@ -100,6 +100,7 @@ class Model {
         let value = d[field.name];
         this.data[field.name] = value;
       }
+      this._id = this.data._id;
     }
 
     model.prototype.getPayload = function () {
@@ -133,14 +134,17 @@ class Model {
     }
 
     model.prototype.set = function (key, value) {
-      if (key === '_id')
+      if (key === '_id') {
         throw new Error('Cannot set _id');
+      }
       this.data[key] = value;
     }
 
     model.prototype.update = async function (key, value) {
-      if (!this._id)
+      if (!this._id) {
         throw new Error('Cannot update ghost model');
+      }
+
       await db.update({_id: this._id}, this.getPayload());
       return;
     }
@@ -156,10 +160,10 @@ class Model {
         // .concat(['sort', 'skip', 'limit', 'direction'])
         .value();
 
-      if (Object.keys(q).length  == 0 && !self.acceptsEmptyQuery && !forceEmpty)
+      if (Object.keys(q).length  == 0 && !self.acceptsEmptyQuery
+        && !forceEmpty) {
         throw new Error('Empty or invalid query');
-
-
+      }
       let opts = Lazy(query).pick([
         'limit', 'offset', 'sort', 'direction'
       ]).value();

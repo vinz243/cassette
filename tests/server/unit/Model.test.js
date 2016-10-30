@@ -149,4 +149,20 @@ test('model should create() correctly and then find it by id and name', async t 
   res = (await Person.find({name: 'Bilbo'}))[0];
   t.is(res.data._id, bilbo._id);
   t.is(bilbo.data.age, 131);
+});
+
+test('Model set function', async t => {
+  let Person = personModel('Ppl');
+
+  let jon = new Person({name: 'Jon Snow'});
+
+  await jon.create();
+
+  jon.set('name', 'Jon Targaryen');
+
+  t.is((await Person.findById(jon._id)).data.name, 'Jon Snow');
+
+  await jon.update();
+
+  t.is((await Person.findById(jon._id)).data.name, 'Jon Targaryen');
 })
