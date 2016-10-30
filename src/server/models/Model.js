@@ -69,10 +69,13 @@ class ModelField {
     return this.model;
   }
 }
+
+let databases = {};
+
 class Model {
   constructor(name) {
     this.name = name;
-    this.dbName = snakeCase(name);
+    this.dbName = snakeCase(name) + 's';
     this.dbPath = conf.rootDir + '/data/' + this.dbName + '.db';
     this.fields = [];
 
@@ -92,10 +95,16 @@ class Model {
     return this;
   }
   done() {
-    let self = this;
+    let db = undefined, self = this;
 
-    let db = new Datastore(self.dbPath);
-    db.loadDatabase();
+    if (databases[self.dbPath]) {
+      console.log('Not loading db again...');
+      db = databases[self.dbPath];
+    } else {
+      db = new Datastore(self.dbPath);
+      db.loadDatabase();
+      databases[self.dbPath] = db;
+    }
 
     let model = function (d) {
       if (typeof d === 'string') {
@@ -142,7 +151,7 @@ class Model {
 
     model.prototype.create = async function () {
       if (this._id || this.data._id)
-        throw new Error('Object is already from database'); 
+        throw new Error('Object is already from database');
 
       if (self._noDuplicates) {
         if (!self._default) {

@@ -5,13 +5,6 @@ import config from './config.js';
 import mkdirp from 'mkdirp';
 import Model from './Model'
 import Lazy from 'lazy.js';
-// import shorti
-
-// mkdirp.sync(conf.rootDir + '/data/')
-
-// console.log('  Using dir ' + conf.rootDir);
-let db = new Datastore(conf.rootDir + '/data/artists.db');
-db.loadDatabase();
 
 // ARTIST SCHEMA:
 //   _id: artistsid

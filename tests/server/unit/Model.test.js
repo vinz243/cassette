@@ -2,7 +2,7 @@ import Model from '../../../src/server/models/Model';
 import test from 'ava';
 
 test('constructor should snake case db name', t => {
-  t.is((new Model('myDoc')).dbName, 'my_doc');
+  t.is((new Model('myDoc')).dbName, 'my_docs');
 })
 
 test('field should type correctly to float', t => {

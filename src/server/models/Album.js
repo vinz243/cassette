@@ -3,7 +3,6 @@ import conf from '../../../config.js';
 import config from './config.js';
 import Artist from './Artist.js';
 
-
 import Lazy from 'lazy.js';
 import Model from './Model';
 // schema:

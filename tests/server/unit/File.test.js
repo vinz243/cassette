@@ -7,11 +7,10 @@ test('creates an object with expected props and no more', t => {
     _id: 'id of file',
     path: 'abs path to file',
     format: 'format',
-    bitrate: 'audio bitrate in kbps',
-    lossless: 'boolean',
+    bitrate: 320,
+    lossless: true,
     size: 'file size in bytes',
-    duration: 'duration in ms',
-    score: 'computer score based on bitrate / format / size',
+    duration: 1337,
     trackId: 'track id',
     albumId: 'album id',
     artistId: 'artist id'
@@ -21,7 +20,7 @@ test('creates an object with expected props and no more', t => {
   // console.log(track);
   for(let key in data) {
     // console.log(key);
-    t.is(track[key], data[key]);
+    t.is(track.data[key], data[key]);
   }
 });
 
@@ -31,7 +30,7 @@ test('creates object and insert it to db', async t => {
     lossless: true
   });
   await file.create();
-  t.not(file._id, undefined);
+  t.not(file.data._id, undefined);
 });
 
 test('creates an object, insert it and fetch it by _id', async t => {
@@ -42,9 +41,9 @@ test('creates an object, insert it and fetch it by _id', async t => {
   await file.create();
   t.not(file._id, undefined);
 
-  let res = await File.getById(file._id);
-  t.is(res.path, '/foo/bar');
-  t.is(res.bitrate, 320);
+  let res = await File.findById(file._id);
+  t.is(res.data.path, '/foo/bar');
+  t.is(res.data.bitrate, 320);
 });
 
 test('creates an object and fetch it by path', async t => {
@@ -56,7 +55,7 @@ test('creates an object and fetch it by path', async t => {
 
   t.not(file._id, undefined);
 
-  let res = await File.getOne('/bar/foo');
+  let res = (await File.find({path: '/bar/foo'}))[0];
   t.is(res._id, file._id);
 });
 
