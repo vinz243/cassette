@@ -73,6 +73,7 @@ test('field should type correctly to bool', t => {
 });
 
 
+
 test('should chain calls without Error', t => {
   (new Model('MyModel'))
     .field('itemName')
@@ -92,13 +93,18 @@ let personModel = (name) => {
     .field('name')
       .required()
       .string()
+      .defaultParam()
       .done()
     .field('age')
       .int()
       .done()
     .done();
 }
+test('model should accept a default type', t => {
+  let Person = personModel('Person');
 
+  t.is((new Person('Danny')).data.name, 'Danny');
+});
 test('model should generate correct payloads', t => {
 
   let Person = personModel('People');

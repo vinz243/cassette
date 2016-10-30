@@ -27,6 +27,11 @@ class ModelField {
     }
     return this;
   }
+  defaultParam () {
+    this._default = true;
+    this.model._default = this.name;
+    return this;
+  }
   float() {
     this.type = 'float';
     this.validator = (n) => Number(n) === n;
@@ -93,6 +98,15 @@ class Model {
     db.loadDatabase();
 
     let model = function (d) {
+      if (typeof d === 'string') {
+        if (self._default) {
+          let val = d;
+          d = {};
+          d[self._default] = val;
+        } else {
+          throw new Error('Cannot accept a string as an object');
+        }
+      }
       this.data = {};
       // let data = Lazy(d).pick(this.fields.map(f => f.name));
       for (let index in self.fields) {
