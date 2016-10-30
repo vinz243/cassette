@@ -142,9 +142,20 @@ class Model {
 
     model.prototype.create = async function () {
       // console.log(this.getPayload());
+      if (self._noDuplicates) {
+        if (!self._default) {
+          throw new Error('No dups specified but no default field');
+        }
+        let q = {};
+        q[self._default] = this.data[self._default];
+        let res = await db.find(q);
+        if (q.length > 0)
+          throw new Error('Entry is already existing and dups found');
+      }
+
       let res = await db.insert(this.getPayload());
 
-      this._id = res._id;
+      this._id = this.data._id = res._id;
     }
 
     model.prototype.set = function (key, value) {
@@ -174,10 +185,10 @@ class Model {
         // .concat(['sort', 'skip', 'limit', 'direction'])
         .value();
 
-      if (Object.keys(q).length  == 0 && !self.acceptsEmptyQuery
-        && !forceEmpty) {
-        throw new Error('Empty or invalid query');
-      }
+      // if (Object.keys(q).length  == 0 && !self.acceptsEmptyQuery
+      //   && !forceEmpty) {
+      //   throw new Error('Empty or invalid query');
+      // }
       let opts = Lazy(query).pick([
         'limit', 'offset', 'sort', 'direction'
       ]).value();

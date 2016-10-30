@@ -171,4 +171,32 @@ test('Model set function', async t => {
   await jon.update();
 
   t.is((await Person.findById(jon._id)).data.name, 'Jon Targaryen');
-})
+});
+
+test('finds multiple docs', async t => {
+  let Person = personModel('Dudes');
+
+  let john = new Person({
+    name: 'john',
+    age: 34
+  });
+
+  await john.create();
+
+  let joe = new Person({
+    name: 'joe',
+    age: 34
+  });
+
+  await joe.create();
+
+  let harvey = new Person({
+    name: 'harvey',
+    age: 42
+  });
+
+  await harvey.create();
+
+  t.is((await Person.find({age: 34})).length, 2);
+  t.is((await Person.find({age: 42})).length, 1);
+});
