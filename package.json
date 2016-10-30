@@ -7,7 +7,7 @@
     "test": "ava tests -v",
     "start": "babel-node src/server/server.js --presets es2015,es2016,stage-2 --dev",
     "coverage": "cross-env NODE_ENV=test nyc npm test && nyc report --reporter=html",
-    "coverage-travis": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
+    "coverage-travis": "cross-env NODE_ENV=test nyc npm test && nyc report --reporter=text-lcov | coveralls"
   },
   "author": "vinz243",
   "license": "MIT",
