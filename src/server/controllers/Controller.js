@@ -47,7 +47,7 @@ class Controller {
           let val = q[key];
 
           if (val[0] === '/' && val[val.length - 1] === '/') {
-            q[key] = new RegExp(val.slice(1, -1), 'gi');
+            q[key] = new RegExp(val.slice(1, -1), 'i');
           }
         }
         // cons

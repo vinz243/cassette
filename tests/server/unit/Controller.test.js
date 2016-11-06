@@ -178,14 +178,14 @@ test('should support searches', async t => {
   };
   await search(ctx);
   t.is(ctx.body.length, 2);
+  t.is(ctx.body.data[0].fireRate, 700)
+  t.is(ctx.body.data[1].fireRate, 700)
 
   ctx.request.fields = {
     name: '/16A/'
   };
   await search(ctx);
   t.is(ctx.body.length, 3);
-  t.is(ctx.body.data[0].fireRate, 700)
-  t.is(ctx.body.data[1].fireRate, 700)
 });
 
 
