@@ -111,6 +111,84 @@ test('Controller should be able to find one by id', async t => {
   t.is(ctx.body.payload.params.id, '42');
 });
 
+
+test('should support searches', async t => {
+  let Weapon = new Model('weapon')
+    .field('name')
+      .string()
+      .required()
+      .done()
+    .field('type')
+      .string()
+      .done()
+    .field('fireRate')
+      .int()
+      .done()
+    .done();
+
+  let ctrller = new Controller(Weapon).done();
+
+  await (new Weapon({
+    name: 'Famas',
+    fireRate: 1000,
+    type: 'AssaultRifle'
+  })).create();
+  await (new Weapon({
+    name: 'AEK-971',
+    fireRate: 900,
+    type: 'AssaultRifle'
+  })).create();
+  await (new Weapon({
+    name: 'M16A1',
+    fireRate: 700,
+    type: 'AssaultRifle'
+  })).create();
+  await (new Weapon({
+    name: 'M16A2',
+    fireRate: 700,
+    type: 'AssaultRifle'
+  })).create();
+  await (new Weapon({
+    name: 'M16A4',
+    fireRate: 750,
+    type: 'AssaultRifle'
+  })).create();
+  await (new Weapon({
+    name: 'MK Mod 11',
+    type: 'DMR'
+  })).create();
+  await (new Weapon({
+    name: 'MK Mod 8',
+    type: 'DMR'
+  })).create();
+
+  let ctx = {body: {}, request: {}};
+  ctx.request.fields = {
+    name: 'Famas'
+  };
+
+  let search = ctrller['/v1/weapons/searches'].post;
+
+  await search(ctx);
+  t.is(ctx.body.length, 1);
+  t.is(ctx.body.data[0].fireRate, 1000);
+
+  ctx.request.fields = {
+    fireRate: 700
+  };
+  await search(ctx);
+  t.is(ctx.body.length, 2);
+
+  ctx.request.fields = {
+    name: '/16A/'
+  };
+  await search(ctx);
+  t.is(ctx.body.length, 3);
+  t.is(ctx.body.data[0].fireRate, 700)
+  t.is(ctx.body.data[1].fireRate, 700)
+});
+
+
 test('should support allowPost, put and del', async t => {
   let Object = new Model('object')
     .field('name').string().required().done().done();

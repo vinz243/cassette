@@ -1,4 +1,5 @@
 import pluralize from 'pluralize';
+import Lazy from 'lazy.js';
 
 class Controller {
   constructor(model) {
@@ -37,10 +38,36 @@ class Controller {
       }
     };
 
+    routes[base + '/searches'] =  {
+      post: async (ctx, next) => {
+        let q = Lazy(ctx.request.fields || ctx.request.body || {})
+            .merge(ctx.query || {}).value();
+
+        for (let key in q) {
+          let val = q[key];
+
+          if (val[0] === '/' && val[val.length - 1] === '/') {
+            q[key] = new RegExp(val.slice(1, -1), 'gi');
+          }
+        }
+        // cons
+        let res = await self._model.find(q);
+
+        ctx.body = {
+          status: 'success',
+          data: res.map(d => d.data),
+          length: res.length,
+          payload: {
+            body: res.query
+          }
+        }
+        ctx.status = 200;
+      }
+    }
 
     routes[base + '/:id'] = {
       get: async (ctx, next) => {
-        if (!ctx.params.id) return ctx.redirect(base);
+        if (!ctx.params.id || ctx.params.id === '') return ctx.redirect(base);
 
         let res = await self._model.findById(ctx.params.id);
 

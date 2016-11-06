@@ -212,6 +212,7 @@ class Model {
       let sort = {};
       sort[opts.sort || 'name'] = opts.direction ?
         (opts.direction == 'asc' ? 1 : -1) : 1;
+      // console.log()
       let res = (await db.cfind(q).sort(sort).limit(opts.limit)
         .skip(opts.skip || 0).exec()).map(d => new model(d));
       res.query = Lazy(q).merge(opts).value();
