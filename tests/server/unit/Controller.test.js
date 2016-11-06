@@ -110,3 +110,13 @@ test('Controller should be able to find one by id', async t => {
   t.is(ctx.status, 404);
   t.is(ctx.body.payload.params.id, '42');
 });
+
+test('should support allowPost, put and del', async t => {
+  let Object = new Model('object')
+    .field('name').string().required().done().done();
+
+  let routes = new Controller(Object)
+    .allowPost().allowPut().allowDel().allowSearches()
+  .done();
+
+});
