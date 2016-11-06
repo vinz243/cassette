@@ -5,17 +5,15 @@ const routes = {
   '/v1/artists': {
     // returns a list of artists and their associated metadata
     get: async (ctx, next) => {
-      let res = await Artist.getAll(query);
+      let res = Artist.find(ctx.query);
       ctx.body = {
         status: 'success',
-        count: res.length,
-        data: res.map(doc => doc.toObject())
+        data: res.map(d => d.body),
+        length: res.length,
         payload: {
-          query: res.query,
-          params: {},
-          body: {}
+          query: res.query
         }
-      }
+      };
 
     }
   },
@@ -23,12 +21,17 @@ const routes = {
     // Creates a search resource,
     // in other words, simply search artists
     post: async (ctx, next) => {
-
+      ctx.status = 404;
     }
   },
   '/v1/artists/:id': {
-    get: async (ctx, next) => {
-
+//     get: async (ctx, next) => {
+//       let res = Artist.findById(ctx.params.id);
+//       if (res) {
+//         res.body = {
+//           status: ''
+// }
+}
     }
   },
   '/v1/artists/:id/albums': {

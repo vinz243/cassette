@@ -125,7 +125,7 @@ class Model {
       }
       this._id = this.data._id;
     }
-
+    model.model = self;
     model.prototype.getPayload = function () {
       let payload = {};
       // console.log(self.fields);
@@ -214,7 +214,7 @@ class Model {
         (opts.direction == 'asc' ? 1 : -1) : 1;
       let res = (await db.cfind(q).sort(sort).limit(opts.limit)
         .skip(opts.skip || 0).exec()).map(d => new model(d));
-      res.query = Lazy(q).merge(opts);
+      res.query = Lazy(q).merge(opts).value();
       return res;
     }
     // for (let i in this.fields.filter(t => t.type == 'oneToOne')) {
