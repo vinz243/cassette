@@ -43,6 +43,11 @@ test('Controller should be able to query', async t => {
   t.is(ctx.body.data.length, 3);
   t.is(ctx.body.status, 'success');
 
+  for (let pet of ctx.body.data) {
+    t.not(pet.name, undefined);
+    t.not(pet.legs, undefined);
+  }
+  
   ctx = {
     params:  {},
     query: {

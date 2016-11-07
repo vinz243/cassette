@@ -29,7 +29,7 @@ class Controller {
         let res = await self._model.find(ctx.query);
         ctx.body = {
           status: 'success',
-          data: res.map(d => d.body),
+          data: res.map(d => d.data),
           length: res.length,
           payload: {
             query: res.query
