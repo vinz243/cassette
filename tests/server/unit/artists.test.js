@@ -16,9 +16,9 @@ test('lists artists', async t => {
   await (new Artist({name: 'Foo'})).create();
 
   res = await request.get('/v1/artists');
-
+  console.log(res.body);
   for(let artist of res.body.data) {
-    if (artist.name === 'Foo') return;
+    if ((artist || {}).name === 'Foo') return;
   }
   t.fail('created artist not found');
 });
