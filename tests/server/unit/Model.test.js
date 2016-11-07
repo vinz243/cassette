@@ -209,3 +209,62 @@ test('correct dup check', async t => {
   let joey = new Soul('joe');
   t.throws(joey.create());
 });
+
+test('oneToMany', async t => {
+
+  let Parent = (new Model('parent'))
+    .field('name')
+      .string()
+      .required()
+      .defaultParam()
+      .done()
+    .field('childId')
+      .string()
+      .done()
+    .done();
+
+  let Child = (new Model('child'))
+    .field('name')
+      .string()
+      .required()
+      .defaultParam()
+      .done()
+    .oneToMany(Parent, 'childId')
+    .done();
+  let bruce = new Child('Bruce');
+  await bruce.create();
+
+  let thomas = new Parent('Thomas');
+  thomas.data.childId = bruce.data._id;
+  await thomas.create();
+
+  let martha = new Parent('Martha');
+  martha.data.childId = bruce.data._id;
+  await martha.create();
+
+  let yourMother = new Parent('Lady of the night'); // :D :D :D
+  await yourMother.create();
+
+  let parents = await bruce.getParents();
+  t.is(parents.length, 2);
+
+  if(parents[0].name == 'Thomas') {
+    t.is(parents[1].data.name, 'Martha')
+    t.is(parents[1].data._id, martha._id);
+    t.is(parents[0].data._id, thomas._id);
+  } else {
+    t.is(parents[1].data.name, 'Thomas')
+    t.is(parents[0].data.name, 'Martha')
+    t.is(parents[1].data._id, thomas.data._id)
+    t.is(parents[0].data._id, martha.data._id);
+  }
+
+  // Let's check it support basic query
+  parents = await bruce.getParents({limit: 1});
+  t.is(parents.length, 1);
+  parents = await bruce.getParents({name: /lady/});
+  t.is(parents.length, 0);
+  parents = await bruce.getParents({name: /mas/});
+  t.is(parents.length, 1);
+  t.is(parents[0].data.name, 'Thomas');
+});

@@ -16,6 +16,18 @@ test('Controller should map routes correctly', t => {
   t.not(routes['/v1/people'].get, undefined);
   t.not(routes['/v1/people/:id'].get, undefined);
 });
+test('Controller should support prefix', t => {
+  let Person = new Model('block')
+    .field('name')
+    .done()
+  .done();
+
+  let routes = new Controller(Person).prefix('/foo').done();
+
+  // console.log(routes);
+  t.not(routes['/v1/foo/people'].get, undefined);
+  t.not(routes['/v1/foo/people/:id'].get, undefined);
+});
 
 
 test('Controller should be able to query', async t => {
@@ -47,7 +59,7 @@ test('Controller should be able to query', async t => {
     t.not(pet.name, undefined);
     t.not(pet.legs, undefined);
   }
-  
+
   ctx = {
     params:  {},
     query: {

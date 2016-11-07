@@ -6,6 +6,7 @@ import mkdirp from 'mkdirp';
 import Lazy from 'lazy.js';
 
 import pascalCase from 'pascal-case';
+import pluralize from 'pluralize';
 import snakeCase from 'snake-case';
 
 
@@ -78,6 +79,7 @@ class Model {
     this.dbName = snakeCase(name) + 's';
     this.dbPath = conf.rootDir + '/data/' + this.dbName + '.db';
     this.fields = [];
+    this.relations = [];
 
     this.field('_id').string();
   }
@@ -85,6 +87,14 @@ class Model {
     let field = new ModelField(name, this);
     this.fields.push(field);
     return field;
+  }
+  oneToMany(manyModel, fieldName) {
+    this.relations.push({
+      model: manyModel,
+      fieldName: fieldName,
+      type: 'oneToMany'
+    });
+    return this;
   }
   noDuplicates() {
     this._noDuplicates = true;
@@ -224,6 +234,21 @@ class Model {
     //
     //   }
     // }
+
+    for (let rel of this.relations) {
+      if (rel.type === 'oneToMany') {
+        let m = 'get' + pascalCase(pluralize(rel.model.model.name));
+        // console.log(m);
+        model.prototype[m] = function (query) {
+          query = query || {};
+          if (!this._id) {
+            throw new Error('Can\'t get children of unserialized object');
+          }
+          query[rel.fieldName] = this._id;
+          return rel.model.find(query);
+        }
+      }
+    }
     return model;
   }
 }

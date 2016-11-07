@@ -5,6 +5,10 @@ class Controller {
   constructor(model) {
     this._model = model;
   }
+  prefix(prefix) {
+    this._prefix = prefix;
+    return this;
+  }
   allowPost() {
     this._allowPost = true;
     return this;
@@ -22,7 +26,9 @@ class Controller {
     return this;
   }
   done() {
-    let self = this, routes = {}, base = '/v1/' + pluralize(this._model.model.name);
+    let self = this, routes = {},
+      base = '/v1' + (this._prefix || '') + '/'
+        + pluralize(this._model.model.name);
 
     routes[base] = {
       get: async (ctx, next) => {
@@ -96,16 +102,17 @@ class Controller {
       }
     }
 
+
     // for (let index in this._model.fields) {
     //   let field = this._model.fields[index];
-    //   if (field.type === 'oneToOne') {
-    //     // routes[base + '/:id/' + pluralize(field.name)] = {
-    //     //   get: async (ctx, next) => {
-    //     //     let res = await self.
-    //     //   }
-    //     // }
+    //   if (field.type === 'oneToMany') {
+    //     routes[base + '/:id/' + pluralize(field.name)] = {
+    //       get: async (ctx, next) => {
+    //         let res = await self.
+    //       }
+    //     }
     //   }
-
+    //
     // }
     return routes;
   }
