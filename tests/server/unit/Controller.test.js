@@ -214,3 +214,54 @@ test('should support allowPost, put and del', async t => {
   .done();
 
 });
+
+test('supports oneToMany relations', async t => {
+
+    let Parent = (new Model('parent'))
+      .field('name')
+        .string()
+        .required()
+        .defaultParam()
+        .done()
+      .field('childId')
+        .string()
+        .done()
+      .done();
+
+    let Child = (new Model('child'))
+      .field('name')
+        .string()
+        .required()
+        .defaultParam()
+        .done()
+      .oneToMany(Parent, 'childId')
+      .done();
+    let bruce = new Child('Bruce');
+    await bruce.create();
+
+    let thomas = new Parent('Thomas');
+    thomas.data.childId = bruce.data._id;
+    await thomas.create();
+
+    let martha = new Parent('Martha');
+    martha.data.childId = bruce.data._id;
+    await martha.create();
+
+    let yourMother = new Parent('Lady of the night'); // :D :D :D
+    await yourMother.create();
+
+    let routes = new Controller(Child).done();
+    let ctx = {
+      params: {
+        id: bruce._id
+      },
+      query: {}
+    }
+    await routes['/v1/children/:id/parents'].get(ctx);
+    t.is(ctx.body.data.length, 2);
+
+    ctx.query.name = 'Thomas';
+    await routes['/v1/children/:id/parents'].get(ctx);
+    t.is(ctx.body.data.length, 1);
+    t.is(ctx.body.data[0].name, 'Thomas');
+})

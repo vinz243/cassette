@@ -1,5 +1,6 @@
-import pluralize from 'pluralize';
 import Lazy from 'lazy.js';
+import pascalCase from 'pascal-case';
+import pluralize from 'pluralize';
 
 class Controller {
   constructor(model) {
@@ -101,7 +102,26 @@ class Controller {
         }
       }
     }
-
+    for (let rel of this._model.model.relations) {
+      if (rel.type === 'oneToMany') {
+        let m = 'get' + pascalCase(pluralize(rel.model.model.name));
+        let path = base + '/:id/' + pluralize(rel.model.model.name);
+        routes[path] = {
+          get: async (ctx, next) => {
+            let doc = await self._model.findById(ctx.params.id);
+            let res = await doc[m](ctx.query);
+            ctx.body = {
+              status: 'success',
+              data: res.map(d => d.data),
+              length: res.length,
+              payload: {
+                query: res.query
+              }
+            }
+          }
+        }
+      }
+    }
 
     // for (let index in this._model.fields) {
     //   let field = this._model.fields[index];
