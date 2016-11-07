@@ -24,9 +24,8 @@ test('Controller should support prefix', t => {
 
   let routes = new Controller(Person).prefix('/foo').done();
 
-  // console.log(routes);
-  t.not(routes['/v1/foo/people'].get, undefined);
-  t.not(routes['/v1/foo/people/:id'].get, undefined);
+  t.not(routes['/v1/foo/blocks'].get, undefined);
+  t.not(routes['/v1/foo/blocks/:id'].get, undefined);
 });
 
 
