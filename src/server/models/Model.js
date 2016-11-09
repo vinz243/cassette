@@ -2,6 +2,7 @@ import Datastore from 'nedb-promise';
 import conf from '../../../config.js';
 import config from './config.js';
 
+import assert from 'assert';
 import mkdirp from 'mkdirp';
 import Lazy from 'lazy.js';
 
@@ -89,6 +90,7 @@ class Model {
     return field;
   }
   oneToMany(manyModel, fieldName) {
+    assert(manyModel !== undefined);
     this.relations.push({
       model: manyModel,
       fieldName: fieldName,
@@ -138,12 +140,10 @@ class Model {
     model.model = self;
     model.prototype.getPayload = function () {
       let payload = {};
-      // console.log(self.fields);
+
       for (let index in self.fields) {
         let field = self.fields[index];
         let value = this.data[field.name];
-
-        // console.log(field, value);
 
         if (typeof value === 'undefined' && field._required)
           throw new Error(`Field ${field.name} is required`);
@@ -151,7 +151,6 @@ class Model {
         if (field.validator && !field.validator(value)) {
           if (field._required)
             throw new Error(`Field ${field.name} is required but has invalid value`);
-          // else console.log('    Warning: dropping ' + field.name + ' as ' + value);
         } else {
           payload[field.name] = value;
         }
@@ -204,13 +203,13 @@ class Model {
       let q = Lazy(query)
         .omit(self.fields.filter(f => f.notIdentity))
         .pick(self.fields.map(f => f.name))
-        // .concat(['sort', 'skip', 'limit', 'direction'])
         .value();
 
       // if (Object.keys(q).length  == 0 && !self.acceptsEmptyQuery
       //   && !forceEmpty) {
       //   throw new Error('Empty or invalid query');
       // }
+
       let opts = Lazy(query).pick([
         'limit', 'offset', 'sort', 'direction'
       ]).value();
@@ -222,9 +221,10 @@ class Model {
       let sort = {};
       sort[opts.sort || 'name'] = opts.direction ?
         (opts.direction == 'asc' ? 1 : -1) : 1;
-      // console.log()
+
       let res = (await db.cfind(q).sort(sort).limit(opts.limit)
         .skip(opts.skip || 0).exec()).map(d => new model(d));
+
       res.query = Lazy(q).merge(opts).value();
       return res;
     }
@@ -236,9 +236,9 @@ class Model {
     // }
 
     for (let rel of this.relations) {
+
       if (rel.type === 'oneToMany') {
         let m = 'get' + pascalCase(pluralize(rel.model.model.name));
-        // console.log(m);
         model.prototype[m] = function (query) {
           query = query || {};
           if (!this._id) {

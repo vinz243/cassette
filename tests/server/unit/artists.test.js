@@ -1,4 +1,4 @@
-import {Artist} from '../../../src/server/models';
+import {Artist, Album} from '../../../src/server/models';
 import supertest from 'supertest-as-promised';
 import app from '../../../src/server/server.js';
 
@@ -8,7 +8,7 @@ import test from 'ava';
 const request = supertest((app));
 
 
-test('lists artists', async t => {
+test('/v1/artists', async t => {
   let res = await request.get('/v1/artists');
   t.is(res.body.length, 0);
   t.is(res.body.data.length, 0);
@@ -23,7 +23,7 @@ test('lists artists', async t => {
   t.fail('created artist not found');
 });
 
-test('get one artist', async t => {
+test('/v1/artists/:id', async t => {
   let systemOfADown = new Artist('System Of A Dawn');
   systemOfADown.data.genre = 'Alt Metal';
   await systemOfADown.create();
@@ -33,7 +33,7 @@ test('get one artist', async t => {
   t.is(res.body.data.genre, 'Alt Metal');
 });
 
-test('search artists', async t => {
+test('/v1/artists/:id/searches', async t => {
   await (new Artist('TestA')).create();
   await (new Artist('TestB')).create();
   await (new Artist('TestC')).create();
@@ -43,4 +43,48 @@ test('search artists', async t => {
     name: '/test/'
   });
   t.is(res.body.length, 3);
+});
+
+test('/v1/artists/:id/albums', async t => {
+  let alborosie = new Artist({
+    name: 'Alborosie',
+    genre: 'Reggae'
+  });
+  await alborosie.create();
+
+  let soulPirate = new Album({
+    name: 'Soul Pirate',
+    artistId: alborosie._id
+  });
+  await soulPirate.create();
+
+  let freedomFyah = new Album({
+    name: 'Freedom & Fyah',
+    artistId: alborosie._id
+  });
+  await freedomFyah.create()
+
+  // Create another artist&album
+  let coldplay = new Artist({
+    name: 'Coldplay',
+    genre: 'Commercialized Music'
+  });
+  await coldplay.create();
+
+  let ghostStories = new Album({
+    name: 'Ghost Stories',
+    artistId: coldplay._id
+  });
+  await ghostStories.create();
+
+  let res = await request.get('/v1/artists/'+alborosie._id+'/albums')
+    .expect(200);
+  t.is(res.body.length, 2);
+  t.is(res.body.data.length, 2);
+
+  t.not(res.body.data[0].name, undefined);
+  t.not(res.body.data[1].name, undefined);
+
+  t.is(res.body.data[0].artistId, alborosie._id);
+  t.is(res.body.data[1].artistId, alborosie._id);
 });

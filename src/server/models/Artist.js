@@ -1,10 +1,6 @@
-import Datastore from 'nedb-promise';
-
-import conf from '../../../config.js';
-import config from './config.js';
-import mkdirp from 'mkdirp';
-import Model from './Model'
-import Lazy from 'lazy.js';
+import Album from './Album';
+import Track from './Track';
+import Model from './Model';
 
 // ARTIST SCHEMA:
 //   _id: artistsid
@@ -22,6 +18,8 @@ let Artist = (new Model('artist'))
     .string()
     .done()
   .noDuplicates()
+  .oneToMany(Album, 'artistId')
+  .oneToMany(Track, 'artistId')
   .done();
 
 export default Artist;
