@@ -1,4 +1,4 @@
-import {Artist, Album} from '../../../src/server/models';
+import {Artist, Album, Track} from '../../../src/server/models';
 import supertest from 'supertest-as-promised';
 import app from '../../../src/server/server.js';
 
@@ -16,7 +16,6 @@ test('/v1/artists', async t => {
   await (new Artist({name: 'Foo'})).create();
 
   res = await request.get('/v1/artists');
-  console.log(res.body);
   for(let artist of res.body.data) {
     if ((artist || {}).name === 'Foo') return;
   }
@@ -44,8 +43,7 @@ test('/v1/artists/:id/searches', async t => {
   });
   t.is(res.body.length, 3);
 });
-
-test('/v1/artists/:id/albums', async t => {
+test('/v1/artists/:id/albums and tracks', async t => {
   let alborosie = new Artist({
     name: 'Alborosie',
     genre: 'Reggae'
@@ -87,4 +85,10 @@ test('/v1/artists/:id/albums', async t => {
 
   t.is(res.body.data[0].artistId, alborosie._id);
   t.is(res.body.data[1].artistId, alborosie._id);
+
+  await (new Track({name: 'Herbalist', artistId: alborosie._id})).create();
+
+  res = await request.get('/v1/artists/'+alborosie._id+'/tracks');
+  t.is(res.body.length, 1);
+  t.is(res.body.data[0].name, 'Herbalist');
 });

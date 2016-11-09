@@ -1,3 +1,4 @@
+import assert from 'assert';
 import Lazy from 'lazy.js';
 import pascalCase from 'pascal-case';
 import pluralize from 'pluralize';
@@ -109,6 +110,21 @@ class Controller {
         routes[path] = {
           get: async (ctx, next) => {
             let doc = await self._model.findById(ctx.params.id);
+            if (!doc) {
+              ctx.body = {
+                status: 'failed',
+                data: {
+                  error_message: 'Document not found',
+                  error_code: 'ENOTFOUND'
+                },
+                payload: {
+                  query: res.query,
+                }
+              };
+
+              ctx.status = 404;
+              return;
+            }
             let res = await doc[m](ctx.query);
             ctx.body = {
               status: 'success',

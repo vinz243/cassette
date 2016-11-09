@@ -10,7 +10,6 @@ import pascalCase from 'pascal-case';
 import pluralize from 'pluralize';
 import snakeCase from 'snake-case';
 
-
 mkdirp.sync(conf.rootDir + '/data/')
 
 class ModelField {
