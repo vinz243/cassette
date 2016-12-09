@@ -1,5 +1,5 @@
-import Controller from '../../../src/server/controllers/Controller';
-import Model from '../../../src/server/models/Model';
+import Controller from './Controller';
+import Model from '../models/Model';
 
 import test from 'ava';
 

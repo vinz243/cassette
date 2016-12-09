@@ -1,0 +1,8 @@
+{
+  "dev": {
+    "rootDir": "/Users/Vincent/.cassette/"
+  },
+  "test": {
+    "rootDir": "/Users/Vincent/.cassette/"
+  }
+}

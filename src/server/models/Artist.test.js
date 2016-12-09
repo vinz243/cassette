@@ -1,4 +1,4 @@
-import {Artist} from '../../../src/server/models';
+import {Artist} from './index';
 
 import test from 'ava';
 

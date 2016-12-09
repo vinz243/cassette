@@ -1,4 +1,4 @@
-import {Artist, Album, Track} from '../../../src/server/models';
+import {Artist, Album, Track} from './index';
 
 import test from 'ava';
 

@@ -2,7 +2,7 @@ import agent from 'supertest-koa-agent';
 import config from '../../../config';
 import supertest from 'supertest-as-promised'
 import test from 'ava';
-import app from '../../../src/server/server.js';
+import app from '../server.js';
 
 const request = supertest((app));
 

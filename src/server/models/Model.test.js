@@ -1,4 +1,4 @@
-import Model from '../../../src/server/models/Model';
+import Model from './Model';
 import test from 'ava';
 
 test('constructor should snake case db name', t => {

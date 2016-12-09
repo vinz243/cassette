@@ -1,4 +1,4 @@
-import {Artist, Album} from '../../../src/server/models';
+import {Artist, Album} from './index';
 
 import test from 'ava';
 
@@ -57,7 +57,7 @@ test('won\'t create fetched album', async t => {
   let a = await Album.findById(another._id);
   t.throws(a.create());
 });
-// 
+//
 // test('won\'t query nothing', async t => {
 //   t.throws(Album.find({}));
 //   t.throws(Album.find({foo: 'bar'}));

@@ -1,6 +1,6 @@
-import {Album} from '../../../src/server/models';
+import {Album} from '../models';
 import supertest from 'supertest-as-promised';
-import app from '../../../src/server/server.js';
+import app from '../server.js';
 
 import test from 'ava';
 

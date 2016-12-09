@@ -16,7 +16,7 @@ app.use((ctx, next) => {
   const start = new Date();
   return next().then(() => {
     const ms = new Date() - start;
-    console.log(chalk.dim(`    ${ctx.method} ${ctx.url} - ${ms}ms - ${ctx.status}`));
+    // console.log(chalk.dim(`    ${ctx.method} ${ctx.url} - ${ms}ms - ${ctx.status}`));
   });
 });
 app.use(body());

@@ -4,7 +4,7 @@ import mkdirp from 'mkdirp';
 
 mkdirp.sync(conf.rootDir + '/data/')
 
-console.log('  Using dir ' + conf.rootDir);
+// console.log('  Using dir ' + conf.rootDir);
 let db = new datastore(conf.rootDir + '/data/config.db');
 db.loadDatabase();
 

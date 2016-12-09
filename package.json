@@ -4,7 +4,8 @@
   "description": "Cassette is a modern music database manager and grabber buit on NodeJS",
   "main": "server.js",
   "scripts": {
-    "test": "ava tests -v",
+    "test": "ava -v",
+    "test-watch": "ava --watch",
     "start": "babel-node src/server/server.js --presets es2015,es2016,stage-2 --dev",
     "coverage": "cross-env NODE_ENV=test nyc npm test && nyc report --reporter=html",
     "coverage-travis": "cross-env NODE_ENV=test nyc npm test && nyc report --reporter=text-lcov | coveralls"
