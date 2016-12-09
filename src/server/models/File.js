@@ -1,7 +1,5 @@
-import Datastore from 'nedb-promise';
 import Lazy from 'lazy.js';
 
-import mkdirp from 'mkdirp';
 
 import Artist from './Artist';
 import Album from './Album';

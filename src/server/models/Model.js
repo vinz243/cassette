@@ -80,6 +80,7 @@ class Model {
     this.dbPath = conf.rootDir + '/data/' + this.dbName + '.db';
     this.fields = [];
     this.relations = [];
+    this.methods = []
 
     this.field('_id').string();
   }
@@ -103,6 +104,13 @@ class Model {
   }
   acceptsEmptyQuery() {
     this.acceptsEmptyQuery = true;
+    return this;
+  }
+  implement(funcName, func) {
+    this.methods.push({
+      name: funcName,
+      callback: func
+    });
     return this;
   }
   done() {
@@ -136,6 +144,13 @@ class Model {
       }
       this._id = this.data._id;
     }
+
+    // We add the custom functions
+    for (let index in self.methods) {
+        let method = self.methods[index];
+        model.prototype[method.name] = method.callback;
+    }
+
     model.model = self;
     model.prototype.getPayload = function () {
       let payload = {};

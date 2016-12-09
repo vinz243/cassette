@@ -1,16 +1,13 @@
 import body from 'koa-better-body';
-
 import chalk from 'chalk';
 import config from '../../config';
-
+import convert from 'koa-convert';
 import Koa from 'koa';
 import koaRouter from 'koa-router';
-
 import route from './routes';
 
 let app = new Koa();
 let router = koaRouter();
-
 
 app.use((ctx, next) => {
   const start = new Date();
@@ -19,7 +16,8 @@ app.use((ctx, next) => {
     // console.log(chalk.dim(`    ${ctx.method} ${ctx.url} - ${ms}ms - ${ctx.status}`));
   });
 });
-app.use(body());
+
+app.use(convert(body()));
 
 route(router);
 

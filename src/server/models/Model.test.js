@@ -268,3 +268,27 @@ test('oneToMany', async t => {
   t.is(parents.length, 1);
   t.is(parents[0].data.name, 'Thomas');
 });
+
+test('implements function work', t => {
+  let called = false
+
+  let say = (name, str) => {
+    t.is(name, 'Bacon');
+    t.is(str, 'meoooow');
+    called = true;
+  }
+  let Cat = new Model('cat')
+    .field('name')
+      .required()
+      .string()
+      .defaultParam()
+      .done()
+    .implement('getMeowing', function (length) {
+      return 'me' + 'o'.repeat(length) + 'w';
+    }).implement('meow', function (length) {
+      return say(this.data.name, this.getMeowing(length));
+    }).done();
+
+  (new Cat('Bacon')).meow(4);
+  t.truthy(called);
+})
