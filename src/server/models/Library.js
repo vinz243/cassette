@@ -1,4 +1,5 @@
 import Model from './Model';
+import Scan from './Scan';
 
 let Library = new Model('library')
   .field('name')
@@ -9,6 +10,7 @@ let Library = new Model('library')
   .field('path')
     .string()
     .done()
+  .oneToMany(Scan, 'libraryId')
   .done();
 
 export default Library;

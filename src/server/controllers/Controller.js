@@ -43,6 +43,29 @@ class Controller {
             query: res.query
           }
         }
+      },
+      post: async (ctx, next) => {
+        try {
+          let doc = new self._model(ctx.request.fields ||
+              ctx.request.body || {});
+          let payload = doc.getPayload();
+          let res = await doc.create();
+          ctx.status = 201;
+          ctx.body = {
+            status: 'success',
+            data: doc.data,
+            payload: payload
+          }
+        } catch (err) {
+          ctx.status = 500;
+          ctx.body = {
+            status: 'failure',
+            data:  {
+              message: err.message
+            }
+          }
+        }
+
       }
     };
 

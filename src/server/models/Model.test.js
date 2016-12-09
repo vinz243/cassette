@@ -1,5 +1,6 @@
 import Model from './Model';
 import test from 'ava';
+import process from 'process';
 
 test('constructor should snake case db name', t => {
   t.is((new Model('myDoc')).dbName, 'my_docs');
@@ -291,4 +292,32 @@ test('implements function work', t => {
 
   (new Cat('Bacon')).meow(4);
   t.truthy(called);
+});
+
+test('hooks', async t => {
+  let barks = 1;
+
+  let hook = function (self) {
+    // console.log(Object.getOwnPropertyNames(self));
+    self.bark();
+  }
+
+  let Dog = new Model('dog')
+    .field('name')
+      .required()
+      .string()
+      .defaultParam()
+      .done()
+    .implement('bark', () => {
+      barks += 1;
+    }).hook('construct:after', (self) => {
+      hook(self);
+    }).hook('create:before', hook)
+    .hook('create:after', hook)
+    .done();
+
+  let Beiley = new Dog('Beiley');
+  // t.is(barks, 2);
+  await Beiley.create();
+  t.is(barks, 4);
 })

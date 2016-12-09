@@ -3,6 +3,7 @@ import conf from '../../../config.js';
 import config from './config.js';
 
 import assert from 'assert';
+import events from 'events';
 import mkdirp from 'mkdirp';
 import Lazy from 'lazy.js';
 
@@ -80,7 +81,9 @@ class Model {
     this.dbPath = conf.rootDir + '/data/' + this.dbName + '.db';
     this.fields = [];
     this.relations = [];
-    this.methods = []
+    this.methods = [];
+
+    this.emitter = new events.EventEmitter();
 
     this.field('_id').string();
   }
@@ -91,6 +94,7 @@ class Model {
   }
   oneToMany(manyModel, fieldName) {
     assert(manyModel !== undefined);
+    assert(manyModel !== {});
     this.relations.push({
       model: manyModel,
       fieldName: fieldName,
@@ -113,8 +117,14 @@ class Model {
     });
     return this;
   }
+  hook(evt, callback) {
+    this.emitter.on(evt, callback);
+    return this;
+  }
+
   done() {
     let db = undefined, self = this;
+    self.emitter.emit('done:before');
 
     if (databases[self.dbPath]) {
       console.log('Not loading db again...');
@@ -126,6 +136,7 @@ class Model {
     }
 
     let model = function (d) {
+      self.emitter.emit('construct:before', this);
       if (typeof d === 'string') {
         if (self._default) {
           let val = d;
@@ -143,6 +154,7 @@ class Model {
         this.data[field.name] = value;
       }
       this._id = this.data._id;
+      self.emitter.emit('construct:after', this);
     }
 
     // We add the custom functions
@@ -153,6 +165,7 @@ class Model {
 
     model.model = self;
     model.prototype.getPayload = function () {
+      self.emitter.emit('getPayload:before', this);
       let payload = {};
 
       for (let index in self.fields) {
@@ -169,10 +182,12 @@ class Model {
           payload[field.name] = value;
         }
       }
+      self.emitter.emit('getPayload:after', this);
       return payload;
     }
 
     model.prototype.create = async function () {
+      self.emitter.emit('create:before', this);
       if (this._id || this.data._id)
         throw new Error('Object is already from database');
 
@@ -188,9 +203,10 @@ class Model {
       }
 
 
-      let res = await db.insert(this.getPayload());
+     let res = await db.insert(this.getPayload());
 
       this._id = this.data._id = res._id;
+      self.emitter.emit('create:after', this);
     }
 
     model.prototype.set = function (key, value) {
@@ -201,11 +217,13 @@ class Model {
     }
 
     model.prototype.update = async function (key, value) {
+      self.emitter.emit('update:before', this);
       if (!this._id) {
         throw new Error('Cannot update ghost model');
       }
 
       await db.update({_id: this._id}, this.getPayload());
+      self.emitter.emit('update:after', this);
       return;
     }
 
@@ -254,11 +272,13 @@ class Model {
       if (rel.type === 'oneToMany') {
         let m = 'get' + pascalCase(pluralize(rel.model.model.name));
         model.prototype[m] = function (query) {
+          self.emitter.emit(m + ':before', this);
           query = query || {};
           if (!this._id) {
             throw new Error('Can\'t get children of unserialized object');
           }
           query[rel.fieldName] = this._id;
+          self.emitter.emit(m + ':after', this);
           return rel.model.find(query);
         }
       }
