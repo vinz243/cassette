@@ -9,6 +9,7 @@ routes['/v1/libraries/:id/scans'].post = async (ctx, next) => {
   let scan = new Scan(ctx.params.id);
   scan.data.statusMessage = 'Pending...';
   scan.data.statusCode = 'PENDING';
+  scan.data.dryRun = (ctx.request.fields || ctx.request.body || {}).dryRun || false;
   await scan.create();
 
   ctx.status = 201;

@@ -23,12 +23,15 @@ test('POST /v1/libraries/:id/scans', async t => {
     name: 'Library #2',
     path: '/foo/bar'
   });
+  
   t.is(res.status, 201);
   let id = res.body.data._id;
 
-  let scanRes = await request.post('/v1/libraries/' + id + '/scans').send({});
+  let scanRes = await request.post('/v1/libraries/' + id + '/scans')
+    .send({dryRun: true});
   t.is(scanRes.status, 201);
   t.is(scanRes.body.data.statusCode, 'PENDING');
+  t.is(scanRes.body.data.dryRun, true);
 
   // let sId = scanRes.body.data._id;
   // await delay(500);
