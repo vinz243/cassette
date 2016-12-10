@@ -34,6 +34,10 @@ class ModelField {
     this.model._default = this.name;
     return this;
   }
+  defaultValue(val) {
+    this._defaultValue = val;
+    return this;
+  }
   float() {
     this.type = 'float';
     this.validator = (n) => Number(n) === n;
@@ -137,6 +141,7 @@ class Model {
 
     let model = function (d) {
       self.emitter.emit('construct:before', this);
+      d = d || {};
       if (typeof d === 'string') {
         if (self._default) {
           let val = d;
@@ -151,7 +156,7 @@ class Model {
       for (let index in self.fields) {
         let field = self.fields[index];
         let value = d[field.name];
-        this.data[field.name] = value;
+        this.data[field.name] = value || field._defaultValue;
       }
       this._id = this.data._id;
       self.emitter.emit('construct:after', this);

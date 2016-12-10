@@ -320,4 +320,17 @@ test('hooks', async t => {
   // t.is(barks, 2);
   await Beiley.create();
   t.is(barks, 4);
-})
+});
+
+test('default value', async t => {
+  let Bird = new Model('bird')
+    .field('tweet')
+      .string()
+      .defaultValue('tweet-tweet')
+      .done()
+    .done();
+
+  let sparrow = new Bird();
+  t.is(sparrow.data.tweet, 'tweet-tweet');
+
+});
