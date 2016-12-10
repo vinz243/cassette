@@ -73,6 +73,26 @@ test('field should type correctly to bool', t => {
   t.truthy(boolField.validator(true));
 });
 
+test('field should type correctly to any', t => {
+  let m = new Model('myModel');
+  let anyField = m.field('foo').any();
+
+  t.is(anyField.type, 'any');
+
+  t.truthy(anyField.validator('foo'));
+  t.truthy(anyField.validator());
+  t.truthy(anyField.validator({}));
+  t.truthy(anyField.validator(NaN));
+  t.truthy(anyField.validator(function() {}));
+  t.truthy(anyField.validator({
+    foo: 'bar',
+    numbers:  [1337, '42'],
+    cat: {dog: {this: {makes: {no: {sense: true}}}}}
+  }));
+  t.truthy(anyField.validator(true));
+  t.truthy(anyField.validator(true));
+});
+
 
 
 test('should chain calls without Error', t => {

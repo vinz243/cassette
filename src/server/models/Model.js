@@ -58,6 +58,11 @@ class ModelField {
     this.validator = (data) => typeof data === 'string';
     return this;
   }
+  any() {
+    this.type = 'any';
+    this.validator = (data) => true;
+    return this;
+  }
   regex(reg) {
     if(this.type !== 'string')
       throw new Error('Using regex on a non-string field');
