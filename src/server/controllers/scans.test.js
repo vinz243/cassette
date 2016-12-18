@@ -64,8 +64,43 @@ test.serial('list albums', async t => {
   t.truthy(res.body.data[0].name === 'Night Visions' || res.body.data[0].name === 'The Eminem Show (Explicit Version)');
   t.truthy(res.body.data[1].name === 'Night Visions' || res.body.data[1].name === 'The Eminem Show (Explicit Version)');
 });
-// test.serial('list files', async t => {
-//   console.log('/v1/files?path='+dir+'/Radioactive.flac');
-//   let res = await request.get('/v1/files?path='+dir+'/Radioactive.flac');
-//   console.log(res.body, res.status);
-// });
+
+let file = {};
+
+test.serial('list files', async t => {
+
+  let res = await request.get('/v1/files?path='+dir+'/Radioactive.flac');
+  t.is(res.status, 200);
+
+  file = res.body.data[0];
+  t.is(res.body.length, 1);
+  t.is(file.bitrate, 214391);
+});
+
+test.serial('see commercialized "artist"', async t =>{
+  let res = await request.get('/v1/artists/' + file.artistId);
+
+  let artist = res.body.data;
+  t.is(artist.name, 'Imagine Dragons');
+});
+
+test.serial('see commercialized track > /v1/tracks', async t => {
+  let res = await request.get('/v1/tracks/' + file.trackId);
+
+  let track = res.body.data;
+  t.is(track.name, 'Radioactive');
+});
+
+test.serial('see commercialized track > /v1/artists/id/tracks', async t => {
+  let res = await request.get('/v1/artists/'+ file.artistId + '/tracks');
+  
+  let track = res.body.data[0];
+  t.is(track.name, 'Radioactive');
+});
+test.serial('see commercialized file > /v1/tracks/id/files', async t => {
+  let res = await request.get('/v1/tracks/'+ file.trackId + '/files');
+  
+  let f = res.body.data[0];
+  t.is(f.bitrate, 214391);
+  t.is(f.path, file.path);
+});

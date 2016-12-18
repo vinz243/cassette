@@ -6,6 +6,7 @@ import mkdirp from 'mkdirp';
 import Lazy from 'lazy.js';
 
 import Model from './Model';
+import File from './File';
 
 let Track = (new Model('track'))
   .field('name')
@@ -23,6 +24,7 @@ let Track = (new Model('track'))
   .field('artistId')
     .oneToOne()
     .done()
+  .oneToMany(File, 'trackId')
   .noDuplicates()
   .done();
 
