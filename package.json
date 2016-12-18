@@ -28,6 +28,7 @@
     "nedb-promise": "^2.0.0",
     "pascal-case": "^2.0.0",
     "pluralize": "^3.0.0",
+    "scanpel": "^0.3.2",
     "shortid": "^2.2.6",
     "snake-case": "^2.1.0",
     "webpack": "^1.13.2"

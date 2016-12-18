@@ -1,5 +1,6 @@
 import {Library, Scan} from '../models';
 import supertest from 'supertest-as-promised';
+import path from 'path';
 import app from '../server.js';
 
 import test from 'ava';
@@ -18,7 +19,7 @@ test('POST /v1/libraries', async t => {
   t.is(res.status, 201);
 
 });
-test('POST /v1/libraries/:id/scans', async t => {
+test('POST /v1/libraries/:id/scans dryRun', async t => {
   let res = await request.post('/v1/libraries').send({
     name: 'Library #2',
     path: '/foo/bar'
