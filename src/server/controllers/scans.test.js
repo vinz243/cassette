@@ -46,10 +46,20 @@ test.serial('check result', async t => {
 	assert(libraryId !== undefined);
 	assert(scanId !== undefined);
 
-  await delay(1337);
+  await delay(250);
 
   let res = await request.get(`/v1/libraries/${libraryId}/scans/${scanId}`);
 
+  const MAX_RETRY = 40;
+  let retries = 1;
+  while(res.body.data.statusCode === "PENDING") {
+    await delay(250);
+    res = await request.get(`/v1/libraries/${libraryId}/scans/${scanId}`);
+    retries = retries + 1;
+    if (retries > MAX_RETRY) {
+      throw new Error('Max retries exceeded');
+    }
+  }
   t.is(res.body.data.statusCode, 'DONE');
 });
 
