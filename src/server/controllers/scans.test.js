@@ -62,7 +62,7 @@ test.serial('check result', async t => {
   }
   t.is(res.body.data.statusCode, 'DONE');
 });
-
+let albumId = '';
 test.serial('list albums', async t => {
   assert(libraryId !== undefined);
   assert(scanId !== undefined);
@@ -73,6 +73,14 @@ test.serial('list albums', async t => {
 
   t.truthy(res.body.data[0].name === 'Night Visions' || res.body.data[0].name === 'The Eminem Show (Explicit Version)');
   t.truthy(res.body.data[1].name === 'Night Visions' || res.body.data[1].name === 'The Eminem Show (Explicit Version)');
+
+  if (res.body.data[0].name === 'Night Visions') {
+    t.is(res.body.data[1].name, 'The Eminem Show (Explicit Version)');
+    albumId = res.body.data[0].albumId;
+  } else {
+    t.is(res.body.data[1].name, 'Night Visions');
+    albumId = res.body.data[1].albumId;
+  }
 });
 
 let file = {};
@@ -84,7 +92,7 @@ test.serial('list files', async t => {
 
   file = res.body.data[0];
   t.is(res.body.length, 1);
-  t.is(file.bitrate, 214391);
+  t.is(file.path, dir + '/Radioactive.flac');
 });
 
 test.serial('see commercialized "artist"', async t =>{
@@ -111,6 +119,6 @@ test.serial('see commercialized file > /v1/tracks/id/files', async t => {
   let res = await request.get('/v1/tracks/'+ file.trackId + '/files');
   
   let f = res.body.data[0];
-  t.is(f.bitrate, 214391);
+  // t.is(f.bitrate, 214391);
   t.is(f.path, file.path);
 });
