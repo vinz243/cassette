@@ -50,13 +50,15 @@
 
 	var _vue2 = _interopRequireDefault(_vue);
 
+	var _app = __webpack_require__(3);
+
+	var _app2 = _interopRequireDefault(_app);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	new _vue2.default({
 	  el: '#main',
-	  data: {
-	    message: "Hello Vue"
-	  }
+	  components: { App: _app2.default }
 	});
 
 /***/ },
@@ -8575,6 +8577,30 @@
 	};
 	process.umask = function() { return 0; };
 
+
+/***/ },
+/* 3 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+		value: true
+	});
+	exports.default = {
+		template: __webpack_require__(4),
+		data: function data() {
+			return {
+				msg: "Hello World!"
+			};
+		}
+	};
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	module.exports = "\n\t\n<div class=\"message\">{{ msg }}</div>\n\n";
 
 /***/ }
 /******/ ]);

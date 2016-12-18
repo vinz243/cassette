@@ -5,6 +5,7 @@ module.exports = {
   output: {
     // To the `dist` folder
     path: './public/dist',
+    public: 'public/dist/',
     // With the filename `build.js` so it's dist/build.js
     filename: 'build.js'
   },
@@ -18,12 +19,25 @@ module.exports = {
         loader: 'babel',
         // don't transform node_modules folder (which don't need to be compiled)
         exclude: /node_modules/
+      },
+      {
+        test: /\.vue$/,
+        loader: 'vue'
+      },
+      {
+        test: /\.html$/,
+        loader: 'vue-html'
       }
     ]
   },
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.common.js'
+    }
+  },
+  vue: {
+    loaders: {
+      js: 'babel'
     }
   }
 }
