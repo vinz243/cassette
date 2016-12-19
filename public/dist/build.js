@@ -8591,7 +8591,7 @@
 		template: __webpack_require__(4),
 		data: function data() {
 			return {
-				msg: "Hello World!"
+				msg: "Hello World! no"
 			};
 		}
 	};
@@ -8600,7 +8600,7 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	module.exports = "\n\t\n<div class=\"message\">{{ msg }}</div>\n\n";
+	module.exports = "\n\t\n<div class=\"message\">{{ msg }} yes yes</div>\n\n";
 
 /***/ }
 /******/ ]);
