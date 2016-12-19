@@ -5,7 +5,6 @@ import convert from 'koa-convert';
 import Koa from 'koa';
 import koaRouter from 'koa-router';
 import route from './routes';
-
 let app = new Koa();
 let router = koaRouter();
 
@@ -24,5 +23,6 @@ route(router);
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-
-export default app.listen();
+let res = app.listen();
+res.app = app;
+export default res;

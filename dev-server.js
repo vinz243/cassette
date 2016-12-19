@@ -1,4 +1,5 @@
 // Creates a hot reloading development environment
+require('babel-polyfill');
 
 const path = require('path');
 const express = require('express');
@@ -7,6 +8,8 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const DashboardPlugin = require('webpack-dashboard/plugin');
 const config = require('./config/webpack.config.development');
+const backend = require('./lib/server/server').default;
+// console.log(backend);
 
 const app = express();
 const compiler = webpack(config);
@@ -32,6 +35,14 @@ app.use(webpackDevMiddleware(compiler, {
 }));
 
 app.use(webpackHotMiddleware(compiler));
+const callback = backend.app.callback();
+app.use((req, res, next) => {
+  if(req.path.startsWith('/v1/')) {
+    callback(req, res);
+} else {
+  next();
+}
+});
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, './src/client/assets/index.html'));
