@@ -1,6 +1,24 @@
 language: node_js
+
 before_install:
-  - sudo apt-get install ffmpeg
+  - sudo apt-get install ffmpee
+
 node_js:
   - "6"
-script: "npm run coverage-travis -- -v"
+
+script: 
+  - npm run test
+  - npm run lint
+  - npm run jscs
+  - npm run prebuild
+  - npm run build
+  - npm run build:html
+  - npm run coverage-travis -- -v
+
+cache:
+  directories:
+    - node_modules
+
+install:
+  - npm i -g npm@latest
+  - sudo npm install
