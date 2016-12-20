@@ -1,7 +1,7 @@
 language: node_js
 
 before_install:
-  - sudo apt-get install ffmpee
+  - sudo apt-get install ffmpeg
 
 node_js:
   - "6"
@@ -13,7 +13,7 @@ script:
   - npm run prebuild
   - npm run build
   - npm run build:html
-  - npm run coverage-travis -- -v
+  - npm run backend:coverage-travis -- -v
 
 cache:
   directories:
@@ -21,4 +21,4 @@ cache:
 
 install:
   - npm i -g npm@latest
-  - sudo npm install
+  - npm install
