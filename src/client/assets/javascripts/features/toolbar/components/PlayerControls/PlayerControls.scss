@@ -1,11 +1,9 @@
-$iconOpacity: 0.2;
+$iconOpacity: 0.3;
 $volumIconSize: 1.2em;
 
 .playerControls {
-	margin: 0 auto;
-	width: 42%;
 	vertical-align: middle;
-	line-height: 25px;
+	// line-height: 25px;
 }
 .rewindControl {
 	margin-top: 0.2em;
@@ -40,7 +38,6 @@ $volumIconSize: 1.2em;
 	}
 }
 .ant-slider {
-
     border-top: 4px solid rgb(224, 223, 223);
     border-bottom: 4px solid rgb(224, 223, 223);
 }
@@ -67,7 +64,7 @@ $volumIconSize: 1.2em;
 		height: $volumIconSize;
 		width: $volumIconSize;
 	}
-	padding-right: 15px;
+	margin-right: 15px;
 }
 
 .soundSliderRightIcon {

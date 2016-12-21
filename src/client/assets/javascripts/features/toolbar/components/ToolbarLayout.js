@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 import PlayerControls from './PlayerControls';
+import CurrentTrackStatus from './CurrentTrackStatus';
 import './ToolbarApp.scss';
 import {Row, Col} from 'antd';
-import 'antd/dist/antd.css'; 
+import 'antd/dist/antd.css';
 
 export default class ToolbarLayout extends Component {
   static propTypes = {
@@ -13,11 +14,19 @@ export default class ToolbarLayout extends Component {
     const { toolbar, actions } = this.props;
     return (
     	<div>
-        <Row className="mainRow">
-          <Col xs={24} span={8}>
+        <Row className="mainRow" gutter={64}>
+          <Col span={1}></Col>
+          <Col span={7}>
+            <PlayerControls {...this.props} />
+  	      </Col>
+          <Col span={7} className="currentTrackStatusCol">
+            <CurrentTrackStatus {...this.props} />
+  	      </Col>
+          <Col span={7}>
             <PlayerControls  {...this.props} />
-    	     </Col>
-          </Row>
+  	      </Col>
+          <Col span={2}></Col>
+        </Row>
       </div>
     );
   }

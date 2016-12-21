@@ -12,7 +12,7 @@ import GoMute from 'react-icons/lib/go/mute';
 import GoUnmute from 'react-icons/lib/go/unmute';
 
 
-export default class ToolbarLayout extends Component {
+export default class PlayerControls extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     toolbar: PropTypes.object.isRequired
@@ -23,40 +23,44 @@ export default class ToolbarLayout extends Component {
 
     return (
     	<div className="controlsContainer">
-	    	<div className="playerControls">
-	    		<Row gutter={16}>
-	    			<Col span={4}>
-	    				<div className="rewindControl">
-	    					<GoPlaybackRewind />
-	    				</div>
-	    			</Col>
-	    			<Col span={4}>
-	    				<div className="playbackControl">
-	    					<GoPlaybackPause />
-	    				</div>
-	    			</Col>
-	    			<Col span={4}>
-	    				<div className="fastForwardControl">
-	    					<GoPlaybackFastForward />
-	    				</div>
-	    			</Col>
-	    			<Col span={1}>
-	    			</Col>
-	    			<Col span={1}>
-	    				<div className="soundSliderLeftIcon">
-	    					<GoMute />
-	    				</div>
-	    			</Col>
-	    			<Col span={8}>
-	    				<Slider />
-	    			</Col>
-	    			<Col span={1}>
-	    				<div className="soundSliderRightIcon">
-	    					<GoUnmute />
-	    				</div>
-	    			</Col>
-	    			<Col span={1}>
-	    			</Col>
+	    	<div>
+	    		<Row gutter={24} className="playerControls">
+	    			<Col span={12}>
+	    				<Row gutter={16}>
+			    			<Col span={8}>
+			    				<div className="rewindControl">
+			    					<GoPlaybackRewind />
+			    				</div>
+			    			</Col>
+			    			<Col span={8}>
+			    				<div className="playbackControl">
+			    					<GoPlaybackPause />
+			    				</div>
+			    			</Col>
+			    			<Col span={8}>
+			    				<div className="fastForwardControl">
+			    					<GoPlaybackFastForward />
+			    				</div>
+			    			</Col>
+		    			</Row>
+		    		</Col>
+	    			<Col span={12}>
+	    				<Row gutter={8}>
+	    					<Col span={4}>
+			    				<div className="soundSliderLeftIcon">
+			    					<GoMute />
+	    						</div>
+	    					</Col>
+	    					<Col span={16}>
+	    						<Slider />
+	    					</Col>
+	    					<Col span={4}>
+			    				<div className="soundSliderRightIcon">
+			    					<GoUnmute />
+			    				</div>
+			    			</Col>
+			    		</Row>
+			    	</Col>
 	    		</Row>
 	    	</div>
 	    </div>

@@ -1,0 +1,35 @@
+$iconOpacity: 0.3;
+
+.currentTrackStatus {
+  color: rgba(0, 0, 0, $iconOpacity);
+}
+
+.currentTrackTitle {
+  width: 100%;
+  margin-top: 5px;
+
+  text-align: center;
+
+  font-weight: bold;
+  font-size: 0.96em;
+}
+
+.currentTrackSubtitle {
+  width: 100%;
+
+  text-align: center;
+  font-size: 0.8em;
+}
+
+.currentTime {
+  font-size: 0.7em;
+}
+
+.timeLeft  {
+  font-size: 0.7em;
+}
+
+.trackTimeSlider {
+  margin-top: 8px;
+  margin-bottom: 2px;
+}
