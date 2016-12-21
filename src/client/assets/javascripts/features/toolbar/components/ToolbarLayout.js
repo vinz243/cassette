@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import PlayerControls from './PlayerControls';
 import CurrentTrackStatus from './CurrentTrackStatus';
+import BrowserControls from './BrowserControls';
 import './ToolbarApp.scss';
 import {Row, Col} from 'antd';
 import 'antd/dist/antd.css';
@@ -23,7 +24,7 @@ export default class ToolbarLayout extends Component {
             <CurrentTrackStatus {...this.props} />
   	      </Col>
           <Col span={7}>
-            <PlayerControls  {...this.props} />
+            <BrowserControls  {...this.props} />
   	      </Col>
           <Col span={2}></Col>
         </Row>

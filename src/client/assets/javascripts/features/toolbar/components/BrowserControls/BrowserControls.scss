@@ -1,0 +1,28 @@
+$iconOpacity: 0.3;
+
+.browserControls {
+  height: 1em;
+}
+.viewType, .logoutIcon{
+  display: inline;
+  line-height: 4.5em;
+  // margin-right: 1.5em;
+
+  color: rgba(0, 0, 0, $iconOpacity);
+
+
+  svg {
+    height: 1.5em;
+    width: 1.5em;
+  }
+}
+
+.searchCol {
+  line-height: 4.5em;
+  div {
+    width: 100%;
+  }
+}
+.selectedViewType {
+  color: #279fec;
+}
