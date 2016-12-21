@@ -31,7 +31,8 @@ module.exports = {
       name: 'vendor',
       filename: 'js/vendor.bundle.js',
       minChunks: Infinity
-    })
+    }),
+    // ["import", { libraryName: "antd", style: "css" }]
   ],
   module: {
     loaders: [

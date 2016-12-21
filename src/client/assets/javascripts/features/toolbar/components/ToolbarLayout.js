@@ -1,6 +1,8 @@
 import React, { Component, PropTypes } from 'react';
-
+import PlayerControls from './PlayerControls';
 import './ToolbarApp.scss';
+import {Row, Col} from 'antd';
+import 'antd/dist/antd.css'; 
 
 export default class ToolbarLayout extends Component {
   static propTypes = {
@@ -9,11 +11,14 @@ export default class ToolbarLayout extends Component {
 
   render() {
     const { toolbar, actions } = this.props;
-    console.log(this.props, toolbar);
     return (
     	<div>
-    		Hello there!
-    	</div>
+        <Row className="mainRow">
+          <Col xs={24} span={8}>
+            <PlayerControls  {...this.props} />
+    	     </Col>
+          </Row>
+      </div>
     );
   }
 }

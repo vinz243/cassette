@@ -1,0 +1,79 @@
+$iconOpacity: 0.2;
+$volumIconSize: 1.2em;
+
+.playerControls {
+	margin: 0 auto;
+	width: 42%;
+	vertical-align: middle;
+	line-height: 25px;
+}
+.rewindControl {
+	margin-top: 0.2em;
+	height: 2em;
+	width: 2em;
+
+	border-radius: 1em;
+	border: 2.5px solid rgba(0, 0, 0, $iconOpacity);
+	svg {
+		height: 1.5em;
+		width: 1.5em;
+		color: rgba(0, 0, 0, $iconOpacity);
+	}
+}
+.controlsContainer {
+	padding-top: 25px;
+	height: 80px;
+}
+.playbackControl {
+	height: 2.5em;
+	width: 2.5em;
+
+	padding-top: 0.15em;
+	padding-left: 0.15em;
+
+	border-radius: 1.25em;
+	border: 2.5px solid rgba(0, 0, 0, $iconOpacity);
+	svg {
+		height: 2em;
+		width: 2em;
+		color: rgba(0, 0, 0, $iconOpacity);
+	}
+}
+.ant-slider {
+
+    border-top: 4px solid rgb(224, 223, 223);
+    border-bottom: 4px solid rgb(224, 223, 223);
+}
+
+.fastForwardControl {
+	margin-top: 0.2em;
+	margin-left: 0.4em;
+	height: 2em;
+	width: 2em;
+	padding-left: 0.2em;
+
+	border-radius: 1em;
+	border: 2.5px solid rgba(0, 0, 0, $iconOpacity);
+	svg {
+		height: 1.5em;
+		width: 1.5em;
+		color: rgba(0, 0, 0, $iconOpacity);
+	}
+}
+
+.soundSliderLeftIcon {
+	color: rgba(0,0,0, $iconOpacity);
+	svg {
+		height: $volumIconSize;
+		width: $volumIconSize;
+	}
+	padding-right: 15px;
+}
+
+.soundSliderRightIcon {
+	color: rgba(0, 0, 0, $iconOpacity);
+	svg {
+		height: $volumIconSize;
+		width: $volumIconSize;
+	}
+}
