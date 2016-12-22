@@ -11,6 +11,8 @@ const SET_VOLUME = 'cassette/toolbar/SET_VOLUME';
 const SET_TRACK_TIME = 'cassette/toolbar/SET_TRACK_TIME';
 const SET_VIEW_TYPE = 'cassette/toolbar/SET_VIEW_TYPE';
 const SEARCH = 'cassette/toolbar/SEARCH';
+const PLAY_TRACKS = 'cassette/shared/PLAY_TRACKS'; // SHARED namespace
+
 
 const PREVIOUS_TRESHOLD = 2000;
 
@@ -103,7 +105,12 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			newState.currentTime = Math.min(Math.max(action.value, 0.0), state.currentTrack.duration);
 
 			return newState;
-
+    case PLAY_TRACKS:
+      newState.currentTrack = action.tracks[0];
+      newState.previousTrack = state.currentTrack;
+      newState.nextTrack = action.tracks[1];
+      newState.currentTime = 0.0;
+      return newState;
 		case SET_VIEW_TYPE:
 			return newState;
 

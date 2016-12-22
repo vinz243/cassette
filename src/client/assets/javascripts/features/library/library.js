@@ -11,6 +11,7 @@ const SELECT            = 'cassette/library/SELECT';
 const OPEN_SELECTION    = 'cassette/library/OPEN_SELECTION';
 const LOAD_CONTENT      = 'cassette/library/LOAD_CONTENT';
 const PUSH_CONTENT      = 'cassette/library/PUSH_CONTENT';
+const PLAY_TRACKS       = 'cassette/shared/PLAY_TRACKS';
 
 export const NAME = 'library';
 
@@ -95,6 +96,14 @@ function openSelection() {
   };
 }
 
+function playTracks(tracks) {
+console.log(tracks);
+  return {
+    type: PLAY_TRACKS,
+    tracks: tracks
+  };
+}
+
 function loadContent() {
 
   let doneIds = [];
@@ -139,5 +148,5 @@ function pushContent(data) {
 }
 
 export const actionCreators = {
-  setViewType, setViewScope, select, openSelection, loadContent, pushContent
+  setViewType, setViewScope, select, openSelection, loadContent, pushContent, playTracks
 }

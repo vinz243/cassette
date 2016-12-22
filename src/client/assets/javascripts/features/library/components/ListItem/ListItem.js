@@ -9,10 +9,9 @@ export default class ListItem extends Component {
   };
 
   handleTrackNameClick() {
-    this.props.select({
-      itemType: 'track',
-      itemId: this.props.track.id
-    });
+    this.props.select([
+      this.props.track
+    ]);
   }
 
   render() {

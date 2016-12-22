@@ -15,7 +15,7 @@ export default class ListView extends Component {
     let list = [];
     for (let item of library.items) {
       list.push(
-        <ListItem track={item.track} key={item.id} select={actions.select}/>
+        <ListItem track={item.track} key={item.id} select={actions.playTracks}/>
       );
     }
     return (
