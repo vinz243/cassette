@@ -16,16 +16,45 @@ const PREVIOUS_TRESHOLD = 2000;
 
 export const NAME = 'toolbar';
 
+// const initialState: State = {
+// 	playing: false,
+// 	currentTrack: undefined,
+// 	nextTrack: undefined,
+// 	previousTrack:  undefined,
+// 	currentTime: 0.0,
+// 	viewType: 'redux-app/view-types/THUMBNAILS',
+// 	searchString: '',
+// 	volume: 1.0
+// }
+
+
+let rageArtist = {
+  name: 'Rage Against The Machine',
+  id: '42'
+};
+
+let rageAlbum = {
+  name: 'Rage Against The Machine',
+  id: '1337',
+  artist: rageArtist
+};
+
 const initialState: State = {
 	playing: false,
-	currentTrack: undefined,
+	currentTrack: {
+    name: 'Bullet In The Head',
+    duration: (5 * 60 + 10) * 1000,
+    artist: rageArtist,
+    album: rageAlbum,
+    id: '1337-42'
+  },
 	nextTrack: undefined,
 	previousTrack:  undefined,
-	currentTime: 0.0,
+	currentTime: (1*60+14)*1000,
 	viewType: 'redux-app/view-types/THUMBNAILS',
 	searchString: '',
 	volume: 1.0
-}
+};
 
 export default function reducer(state: State = initialState, action: any = {}): State {
 	let newState = {};
