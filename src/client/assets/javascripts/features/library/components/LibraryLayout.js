@@ -16,9 +16,15 @@ export default class LibraryLayout extends Component {
   }
   render() {
     const { library, actions } = this.props;
+    let content;
+    if (library.loading) {
+      content = <span>Loading...</span>
+    } else {
+      content = <ListView {...this.props}/>
+    }
     return (
-    	<div>
-        <ListView {...this.props}/>
+    	<div className="libraryContainer">
+        {content}
       </div>
     );
   }

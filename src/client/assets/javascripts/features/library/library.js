@@ -15,20 +15,15 @@ const PUSH_CONTENT      = 'cassette/library/PUSH_CONTENT';
 export const NAME = 'library';
 
 const initialState: State = {
-  items: [{
-    name: 'Killing in The Name',
-    id: '1',
-    type: 'TRACK',
-  }, {
-    name: 'Rap God',
-    id: '3',
-    type: 'TRACK'
-  }],
+  items: [],
+  loading: true,
   viewType: 'LIST',
   viewScope: 'TRACKS'
 };
 
 export default function reducer(state: State = initialState, action: any = {}): State {
+  let newState = {};
+  assign(newState, state);
   switch (action.type) {
     case SET_VIEW_TYPE:
       return state;
@@ -41,11 +36,25 @@ export default function reducer(state: State = initialState, action: any = {}): 
     case LOAD_CONTENT:
       switch (state.viewScope) {
         case 'TRACKS':
-          axios.get('/v1/tracks').then((res) => {
-            let data = res.data.data;
-
-            // MOCK UP
+          newState.loading = false;
+          newState.items = action.data.map((track) => {
+              return {
+                id: track._id,
+                track: {
+                  name: track.name,
+                  artist: {
+                    id: track.artistId,
+                    name: track.artist.name
+                  },
+                  album: {
+                    id: track.albumId,
+                    name: track.album.name
+                  },
+                  duration: 0
+                }
+              };
           });
+          return newState;
       }
       return state;
     default:
@@ -87,9 +96,39 @@ function openSelection() {
 }
 
 function loadContent() {
-  return {
-    type: LOAD_CONTENT
-  };
+
+  let doneIds = [];
+  let identifiers = {};
+  return axios.get('/v1/tracks').then((res) => {
+    let data = res.data.data;
+    let promises = [];
+
+    for (let track of data) {
+      if (!doneIds.includes(track.albumId)) {
+        promises.push(axios.get(`/v1/albums/${track.albumId}`).then((res) => {
+          identifiers[track.albumId] = res.data.data;
+        }));
+        doneIds.push(track.albumId);
+      }
+      if (!doneIds.includes(track.artistId)) {
+        promises.push(axios.get(`/v1/artists/${track.artistId}`).then((res) => {
+          identifiers[track.artistId] = res.data.data;
+        }));
+        doneIds.push(track.artistId);
+      }
+    }
+    return Promise.all(promises).then(() => {
+
+      for (let track of data) {
+        track.artist = identifiers[track.artistId];
+        track.album = identifiers[track.albumId];
+      }
+      return {
+        type: LOAD_CONTENT,
+        data
+      };
+    });
+  })
 }
 
 function pushContent(data) {
