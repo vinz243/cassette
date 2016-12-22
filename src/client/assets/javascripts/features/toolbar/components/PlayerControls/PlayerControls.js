@@ -18,6 +18,11 @@ export default class PlayerControls extends Component {
     actions: PropTypes.object.isRequired,
     toolbar: PropTypes.object.isRequired
   };
+  rewind(e) {
+    const { toolbar, actions } = this.props;
+    actions.playPrevious();
+
+  }
   pauseUnpause(e) {
     const { toolbar, actions } = this.props;
     actions.togglePause();
@@ -48,6 +53,7 @@ export default class PlayerControls extends Component {
     const boundMute = this.mute.bind(this);
     const boundChangeVolume = this.changeVolume.bind(this);
     const boundUnmute = this.unmute.bind(this);
+    const boundRewind = this.rewind.bind(this);
 
     return (
     	<div className="controlsContainer">
@@ -57,7 +63,7 @@ export default class PlayerControls extends Component {
 	    			<Col span={10}>
 	    				<Row gutter={16}>
 			    			<Col span={8}>
-			    				<div className={'rewindControl' +
+			    				<div onClick={boundRewind} className={'rewindControl' +
                     ((toolbar.previousTrack || toolbar.currentTrack) ?
                         '' : ' disabled')}>
 			    					<GoPlaybackRewind />
