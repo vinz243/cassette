@@ -8,9 +8,14 @@ export default class LibraryLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
   };
+  componentDidMount() {
+    const { library, actions } = this.props;
 
+    actions.loadContent();
+
+  }
   render() {
-    const { toolbar, actions } = this.props;
+    const { library, actions } = this.props;
     return (
     	<div>
         <ListView {...this.props}/>

@@ -1,7 +1,27 @@
+type Artist = {
+	name: string,
+	id: string
+}
+
+type Album = {
+	name: string,
+	artist: Artist,
+	id: string
+}
+
+type Track = {
+	name: string,
+	artist: Artist,
+	album: Album,
+	id: string,
+	duration: double
+}
+
 type Item = {
-  name: string,
-  id: string,
-  type: string
+  artist: Artist,
+  album: Album,
+  track: Track,
+  id: string
 }
 
 export type State = {

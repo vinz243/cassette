@@ -1,6 +1,7 @@
 
 import { createStructuredSelector } from 'reselect';
 import assign from 'lodash/assign';
+import axios from 'axios';
 
 import {State} from 'models/library';
 
@@ -40,9 +41,11 @@ export default function reducer(state: State = initialState, action: any = {}): 
     case LOAD_CONTENT:
       switch (state.viewScope) {
         case 'TRACKS':
-          // fetch('/v1/tracks').then(res => res.json()).then((body) => {
-          //   console.log(body);
-          // });
+          axios.get('/v1/tracks').then((res) => {
+            let data = res.data.data;
+
+            // MOCK UP
+          });
       }
       return state;
     default:
