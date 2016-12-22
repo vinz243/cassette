@@ -7,7 +7,7 @@ import File from './File';
 import Model from './Model';
 import process from 'process';
 
-let processResult = async (res) => {
+export const processResult = async (res) => {
   if(res.status === 'done') {
     let data = res.data;
     for (let artistName of Object.keys(data)) {
@@ -100,7 +100,7 @@ let Scan = new Model('scan')
             });
           });
         });
-        
+
 
       }
     });

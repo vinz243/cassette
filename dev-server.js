@@ -9,6 +9,8 @@ const webpackHotMiddleware = require('webpack-hot-middleware');
 const DashboardPlugin = require('webpack-dashboard/plugin');
 const config = require('./config/webpack.config.development');
 const backend = require('./lib/server/server').default;
+
+const processResult = require('./lib/server/models/Scan').processResult;
 // console.log(backend);
 
 const app = express();
@@ -55,4 +57,15 @@ app.listen(port, host, (err) => {
   }
 
   log('🚧  App is listening at http://%s:%s', host, port);
+
+  log('\nTrying to inject some mock data...');
+
+  const mockData = require('./data/libraryMockup.json');
+
+  processResult({
+    status: 'done',
+    data: mockData
+  }).then(() => {
+    log('\n Mocking done');
+  });
 });

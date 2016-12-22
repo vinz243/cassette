@@ -17,7 +17,7 @@ try {
 } catch (err) {
   if (env !== 'production') {
     localConfig[env].rootDir = os.homedir() + '/';
-  } else { 
+  } else {
     throw err;
   }
 }
@@ -25,8 +25,8 @@ try {
 env = localConfig.env || env;
 
 let root = localConfig[env].rootDir;
-
 module.exports = {
   rootDir: env === 'test' ? root + 'test/' + shortid.generate() : root,
   baseDir: root
 };
+console.log(module.exports.rootDir);

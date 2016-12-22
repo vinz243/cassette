@@ -18,9 +18,9 @@
     "test": "mocha --compilers js:babel-core/register,css:./test/unit/cssNullCompiler.js --require ./test/unit/testHelper.js --recursive ./test/unit",
     "test:watch": "npm run test -- --watch",
     "tunnel": "lt --port 3000",
-    "backend:test": "ava -v",
-    "test-watch": "ava --watch",
-    "backend:build": "babel src/server --presets es2015,es2016,stage-2 --out-dir lib/server --ignore *.test.js",
+    "backend:test": "ava src/server -v",
+    "test-watch": "ava src/server  --watch",
+    "backend:build": "babel src/server --presets es2015,es2016,stage-2 --out-dir lib/server",
     "backend:start": "babel-node src/server/server.js --presets es2015,es2016,stage-2 --dev",
     "backend:coverage": "cross-env NODE_ENV=test nyc npm test && nyc report --reporter=html",
     "backend:coverage-travis": "cross-env NODE_ENV=test nyc npm test && nyc report --reporter=text-lcov | coveralls"
@@ -143,7 +143,6 @@
     }
   },
   "ava": {
-    "babel": "inherit",
     "require": [
       "babel-register",
       "babel-polyfill"
