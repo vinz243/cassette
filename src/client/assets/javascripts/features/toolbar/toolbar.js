@@ -4,13 +4,13 @@ import assign from 'lodash/assign';
 
 import { State } from 'models/playerStatus';
 
-const TOGGLE_PAUSE = 'redux-app/toolbar/TOGGLE_PAUSE';
-const PLAY_PREVIOUS = 'redux-app/toolbar/PLAY_PREVIOUS';
-const PLAY_NEXT = 'redux-app/toolbar/PLAY_NEXT';
-const SET_VOLUME = 'redux-app/toolbar/SET_VOLUME';
-const SET_TRACK_TIME = 'redux-app/toolbar/SET_TRACK_TIME';
-const SET_VIEW_TYPE = 'redux-app/toolbar/SET_VIEW_TYPE';
-const SEARCH = 'redux-app/toolbar/SEARCH';
+const TOGGLE_PAUSE = 'cassette/toolbar/TOGGLE_PAUSE';
+const PLAY_PREVIOUS = 'cassette/toolbar/PLAY_PREVIOUS';
+const PLAY_NEXT = 'cassette/toolbar/PLAY_NEXT';
+const SET_VOLUME = 'cassette/toolbar/SET_VOLUME';
+const SET_TRACK_TIME = 'cassette/toolbar/SET_TRACK_TIME';
+const SET_VIEW_TYPE = 'cassette/toolbar/SET_VIEW_TYPE';
+const SEARCH = 'cassette/toolbar/SEARCH';
 
 const PREVIOUS_TRESHOLD = 2000;
 
