@@ -21,7 +21,10 @@ export default class PlayerControls extends Component {
   rewind(e) {
     const { toolbar, actions } = this.props;
     actions.playPrevious();
-
+  }
+  fastForward(e) {
+    const { toolbar, actions } = this.props;
+    actions.playNext();
   }
   pauseUnpause(e) {
     const { toolbar, actions } = this.props;
@@ -54,6 +57,7 @@ export default class PlayerControls extends Component {
     const boundChangeVolume = this.changeVolume.bind(this);
     const boundUnmute = this.unmute.bind(this);
     const boundRewind = this.rewind.bind(this);
+    const boundFastForward = this.fastForward.bind(this);
 
     return (
     	<div className="controlsContainer">
@@ -75,7 +79,7 @@ export default class PlayerControls extends Component {
 			    				</div>
 			    			</Col>
 			    			<Col span={8}>
-			    				<div className={'fastForwardControl' + (toolbar.nextTrack ? '' : ' disabled')}>
+			    				<div onClick={boundFastForward} className={'fastForwardControl' + (toolbar.nextTrack ? '' : ' disabled')}>
 			    					<GoPlaybackFastForward />
 			    				</div>
 			    			</Col>

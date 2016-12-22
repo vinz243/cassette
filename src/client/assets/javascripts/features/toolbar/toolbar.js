@@ -48,7 +48,13 @@ const initialState: State = {
     album: rageAlbum,
     id: '1337-42'
   },
-	nextTrack: undefined,
+	nextTrack: {
+    name: 'Killing In The Name',
+    duration: (6*60+38) * 1000,
+    artist: rageArtist,
+    album: rageArtist,
+    id: '1337-34'
+  },
 	previousTrack:  undefined,
 	currentTime: (1*60+14)*1000,
 	viewType: 'redux-app/view-types/THUMBNAILS',
