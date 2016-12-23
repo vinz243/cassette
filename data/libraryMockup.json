@@ -1,0 +1,142 @@
+{
+   "Nas & Damian \"Jr. Gong\" Marley":{
+      "Distant Relatives":[
+         {
+            "duration":147.906,
+            "path":"/Users/vincent/music/music/Nas & Damian Marley/Distant Relatives/01. Nas & Damian Marley - As We Enter.mp3",
+            "trackTitle":"As We Enter",
+            "bitrate":918179
+         },
+         {
+            "duration":361.466,
+            "path":"/Users/vincent/music/music/Nas & Damian Marley/Distant Relatives/03. Nas & Damian Marley - Strong Will Continue.mp3",
+            "trackTitle":"Strong Will Continue",
+            "bitrate":924369
+         },
+         {
+            "duration":353.08,
+            "path":"/Users/vincent/music/music/Nas & Damian Marley/Distant Relatives/07. Nas & Damian Marley - Dispear.mp3",
+            "trackTitle":"Dispear",
+            "bitrate":928794
+         },
+         {
+            "duration":247.053,
+            "path":"/Users/vincent/music/music/Nas & Damian Marley/Distant Relatives/10. Nas & Damian Marley - Nah Mean.mp3",
+            "trackTitle":"Nah Mean",
+            "bitrate":1017235
+         }
+      ]
+   },
+   "Eminem":{
+      "The Marshall Mathers LP2 (Deluxe)":[
+         {
+            "duration":55.337,
+            "path":"/Users/vincent/music/music/Eminem/The Marshall Mathers LP 2/02. Eminem - Parking Lot (Skit).mp3",
+            "trackTitle":"Parking Lot - Skit",
+            "bitrate":820053
+         }
+      ],
+      "The Eminem Show (Explicit Version)":[
+         {
+            "duration":324.568,
+            "path":"/Users/vincent/music/music/Eminem/Greatest Hits Disc 2/02. Eminem - White America.mp3",
+            "trackTitle":"White America",
+            "bitrate":865287
+         },
+         {
+            "duration":339.666,
+            "path":"/Users/vincent/music/music/Eminem/Greatest Hits Disc 1/07. Eminem - Sing For The Moment.mp3",
+            "trackTitle":"Sing For The Moment",
+            "bitrate":854780
+         },
+         {
+            "duration":290.226,
+            "path":"/Users/vincent/music/music/Eminem/Greatest Hits Disc 1/11. Eminem - Without Me.mp3",
+            "trackTitle":"Without Me",
+            "bitrate":884232
+         },
+         {
+            "duration":297.933,
+            "path":"/Users/vincent/music/music/Eminem/Greatest Hits Disc 1/13. Eminem - Cleanin' Out My Closet.mp3",
+            "trackTitle":"Cleanin' Out My Closet",
+            "bitrate":794317
+         }
+      ],
+      "Curtain Call (Deluxe)":[
+         {
+            "duration":205.76,
+            "path":"/Users/vincent/music/music/Eminem/Greatest Hits Disc 1/08. Eminem - Fack.mp3",
+            "trackTitle":"FACK",
+            "bitrate":823469
+         }
+      ]
+   },
+   "Alborosie":{
+      "Soul Pirate":[
+         {
+            "duration":192.4,
+            "path":"/Users/vincent/music/music/Alborosie/Soul Pirate - Deluxe Remastered Edition/04. Alborosie - Kingston Town.mp3",
+            "trackTitle":"Kingston Town",
+            "bitrate":897576
+         },
+         {
+            "duration":206.733,
+            "path":"/Users/vincent/music/music/Alborosie/Soul Pirate - Deluxe Remastered Edition/05. Alborosie - Rastafari Anthem.mp3",
+            "trackTitle":"Rastafari Anthem",
+            "bitrate":908509
+         },
+         {
+            "duration":230.573,
+            "path":"/Users/vincent/music/music/Alborosie/Soul Pirate - Deluxe Remastered Edition/06. Alborosie - Still Blazing.mp3",
+            "trackTitle":"Still Blazing",
+            "bitrate":957347
+         },
+         {
+            "duration":191.333,
+            "path":"/Users/vincent/music/music/Alborosie/Soul Pirate - Deluxe Remastered Edition/07. Alborosie - Herbalist.mp3",
+            "trackTitle":"Herbalist",
+            "bitrate":941922
+         }
+      ],
+      "Soul Pirate (Deluxe Remastered Edition)":[
+         {
+            "duration":191.029,
+            "path":"/Users/vincent/music/music/Alborosie/Soul Pirate - Deluxe Remastered Edition/08. Alborosie - Dutty Road.mp3",
+            "trackTitle":"Dutty Road",
+            "bitrate":861825
+         },
+         {
+            "duration":199.79,
+            "path":"/Users/vincent/music/music/Alborosie/Soul Pirate - Deluxe Remastered Edition/19. Alborosie - Call Up Jah.mp3",
+            "trackTitle":"Call Up Jah",
+            "bitrate":901639
+         },
+         {
+            "duration":209.732,
+            "path":"/Users/vincent/music/music/Alborosie/Soul Pirate - Deluxe Remastered Edition/20. Alborosie - Slambam.mp3",
+            "trackTitle":"Slambam",
+            "bitrate":933861
+         }
+      ],
+      "Freedom & Fyah":[
+         {
+            "duration":227.093,
+            "path":"/Users/vincent/music/music/Alborosie/Freedom & Fyah/03. Alborosie - Fly 420.mp3",
+            "trackTitle":"Fly 420 (feat. Sugus)",
+            "bitrate":916674
+         },
+         {
+            "duration":227.8,
+            "path":"/Users/vincent/music/music/Alborosie/Freedom & Fyah/05. Alborosie - Strolling.mp3",
+            "trackTitle":"Strolling (feat. Protoje)",
+            "bitrate":945289
+         },
+         {
+            "duration":227.946,
+            "path":"/Users/vincent/music/music/Alborosie/Freedom & Fyah/07. Alborosie - Poser.mp3",
+            "trackTitle":"Poser",
+            "bitrate":889979
+         }
+      ]
+   }
+}
