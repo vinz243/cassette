@@ -39,10 +39,13 @@ export default function reducer(state: State = initialState, action: any = {}): 
         case 'TRACKS':
           newState.loading = false;
           newState.items = action.data.map((track) => {
+              console.log(track.duration);
               return {
                 id: track._id,
                 track: {
+                  id: track._id,
                   name: track.name,
+                  duration: track.duration,
                   artist: {
                     id: track.artistId,
                     name: track.artist.name
@@ -51,7 +54,6 @@ export default function reducer(state: State = initialState, action: any = {}): 
                     id: track.albumId,
                     name: track.album.name
                   },
-                  duration: 0
                 }
               };
           });
@@ -130,6 +132,7 @@ function loadContent() {
       for (let track of data) {
         track.artist = identifiers[track.artistId];
         track.album = identifiers[track.albumId];
+        track.duration *= 1000;
       }
       return {
         type: LOAD_CONTENT,

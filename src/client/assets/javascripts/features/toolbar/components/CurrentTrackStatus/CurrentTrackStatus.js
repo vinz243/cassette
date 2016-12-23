@@ -41,6 +41,11 @@ export default class CurrentTrackStatus extends Component {
     const { toolbar, actions } = this.props;
     return this.msToTime((val/100) * (toolbar.currentTrack || {}).duration);
   }
+  componentDidMount() {
+    setInterval(() => {
+        this.props.actions.updateTime();
+    }, 1000);
+  }
   render() {
     const { toolbar, actions } = this.props;
     const boundHandleTimeStatusChange =
@@ -64,8 +69,7 @@ export default class CurrentTrackStatus extends Component {
                 </Col>
                 <Col span={20}>
                   <Slider className="trackTimeSlider"
-                    value={(toolbar.currentTime /
-                      toolbar.currentTrack.duration) * 100}
+                    value={(toolbar.currentTime / (toolbar.currentTrack || {duration: 1}).duration) * 100}
                     tipFormatter={boundTipFormattter}
                     onChange={boundHandleTimeChange} />
                 </Col>

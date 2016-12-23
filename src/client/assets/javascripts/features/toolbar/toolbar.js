@@ -12,7 +12,7 @@ const SET_TRACK_TIME = 'cassette/toolbar/SET_TRACK_TIME';
 const SET_VIEW_TYPE = 'cassette/toolbar/SET_VIEW_TYPE';
 const SEARCH = 'cassette/toolbar/SEARCH';
 const PLAY_TRACKS = 'cassette/shared/PLAY_TRACKS'; // SHARED namespace
-
+const UPDATE_TIME = 'cassette/toolbar/UPDATE_TIME';
 
 const PREVIOUS_TRESHOLD = 2000;
 
@@ -43,39 +43,41 @@ let rageAlbum = {
 
 const initialState: State = {
 	playing: false,
-	currentTrack: {
-    name: 'Bullet In The Head',
-    duration: (5 * 60 + 10) * 1000,
-    artist: rageArtist,
-    album: rageAlbum,
-    id: '1337-42'
-  },
-	nextTrack: {
-    name: 'Killing In The Name',
-    duration: (6*60+38) * 1000,
-    artist: rageArtist,
-    album: rageArtist,
-    id: '1337-34'
-  },
-	previousTrack:  undefined,
-	currentTime: (1*60+14)*1000,
+	currentTrack: undefined,
+	nextTrack: undefined,
+	previousTrack: undefined,
+	currentTime: 0,
 	viewType: 'redux-app/view-types/THUMBNAILS',
 	searchString: '',
 	volume: 1.0
 };
 
+let srcUrl = (id) => {
+  return `/v1/tracks/${id}/file`;
+};
+
+let audio = new Audio();
 export default function reducer(state: State = initialState, action: any = {}): State {
 	let newState = {};
-	assign(newState, state)	;
-
+	assign(newState, state);
 	switch (action.type) {
+    case UPDATE_TIME:
+      newState.currentTime = audio.currentTime * 1000;
+      return newState;
+
 		case TOGGLE_PAUSE:
-			newState.playing = !newState.playing;
+      if (audio) {
+			  newState.playing = !newState.playing;
+        if (newState.playing)
+          audio.play();
+        else audio.pause();
+      }
 			return newState;
 
 		case PLAY_PREVIOUS:
 			if (state.currentTime > PREVIOUS_TRESHOLD) {
 				newState.currentTime = 0.0;
+        audio.currentTime = 0.0;
 				return newState;
 			}
 			if (!state.previousTrack) return newState;
@@ -84,6 +86,8 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			newState.previousTrack = undefined;
 			newState.currentTime = 0.0;
 			newState.nextTrack = state.currentTrack;
+
+      audio.src = srcUrl(newState.currentTrack.id);
 			return newState;
 
 		case PLAY_NEXT:
@@ -93,23 +97,33 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			newState.nextTrack = undefined;
 			newState.currentTime = 0.0;
 			newState.previousTrack = state.currentTrack;
+      audio.src = srcUrl(newState.currentTrack.id);
+
 			return newState;
 
 		case SET_VOLUME:
 			newState.volume = Math.min(Math.max(action.value, 0.0), 1.0);
+      audio.volume = newState.volume;
 			return newState;
 
 		case SET_TRACK_TIME:
 			if (!state.currentTrack) return newState;
 
 			newState.currentTime = Math.min(Math.max(action.value, 0.0), state.currentTrack.duration);
+      audio.currentTime = newState.currentTime / 1000;
 
 			return newState;
+
     case PLAY_TRACKS:
       newState.currentTrack = action.tracks[0];
       newState.previousTrack = state.currentTrack;
       newState.nextTrack = action.tracks[1];
+      newState.playing = true;
       newState.currentTime = 0.0;
+
+      audio.src = srcUrl(newState.currentTrack.id);
+      audio.play();
+
       return newState;
 		case SET_VIEW_TYPE:
 			return newState;
@@ -176,7 +190,13 @@ function search(value: string) {
 	}
 }
 
+function updateTime() {
+  return {
+    type: UPDATE_TIME
+  };
+}
+
 
 export const actionCreators = {
-	togglePause, playPrevious, playNext, setVolume, seek, setViewType, search
+	togglePause, playPrevious, playNext, setVolume, seek, setViewType, search, updateTime
 }
