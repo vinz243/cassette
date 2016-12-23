@@ -97,7 +97,6 @@ function openSelection() {
 }
 
 function playTracks(tracks) {
-console.log(tracks);
   return {
     type: PLAY_TRACKS,
     tracks: tracks
