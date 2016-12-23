@@ -78,6 +78,8 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			if (state.currentTime > PREVIOUS_TRESHOLD) {
 				newState.currentTime = 0.0;
         audio.currentTime = 0.0;
+        if (newState.playing)
+          audio.play();
 				return newState;
 			}
 			if (!state.previousTrack) return newState;
@@ -88,6 +90,8 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			newState.nextTrack = state.currentTrack;
 
       audio.src = srcUrl(newState.currentTrack.id);
+      if (newState.playing)
+        audio.play();
 			return newState;
 
 		case PLAY_NEXT:
@@ -98,6 +102,9 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			newState.currentTime = 0.0;
 			newState.previousTrack = state.currentTrack;
       audio.src = srcUrl(newState.currentTrack.id);
+
+      if (newState.playing)
+        audio.play();
 
 			return newState;
 
