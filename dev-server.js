@@ -58,14 +58,14 @@ app.listen(port, host, (err) => {
 
   log('🚧  App is listening at http://%s:%s', host, port);
 
-  log('\nTrying to inject some mock data...');
-
-  const mockData = require('./data/libraryMockup.json');
-
-  processResult({
-    status: 'done',
-    data: mockData
-  }).then(() => {
-    log('\n Mocking done');
-  });
+  // log('\nTrying to inject some mock data...');
+  //
+  // const mockData = require('./data/libraryMockup.json');
+  //
+  // processResult({
+  //   status: 'done',
+  //   data: mockData
+  // }).then(() => {
+  //   log('\n Mocking done');
+  // });
 });

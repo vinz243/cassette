@@ -134,6 +134,7 @@ function loadContent() {
         track.album = identifiers[track.albumId];
         track.duration *= 1000;
       }
+      data.sort((a, b) => a.album.name.localeCompare(b.album.name));
       return {
         type: LOAD_CONTENT,
         data

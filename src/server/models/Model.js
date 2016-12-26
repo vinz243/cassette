@@ -256,8 +256,8 @@ class Model {
         'limit', 'offset', 'sort', 'direction'
       ]).value();
 
-      if (!opts.limit || opts.limit > 25 || opts.limit < 1) {
-        opts.limit = 25;
+      if (!opts.limit || opts.limit > 500 || opts.limit < 1) {
+        opts.limit = 500;
       }
 
       let sort = {};

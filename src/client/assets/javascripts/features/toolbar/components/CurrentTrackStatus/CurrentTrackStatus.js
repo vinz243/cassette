@@ -43,6 +43,7 @@ export default class CurrentTrackStatus extends Component {
   }
   componentDidMount() {
     setInterval(() => {
+      if (this.props.toolbar.playing)
         this.props.actions.updateTime();
     }, 1000);
   }

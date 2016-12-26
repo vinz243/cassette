@@ -41,7 +41,7 @@ export const processResult = async (res) => {
             trackId: track.data._id
           });
           await file.create();
-          
+
         }
       }
     }
@@ -78,7 +78,7 @@ let Scan = new Model('scan')
         this.data.statusMessage = 'Scan was a dry run';
       } else {
         Library.findById(this.data.libraryId).then((dir) => {
-          let child = child_process.fork('../scripts/music_scanner');
+          let child = child_process.fork('./lib/server/scripts/music_scanner');
 
           child.send({
             action: 'set_config',
@@ -90,7 +90,10 @@ let Scan = new Model('scan')
           child.send({action: 'execute'});
 
           child.on('message', (res) => {
-
+            if (res.status === 'LOG') {
+              console.log('child: ' + res.msg);
+              return;
+            }
             processResult(res).then(() => {
               this.data.statusCode = 'DONE';
               this.data.statusMessage = 'Scan finished without errors';

@@ -6,4 +6,4 @@ export {
   actionCreators,
   selector,
   NAME
-} from './friends';
+} from './sidebar';
