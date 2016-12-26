@@ -18,7 +18,7 @@
     "test": "mocha --compilers js:babel-core/register,css:./test/unit/cssNullCompiler.js --require ./test/unit/testHelper.js --recursive ./test/unit",
     "test:watch": "npm run test -- --watch",
     "tunnel": "lt --port 3000",
-    "backend:test": "ava src/server -v",
+    "backend:test": "npm run backend:build && ava lib/server/**/*.test.js -v",
     "test-watch": "ava src/server  --watch",
     "backend:build": "babel src/server --presets es2015,es2016,stage-2 --out-dir lib/server",
     "backend:start": "babel-node src/server/server.js --presets es2015,es2016,stage-2 --dev",

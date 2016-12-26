@@ -25,7 +25,7 @@ test.serial('create library', async t => {
   });
 
   t.is(res.status, 201);
-  
+
   libraryId = res.body.data._id;
   t.not(libraryId, undefined);
 
@@ -71,11 +71,11 @@ test.serial('list albums', async t => {
 
   // console.log(res.body);
 
-  t.truthy(res.body.data[0].name === 'Night Visions' || res.body.data[0].name === 'The Eminem Show (Explicit Version)');
-  t.truthy(res.body.data[1].name === 'Night Visions' || res.body.data[1].name === 'The Eminem Show (Explicit Version)');
+  t.truthy(res.body.data[0].name === 'Night Visions' || res.body.data[0].name === 'The Eminem Show');
+  t.truthy(res.body.data[1].name === 'Night Visions' || res.body.data[1].name === 'The Eminem Show');
 
   if (res.body.data[0].name === 'Night Visions') {
-    t.is(res.body.data[1].name, 'The Eminem Show (Explicit Version)');
+    t.is(res.body.data[1].name, 'The Eminem Show');
     albumId = res.body.data[0].albumId;
   } else {
     t.is(res.body.data[1].name, 'Night Visions');
@@ -111,13 +111,13 @@ test.serial('see commercialized track > /v1/tracks', async t => {
 
 test.serial('see commercialized track > /v1/artists/id/tracks', async t => {
   let res = await request.get('/v1/artists/'+ file.artistId + '/tracks');
-  
+
   let track = res.body.data[0];
   t.is(track.name, 'Radioactive');
 });
 test.serial('see commercialized file > /v1/tracks/id/files', async t => {
   let res = await request.get('/v1/tracks/'+ file.trackId + '/files');
-  
+
   let f = res.body.data[0];
   // t.is(f.bitrate, 214391);
   t.is(f.path, file.path);

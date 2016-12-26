@@ -1,13 +1,23 @@
 'use strict';
-let assert = require('assert');
-let scanpel = require('scanpel');
+const assert = require('assert');
+const scanpel = require('scanpel');
+const Mediastic = require('mediastic');
+
+let mediastic = Mediastic();
 let config = {};
 
 const execute = function (data) {
 	assert(data.action === 'execute');
 	assert(config && config.dir);
 
-	let res = scanpel(config.dir, config).then((res) => {
+  mediastic.use(Mediastic.tagParser());
+  mediastic.use(Mediastic.fileNameParser());
+  mediastic.use(Mediastic.spotifyApi({
+    albumKeywordBlacklist: /deluxe|renditions|explicit|edited|performs/i,
+    durationTreshold: 5
+  }));
+
+	let res = scanpel(config.dir, mediastic).then((res) => {
 		process.send({
 			status: 'done',
 			data: res
