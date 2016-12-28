@@ -78,7 +78,7 @@ let Scan = new Model('scan')
         this.data.statusMessage = 'Scan was a dry run';
       } else {
         Library.findById(this.data.libraryId).then((dir) => {
-          let child = child_process.fork('./lib/server/scripts/music_scanner');
+          let child = child_process.fork(require.resolve('../scripts/music_scanner'));
 
           child.send({
             action: 'set_config',

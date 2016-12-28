@@ -74,7 +74,7 @@ test('Controller should be able to query', async t => {
   ctx = {
     params:  {},
     query: {
-      limit: 42
+      limit: 1337
     }
   };
 
@@ -82,7 +82,7 @@ test('Controller should be able to query', async t => {
 
   t.is(ctx.body.length, 3, 'does not support limit parameter');
   t.is(ctx.body.data.length, 3);
-  t.is(ctx.body.payload.query.limit, 25,
+  t.is(ctx.body.payload.query.limit, 500,
     'does not set a maximum value for limit');
   t.is(ctx.body.status, 'success');
 });
