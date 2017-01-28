@@ -17,7 +17,7 @@ export default class AppView extends Component {
             <SidebarView {...this.props} />
           </Col>
           <Col span={16}>
-            <LibraryView />
+            {this.props.children}
           </Col>
         </Row>
       </div>
