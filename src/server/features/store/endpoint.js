@@ -17,7 +17,7 @@ export default {
         payload: {
           body: body
         },
-        sucess: true,
+        success: true,
         data: {
           tracks: res[0],
           albums: res[1]

@@ -6,13 +6,9 @@ before_install:
 node_js:
   - "6"
 
-script: 
+script:
   - npm run test
   - npm run lint
-  - npm run jscs
-  - npm run prebuild
-  - npm run build
-  - npm run build:html
   - npm run backend:coverage-travis -- -v
 
 cache:
@@ -20,5 +16,5 @@ cache:
     - node_modules
 
 install:
-  - npm i -g npm@latest
-  - npm install
+  - npm i -g npm@latest yarn
+  - yarn
