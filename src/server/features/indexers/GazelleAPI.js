@@ -64,6 +64,7 @@ export default class GazelleAPI {
       freeleech: isFreeleech,
       year: groupYear,
       format,
+      encoding,
       hasLog,
       torrentId,
       artist,
