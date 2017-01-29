@@ -1,4 +1,5 @@
 import request from 'request';
+import {push, pull} from './database';
 
 export default class LastFM {
   constructor (apiKey = '85d5b036c6aa02af4d7216af592e1eea') {
@@ -40,7 +41,8 @@ export default class LastFM {
       if (result.albummatches) {
         return resolve(result.albummatches.album.map((a) => {
           return {
-            id: `lastfm:mbid:${a.mbid}`,
+            id: push(a),
+            mbid: a.mbid,
             type: 'album',
             album: a.name,
             artist: a.artist

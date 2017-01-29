@@ -27,6 +27,8 @@ env = localConfig.env || env;
 let root = localConfig[env].rootDir;
 module.exports = {
   rootDir: env === 'test' ? root + 'test/' + shortid.generate() : root,
-  baseDir: root
+  baseDir: root,
+  pthUsername: localConfig.pthUsername,
+  pthPassword: localConfig.pthPassword
 };
 console.log(module.exports.rootDir);

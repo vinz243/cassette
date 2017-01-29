@@ -3,7 +3,7 @@ import sampleTrack from './sample-track-results';
 import sampleAlbum from './sample-album-results';
 import LastFM from './LastFM';
 import RecursiveIterator from 'recursive-iterator';
-
+import omit from 'lodash/omit';
 let lastFM = new LastFM();
 
 let recursiveKeys = (obj) => {
@@ -20,25 +20,25 @@ test('searching palm trees yields sample\'s skeleton', async t => {
 });
 
 test('parses sample track data', async t => {
-  let res = await Promise.resolve(sampleTrack).then(LastFM.parseResult);
+  let res = (await Promise.resolve(sampleTrack).then(LastFM.parseResult)).map(d => {
+    return omit(d, ['id', 'mbid']);
+  });
   t.deepEqual(res, [ { type: 'track',
     track: 'Palm Trees (Prod. By Erick Arc Elliott)',
-    artist: 'Flatbush ZOMBiES',
-    id: 'lastfm:mbid:'},
+    artist: 'Flatbush ZOMBiES'},
   { type: 'track',
     track: 'Palm Trees',
-    artist: 'Flatbush ZOMBiES',
-    id: 'lastfm:mbid:24c4e06b-55df-49d3-ae59-06b24854860b' } ]);
+    artist: 'Flatbush ZOMBiES'}]);
 });
 
 test('parses sample album data', async t => {
-  let res = await Promise.resolve(sampleAlbum).then(LastFM.parseResult);
-  t.deepEqual(res, [ { id: 'lastfm:mbid:0fcef195-a29d-3c23-b2a8-30c7a2524c0d',
-    type: 'album',
+  let res = (await Promise.resolve(sampleAlbum).then(LastFM.parseResult)).map(d => {
+    return omit(d, ['id', 'mbid']);
+  });
+  t.deepEqual(res, [ { type: 'album',
     album: 'Better Off Dead',
     artist: 'Sodom' },
-  { id: 'lastfm:mbid:',
-    type: 'album',
+  { type: 'album',
     album: 'Better Off DEAD',
     artist: 'Flatbush ZOMBiES' } ]);
 });
