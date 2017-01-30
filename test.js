@@ -4,4 +4,6 @@ const RTorrent = require('./lib/server/features/downloaders/rTorrent');
 // console.log(RTorrent);
 let rt = new RTorrent.default();
 
-rt.addTorrent(fs.readFileSync('../Downloads/ratm3.torrent'));
+var detectCharacterEncoding = require('detect-character-encoding');
+
+console.log(detectCharacterEncoding(fs.readFileSync('../Downloads/led.torrent')));

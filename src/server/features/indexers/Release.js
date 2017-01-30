@@ -161,11 +161,11 @@ export default class Release {
   }
   get data() {
     let {seeders, hasLog, freelech, bitrate, score, scores, isVbr,
-      lossless, artist, album, torrentId, format, encoding} = this;
+      lossless, artist, album, torrentId, format, encoding, _id} = this;
     return {seeders, hasLog, freelech, bitrate, score: {
       total: score,
       details: scores
-    }, isVbr, lossless, artist, album, torrentId, format, encoding} 
+    }, isVbr, lossless, artist, album, torrentId, format, encoding, _id} 
   }
 
 }

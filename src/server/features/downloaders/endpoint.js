@@ -1,17 +1,14 @@
-import GazelleAPI from './GazelleAPI';
+import RTorrent from './rTorrent';
 import config from '../../../../config';
 import {pull} from '../store/database';
-
-export const api = new GazelleAPI({
-  username: config.pthUsername,
-  password: config.pthPassword
-});
+import {api} from '../indexers';
+const rTorrent = new RTorrent();
 
 export default {
-  '/v1/store/:id/releases': {
-    get: async (ctx, next) => {
-      let data = pull(ctx.params.id);
-      if (!data) {
+  '/v1/releases/:id/downloads': {
+    post: async (ctx, next) => {
+      let release = pull(ctx.params.id);
+      if (!release) {
         ctx.status = 404;
         ctx.body = {
           payload: {params: {id: ctx.params.id}},
@@ -20,10 +17,9 @@ export default {
         };
         return;
       }
-      let res = await api.login().then(() => {
-        return api.searchTorrents(data.name);
-      });
-      ctx.status = 200;
+      let raw = await api.getRawTorrent(release.torrentId);
+      let res = await rTorrent.addTorrent(raw);
+      ctx.status = 201;
       ctx.body = {
         payload: {
           params: {
@@ -31,8 +27,8 @@ export default {
           }
         },
         sucess: true,
-        data: res.map(r => r.data)
+        data: {}
       };
     }
   }
-}
+};

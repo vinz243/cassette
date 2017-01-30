@@ -2,6 +2,8 @@ import request from 'request';
 import {nextCallDelay, expandArray} from './utils';
 import querystring from 'querystring';
 import Release from './Release';
+import {push} from '../store/database';
+import shortid from 'shortid';
 
 export default class GazelleAPI {
   defaultConfig = {
@@ -23,7 +25,7 @@ export default class GazelleAPI {
     this._loggedIn = false;
   }
 
-  call(method, args) {
+  call(method, args, endpoint = this._config.endpoint, ropts = {}) {
     if(!this._loggedIn) throw new Error('Not logged in');
 
     return new Promise((resolve, reject) => {
@@ -34,15 +36,19 @@ export default class GazelleAPI {
           action: method
         }, args);
         let qs = querystring.stringify(query);
-        let {protocol, hostname, port, endpoint} = this._config;
+        let {protocol, hostname, port} = this._config;
         let url = `${protocol}://${hostname}:${port}/${endpoint}?${qs}`
 
         console.log('Calling ' + url);
 
-        this._request.get(url, (err, res, data) => {
+        this._request.get(Object.assign({}, {url}, ropts), (err, res, data) => {
           if (err) return reject(err);
-          const json = Object.assign({}, JSON.parse(data));
-          resolve(json);
+          try {
+            const json = Object.assign({}, JSON.parse(data));
+            resolve(json);
+          } catch (err) {
+            resolve(data);
+          }
         });
       }, nextCallDelay(this._calls,
         this._config.rateLimitMaxCalls,
@@ -52,13 +58,24 @@ export default class GazelleAPI {
   searchTorrents(q = '') {
     return this.call('browse', {searchstr: q}).then(GazelleAPI.parseTorrents);
   }
+  getRawTorrent(id) {
+    return this.call('download', {id}, 'torrents.php', {encoding: null});
+    // if(!this._loggedIn) throw new Error('Not logged in');
+    // this._request.get(url, (err, res, data) => {
+    //   let qs = querystring.stringify();
+    //   let url = `${protocol}://${hostname}:${port}/torrents.php?${qs}`;
+    //
+    // });
+  }
   static parseTorrents(res) {
     return Promise.resolve(expandArray(res.response.results, 'torrents', false)
                   .map(GazelleAPI.toRelease));
   }
   static toRelease({groupName, encoding, isFreeleech, format, hasLog,
     torrentId, artist, seeders, groupYear}) {
-    return new Release({
+    let id = shortid.generate();
+    let release = new Release({
+      _id: id,
       album: groupName,
       lossless: encoding === 'Lossless',
       freeleech: isFreeleech,
@@ -70,6 +87,8 @@ export default class GazelleAPI {
       artist,
       seeders
     });
+    push(id, release);
+    return release;
   }
   login() {
     return new Promise((resolve, reject) => {
