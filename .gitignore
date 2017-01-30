@@ -3,3 +3,4 @@ config.json
 .nyc_output/
 coverage/
 config.local.json
+downloads

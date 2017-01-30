@@ -1,8 +1,7 @@
-const GAPI = require('./lib/server/features/indexers/GazelleAPI.js');
-let api = new GAPI.default();
+// 52461
+const fs = require('fs');
+const RTorrent = require('./lib/server/features/downloaders/rTorrent');
+// console.log(RTorrent);
+let rt = new RTorrent.default();
 
-api.login().then(() => {
-  return api.searchTorrents('Led Zeppelin IV');
-}).then((d) => {
-  console.log(JSON.stringify(d));
-}).catch(console.log);
+rt.addTorrent(fs.readFileSync('../Downloads/ratm3.torrent'));
