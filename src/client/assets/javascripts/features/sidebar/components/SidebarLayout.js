@@ -4,6 +4,8 @@ import {Row, Col, Tooltip, Input} from 'antd';
 import 'antd/dist/antd.css';
 import SidebarLibraryItem from './SidebarLibraryItem';
 import IonPlusRound from 'react-icons/lib/io/plus-round';
+import {Link} from 'react-router';
+
 export default class SidebarLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
@@ -53,7 +55,7 @@ export default class SidebarLayout extends Component {
         <div className="parentItem">
           <Row gutter={24}>
             <Col span={21}>
-              Libraries
+              <Link to="/app/library" className="librariesLink">Libraries</Link>
             </Col>
             <Col span={2}>
               <Tooltip
@@ -74,6 +76,9 @@ export default class SidebarLayout extends Component {
           </Row>
         </div>
         {items}
+        <div className="storeLinkParent">
+          <Link to="/app/store" className="storeLink">Store</Link>
+        </div>
       </div>
     );
   }

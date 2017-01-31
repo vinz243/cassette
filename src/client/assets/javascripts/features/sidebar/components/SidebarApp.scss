@@ -28,3 +28,17 @@
   border-width: 0;
   color: white;
 }
+
+.storeLinkParent {
+    margin-top: 3.5em;
+}
+.storeLink, .storeLink:hover, .storeLink:focus{
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.35);
+}
+.librariesLink, .librariesLink:hover, .librariesLink:focus {
+  text-transform: uppercase;
+  text-decoration: none;
+  color: rgba(0, 0, 0, 0.35);
+}

@@ -32,16 +32,19 @@ export const processResult = async (res) => {
             track.data.duration = t.duration;
             await track.create();
           }
-          let file = new File({
-            path: t.path,
-            duration: t.duration, // TODO: Bitrate and everything
-            bitrate: t.bitrate,
-            artistId: artist.data._id,
-            albumId: album.data._id,
-            trackId: track.data._id
-          });
-          await file.create();
+          let dup = await File.find({path: t.path});
 
+          if (dup.length === 0){
+            let file = new File({
+              path: t.path,
+              duration: t.duration, // TODO: Bitrate and everything
+              bitrate: t.bitrate,
+              artistId: artist.data._id,
+              albumId: album.data._id,
+              trackId: track.data._id
+            });
+            await file.create();
+          }
         }
       }
     }

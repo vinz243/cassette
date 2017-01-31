@@ -24,10 +24,11 @@ const execute = function (data) {
 
   mediastic.use(Mediastic.tagParser());
   mediastic.use(Mediastic.fileNameParser());
-  mediastic.use(Mediastic.spotifyApi({
-    albumKeywordBlacklist: /deluxe|renditions|explicit|edited|performs/i,
-    durationTreshold: 5
-  }));
+
+  // mediastic.use(Mediastic.spotifyApi({
+  //   albumKeywordBlacklist: /deluxe|renditions|explicit|edited|performs/i,
+  //   durationTreshold: 5
+  // }));
 
   mediastic.use((metadata, next) => {
     log('Done ' + metadata.path);

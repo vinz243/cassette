@@ -32,7 +32,7 @@ export default class GazelleAPI {
       setTimeout(() => {
         this._calls.push(Date.now());
 
-        let query = Object.assign({
+        let query = Object.assign({}, {
           action: method
         }, args);
         let qs = querystring.stringify(query);

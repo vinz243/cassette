@@ -42,7 +42,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
           newState.items = action.data.map((track) => {
               return deepAssign({}, {
                 id: track._id,
-                name: track.name,
+                name: track.name.replace(/\(.+\)$/, ''),
                 duration: track.duration * 1000,
                 artist: {
                   id: track.artistId,
