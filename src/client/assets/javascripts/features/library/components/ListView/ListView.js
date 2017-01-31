@@ -12,13 +12,9 @@ export default class ListView extends Component {
 
   render() {
     const { library, actions } = this.props;
-    let list = [];
-    
-    for (let item of library.items) {
-      list.push(
-        <ListItem track={item.track} key={item.id} select={actions.playTracks}/>
-      );
-    }
+    let list = library.items.map((item) => {
+        return <ListItem track={item} key={item.id} select={actions.playTracks}/>
+    });
     return (
     	<div>
         {list}

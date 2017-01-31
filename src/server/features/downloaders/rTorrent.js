@@ -2,7 +2,7 @@ import mkdirp from 'mkdirp';
 import scgi from './scgi';
 
 
-var detectCharacterEncoding = require('detect-character-encoding');
+// var detectCharacterEncoding = require('detect-character-encoding');
 
 export default class RTorrent {
   defaultOpts = {
@@ -16,8 +16,8 @@ export default class RTorrent {
     mkdirp.sync(this.opts.targetPath);
   }
   addTorrent(content) {
-    let enc = detectCharacterEncoding(content);
-    console.log('Detected charcter encoding:', enc);
+    // let enc = detectCharacterEncoding(content);
+    // console.log('Detected charcter encoding:', enc);
     let parameters = [''];
 
     parameters.push(content);

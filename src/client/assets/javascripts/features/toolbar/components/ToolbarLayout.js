@@ -21,10 +21,10 @@ export default class ToolbarLayout extends Component {
             <PlayerControls {...this.props} />
   	      </Col>
           <Col span={7} className="currentTrackStatusCol">
-            <CurrentTrackStatus {...this.props} />
+           <CurrentTrackStatus {...this.props} />
   	      </Col>
           <Col span={7}>
-            <BrowserControls  {...this.props} />
+             <BrowserControls  {...this.props} />
   	      </Col>
           <Col span={2}></Col>
         </Row>

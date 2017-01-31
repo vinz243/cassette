@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 // import ListView from './ListView';
 import './StoreApp.scss';
-import {Row, Col, Input, Tooltip} from 'antd';
+import {Row, Col, Input, Tooltip, notification} from 'antd';
 import 'antd/dist/antd.css';
+import axios from 'axios';
 
 export default class LibraryLayout extends Component {
   static propTypes = {
@@ -44,6 +45,23 @@ export default class LibraryLayout extends Component {
         <div>{scores}</div>
     )
   }
+  download(id) {
+    return () => {
+      axios.post(`/v1/releases/${id}/downloads`).then((res) => {
+        if (res.data.sucess) { // sic: fix typo
+          notification.success({
+            message: 'Torrent added',
+            description: 'Torrent was added to downloader. It should be downloading right now!'
+          });
+        } else {
+          notification.error({
+            message: 'Torrent was not added',
+            description: 'Torrent not was added to downloader. Please check logs for more info'
+          });
+        }
+      });
+    }
+  }
   render() {
     const { store, actions } = this.props;
     const boundSearchStringChange = this.searchStringChange.bind(this);
@@ -54,7 +72,7 @@ export default class LibraryLayout extends Component {
       <Col span={8} className="albumSelect">{a.artist}</Col>
     </Row>)
     const releases = store.releases.map((r) =>
-    <Row gutter={24} key={r.id} >
+    <Row gutter={24} key={r._id} onClick={this.download(r._id)}>
       <Col span={6} className="releaseSelect">{r.album}</Col>
       <Col span={6} className="releaseSelect">{r.artist}</Col>
       <Col span={3} className="releaseSelect">{r.format}</Col>

@@ -1,7 +1,7 @@
 
 import { createStructuredSelector } from 'reselect';
 import assign from 'lodash/assign';
-
+import deepAssign from 'deep-assign';
 import { State } from 'models/playerStatus';
 
 const TOGGLE_PAUSE = 'cassette/toolbar/TOGGLE_PAUSE';
@@ -58,8 +58,7 @@ let srcUrl = (id) => {
 
 let audio = new Audio();
 export default function reducer(state: State = initialState, action: any = {}): State {
-	let newState = {};
-	assign(newState, state);
+	let newState = deepAssign({}, state);
 	switch (action.type) {
     case UPDATE_TIME:
       newState.currentTime = audio.currentTime * 1000;
@@ -122,9 +121,9 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			return newState;
 
     case PLAY_TRACKS:
-      newState.currentTrack = action.tracks[0];
-      newState.previousTrack = state.currentTrack;
-      newState.nextTrack = action.tracks[1];
+      newState.currentTrack = deepAssign({}, action.tracks[0]);
+      newState.previousTrack = deepAssign({}, state.currentTrack);
+      newState.nextTrack = deepAssign({}, action.tracks[1]);
       newState.playing = true;
       newState.currentTime = 0.0;
 

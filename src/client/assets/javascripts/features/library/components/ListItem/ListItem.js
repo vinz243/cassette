@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import './ListItem.scss';
 import {Row, Col} from 'antd';
 import 'antd/dist/antd.css';
-
+import deepAssign from 'deep-assign';
 
 export default class ListItem extends Component {
   static propTypes = {
@@ -10,7 +10,7 @@ export default class ListItem extends Component {
 
   handleTrackNameClick() {
     this.props.select([
-      this.props.track
+      deepAssign({}, this.props.track)
     ]);
   }
 
@@ -20,7 +20,7 @@ export default class ListItem extends Component {
     return (
     	<div>
         <Row gutter={32}>
-          <Col span={8} className="trackName" onClick={boundHandleTrackNameClick}>
+          <Col span={8} className={track.duration > 0 ? "trackName" : "disabledTrackName"} onClick={boundHandleTrackNameClick}>
             {track.name}
           </Col>
           <Col span={8} className="trackArtist">

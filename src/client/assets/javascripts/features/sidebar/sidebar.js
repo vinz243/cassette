@@ -88,7 +88,6 @@ function scanLibrary(id: string) {
     let data = res.data.data;
     return waitScan(id, data._id);
   }).then(() => {
-    console.log('PKKKKKKKK');
     return libraryActionCreators.loadContent();
   });
 }

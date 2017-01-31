@@ -10,7 +10,6 @@ export default class LibraryLayout extends Component {
   };
   componentDidMount() {
     const { library, actions } = this.props;
-
     actions.loadContent();
 
   }

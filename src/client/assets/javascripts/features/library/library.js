@@ -1,7 +1,9 @@
 
 import { createStructuredSelector } from 'reselect';
 import assign from 'lodash/assign';
+import uniq from 'lodash/uniq';
 import axios from 'axios';
+import deepAssign from 'deep-assign';
 
 import {State} from 'models/library';
 
@@ -16,15 +18,14 @@ const PLAY_TRACKS       = 'cassette/shared/PLAY_TRACKS';
 export const NAME = 'library';
 
 const initialState: State = {
-  items: [],
+  items: [ ],
   loading: true,
   viewType: 'LIST',
   viewScope: 'TRACKS'
 };
 
 export default function reducer(state: State = initialState, action: any = {}): State {
-  let newState = {};
-  assign(newState, state);
+  let newState = deepAssign({}, state);
   switch (action.type) {
     case SET_VIEW_TYPE:
       return state;
@@ -39,23 +40,20 @@ export default function reducer(state: State = initialState, action: any = {}): 
         case 'TRACKS':
           newState.loading = false;
           newState.items = action.data.map((track) => {
-              console.log(track.duration);
-              return {
+              return deepAssign({}, {
                 id: track._id,
-                track: {
-                  id: track._id,
-                  name: track.name,
-                  duration: track.duration,
-                  artist: {
-                    id: track.artistId,
-                    name: track.artist.name
-                  },
-                  album: {
-                    id: track.albumId,
-                    name: track.album.name
-                  },
-                }
-              };
+                name: track.name,
+                duration: track.duration * 1000,
+                artist: {
+                  id: track.artistId,
+                  name: track.artist.name
+                },
+                album: {
+                  id: track.albumId,
+                  name: track.album.name
+                },
+              }
+            );
           });
           return newState;
       }
@@ -101,43 +99,47 @@ function openSelection() {
 function playTracks(tracks) {
   return {
     type: PLAY_TRACKS,
-    tracks: tracks
+    tracks: deepAssign({}, tracks)
   };
 }
-
+// function loadContent() {
+//   return {
+//     type: LOAD_CONTENT,
+//     data: [
+//       {"_id":"NVcZ9spiBPSebv57","name":"X","duration":118160,"albumId":"8B7MePC7rhglf7px","artistId":"1MUjmFoDBQOk2vbO","artist":{"_id":"1MUjmFoDBQOk2vbO","name":"System of a Down"},"album":{"_id":"8B7MePC7rhglf7px","name":"Toxicity","artistId":"1MUjmFoDBQOk2vbO"}}
+//     ]
+//   }
+// }
 function loadContent() {
 
   let doneIds = [];
   let identifiers = {};
   return axios.get('/v1/tracks').then((res) => {
     let data = res.data.data;
-    let promises = [];
+    let albums = uniq(data.map((t) => t.albumId)).map((id) => {
+      return axios.get(`/v1/albums/${id}`).then((res) => {
+        identifiers[id] = res.data.data;
+      })
+    });
 
-    for (let track of data) {
-      if (!doneIds.includes(track.albumId)) {
-        promises.push(axios.get(`/v1/albums/${track.albumId}`).then((res) => {
-          identifiers[track.albumId] = res.data.data;
-        }));
-        doneIds.push(track.albumId);
-      }
-      if (!doneIds.includes(track.artistId)) {
-        promises.push(axios.get(`/v1/artists/${track.artistId}`).then((res) => {
-          identifiers[track.artistId] = res.data.data;
-        }));
-        doneIds.push(track.artistId);
-      }
-    }
-    return Promise.all(promises).then(() => {
+    let artists = uniq(data.map((t) => t.artistId)).map((id) => {
+      return axios.get(`/v1/artists/${id}`).then((res) => {
+        identifiers[id] = res.data.data;
+      });
+    })
 
-      for (let track of data) {
-        track.artist = identifiers[track.artistId];
-        track.album = identifiers[track.albumId];
-        track.duration *= 1000;
-      }
-      data.sort((a, b) => a.album.name.localeCompare(b.album.name));
+    return Promise.all([...albums, ...artists]).then(() => {
+
+
       return {
         type: LOAD_CONTENT,
-        data
+        data: data.map((track) => {
+          return Object.assign({}, track, {
+            artist: identifiers[track.artistId],
+            album: identifiers[track.albumId],
+            duration: track.duration || 0
+          }
+        )}).sort((a, b) => a.album.name.localeCompare(b.album.name))
       };
     });
   })
