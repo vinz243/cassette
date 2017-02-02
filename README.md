@@ -18,11 +18,12 @@ There is no way to use it as-is for the moment as it is an alpha release, and un
 ### How to build and develop
 
 ```
-$ git clone git@github.com:vinz243/cassette.git
+$ git clone https://github.com/vinz243/cassette.git
 $ npm install yarn -g
 $ yarn
 $ yarn start
 ```
+Then head over to `localhost:3000/app/library`. 
 I prefer using yarn over npm, it's like 10x faster.
 
 
