@@ -1,17 +1,19 @@
 import Datastore from 'nedb-promise';
-import conf from '../../../config.js';
+import conf from '../config.js';
 import config from './config.js';
 
 import assert from 'assert';
 import events from 'events';
 import mkdirp from 'mkdirp';
+import path from 'path';
 import Lazy from 'lazy.js';
 
 import pascalCase from 'pascal-case';
 import pluralize from 'pluralize';
 import snakeCase from 'snake-case';
 
-mkdirp.sync(conf.rootDir + '/data/')
+let dataDir = path.join(conf.get('configPath'), '/data/');
+mkdirp.sync(dataDir);
 
 class ModelField {
   constructor(name, model) {
@@ -87,7 +89,7 @@ class Model {
   constructor(name) {
     this.name = name;
     this.dbName = snakeCase(name) + 's';
-    this.dbPath = conf.rootDir + '/data/' + this.dbName + '.db';
+    this.dbPath = path.join(dataDir, this.dbName + '.db');
     this.fields = [];
     this.relations = [];
     this.methods = [];

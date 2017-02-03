@@ -5,7 +5,7 @@ import Artist from './Artist';
 import Album from './Album';
 import Track from './Track';
 
-import conf from '../../../config.js';
+import conf from '../config.js';
 
 import Model from './Model';
 

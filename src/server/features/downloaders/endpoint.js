@@ -1,5 +1,5 @@
 import RTorrent from './rTorrent';
-import config from '../../../../config';
+import config from '../../config.js';
 import {pull} from '../store/database';
 import {api} from '../indexers';
 const rTorrent = new RTorrent();

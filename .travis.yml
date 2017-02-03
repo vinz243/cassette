@@ -7,9 +7,8 @@ node_js:
   - "6"
 
 script:
-  - npm run test
-  - npm run lint
-  - npm run backend:coverage-travis -- -v
+  - yarn test
+  - yarn backend:coverage-travis -- -v
 
 cache:
   directories:

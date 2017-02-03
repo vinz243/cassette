@@ -1,6 +1,9 @@
 // Creates a hot reloading development environment
-require('babel-polyfill');
+// process.env.NODE_PATH = __dirname;
+// require('module').Module._initPaths();
 
+require('babel-polyfill');
+// console.log(require('config.js'));
 const path = require('path');
 const express = require('express');
 const webpack = require('webpack');

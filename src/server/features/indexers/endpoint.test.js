@@ -1,7 +1,7 @@
 // Only real world test here...
 
 import test from 'ava';
-import config from '../../../../config';
+import config from '../../config';
 
 import supertest from 'supertest-as-promised';
 import app from '../../server.js';

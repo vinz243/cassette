@@ -1,15 +1,10 @@
 import agent from 'supertest-koa-agent';
-import config from '../../../config';
+import config from '../config';
 import supertest from 'supertest-as-promised'
 import test from 'ava';
 import app from '../server.js';
 
 const request = supertest((app));
-
-test('rootDir is a temp dir different from baseDir', t => {
-  t.not(config.rootDir, config.baseDir);
-});
-
 
 test.serial('server can post to create new config entry', async t => {
   t.plan(2);

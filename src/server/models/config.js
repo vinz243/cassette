@@ -1,10 +1,13 @@
 import datastore from 'nedb-promise';
-import conf from '../../../config.js';
+import config from '../config.js';
 import mkdirp from 'mkdirp';
+import path from 'path';
 
-mkdirp.sync(conf.rootDir + '/data/')
+let dataDir = path.join(config.get('configPath'), '/data/');
+mkdirp.sync(dataDir);
 
-let db = new datastore(conf.rootDir + '/data/config.db');
+
+let db = new datastore(path.join(dataDir, '/config.db'));
 db.loadDatabase();
 
 const model = {

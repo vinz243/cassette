@@ -1,6 +1,6 @@
 import body from 'koa-better-body';
 import chalk from 'chalk';
-import config from '../../config';
+import config from './config.js';
 import convert from 'koa-convert';
 import Koa from 'koa';
 import koaRouter from 'koa-router';

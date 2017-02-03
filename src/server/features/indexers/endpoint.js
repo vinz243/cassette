@@ -1,5 +1,5 @@
 import GazelleAPI from './GazelleAPI';
-import config from '../../../../config';
+import config from '../../config';
 import {pull} from '../store/database';
 
 export const api = new GazelleAPI({

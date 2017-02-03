@@ -1229,6 +1229,12 @@ babel-register@^6.22.0:
     mkdirp "^0.5.1"
     source-map-support "^0.4.2"
 
+babel-root-import@^4.1.5:
+  version "4.1.5"
+  resolved "https://registry.yarnpkg.com/babel-root-import/-/babel-root-import-4.1.5.tgz#cb2b8163af1c4935d8fb570b5369154317a84f96"
+  dependencies:
+    slash "^1.0.0"
+
 babel-runtime@6.11.6, babel-runtime@6.x:
   version "6.11.6"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.11.6.tgz#6db707fef2d49c49bfa3cb64efdb436b518b8222"
@@ -3178,6 +3184,10 @@ find-cache-dir@^0.1.1:
     commondir "^1.0.1"
     mkdirp "^0.5.1"
     pkg-dir "^1.0.0"
+
+find-package-json@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/find-package-json/-/find-package-json-1.0.0.tgz#ed6efb0bcc905e839173e53d47920711e38b9561"
 
 find-up@^1.0.0, find-up@^1.1.2:
   version "1.1.2"
