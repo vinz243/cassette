@@ -4,4 +4,4 @@ config.json
 coverage/
 config.local.json
 downloads
-./secure.json
+secure.json
