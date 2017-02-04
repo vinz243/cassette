@@ -43,6 +43,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
               return deepAssign({}, {
                 id: track._id,
                 name: track.name.replace(/\(.+\)$/, ''),
+                originalName: track.name,
                 duration: track.duration * 1000,
                 artist: {
                   id: track.artistId,
@@ -50,7 +51,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
                 },
                 album: {
                   id: track.albumId,
-                  name: track.album.name
+                  name: track.album.name.replace(/\(.+\).*$/, '')
                 },
               }
             );

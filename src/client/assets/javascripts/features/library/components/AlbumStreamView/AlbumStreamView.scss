@@ -1,0 +1,29 @@
+.albumArt {
+  width: 100%;
+  margin-top: 0.5em;
+}
+
+.albumStreamItem {
+  margin-bottom: 6em;
+}
+
+.albumHeader {
+  margin: 0.5em 0;
+  text-transform: uppercase;
+  font-weight: bold;
+  color: #6a6a6a;
+  .album {
+    color: #111111;
+  }
+}
+
+.trackItem {
+  margin: 0.12em 0;
+  cursor: pointer;
+  .duration {
+    color: #9f9f9f;
+  }
+  .nameExt {
+    color: #9f9f9f;
+  }
+}
