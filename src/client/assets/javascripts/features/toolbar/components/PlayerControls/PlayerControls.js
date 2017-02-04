@@ -68,7 +68,7 @@ export default class PlayerControls extends Component {
 	    				<Row gutter={16}>
 			    			<Col span={8}>
 			    				<div onClick={boundRewind} className={'rewindControl' +
-                    ((toolbar.previousTrack || toolbar.currentTrack) ?
+                    ((toolbar.previousTracks.length > 0 || toolbar.currentTrack) ?
                         '' : ' disabled')}>
 			    					<GoPlaybackRewind />
 			    				</div>
@@ -79,7 +79,9 @@ export default class PlayerControls extends Component {
 			    				</div>
 			    			</Col>
 			    			<Col span={8}>
-			    				<div onClick={boundFastForward} className={'fastForwardControl' + (toolbar.nextTrack ? '' : ' disabled')}>
+			    				<div onClick={boundFastForward}
+                    className={'fastForwardControl' +
+                      (toolbar.nextTracks.length > 0 ? '' : ' disabled')}>
 			    					<GoPlaybackFastForward />
 			    				</div>
 			    			</Col>

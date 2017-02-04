@@ -101,7 +101,7 @@ function openSelection() {
 function playTracks(tracks) {
   return {
     type: PLAY_TRACKS,
-    tracks: deepAssign({}, tracks)
+    tracks: tracks
   };
 }
 // function loadContent() {

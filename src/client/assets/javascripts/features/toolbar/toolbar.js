@@ -45,7 +45,9 @@ const initialState: State = {
 	playing: false,
 	currentTrack: undefined,
 	nextTrack: undefined,
+	nextTracks: [],
 	previousTrack: undefined,
+	previousTracks: [],
 	currentTime: 0,
 	viewType: 'redux-app/view-types/THUMBNAILS',
 	searchString: '',
@@ -81,12 +83,11 @@ export default function reducer(state: State = initialState, action: any = {}): 
           audio.play();
 				return newState;
 			}
-			if (!state.previousTrack) return newState;
+			if (state.previousTracks.length === 0) return newState;
 
-			newState.currentTrack = state.previousTrack;
-			newState.previousTrack = undefined;
+			newState.currentTrack = newState.previousTracks.shift();
 			newState.currentTime = 0.0;
-			newState.nextTrack = state.currentTrack;
+			newState.nextTracks.unshift(state.currentTrack);
 
       audio.src = srcUrl(newState.currentTrack.id);
       if (newState.playing)
@@ -94,12 +95,11 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			return newState;
 
 		case PLAY_NEXT:
-			if (!state.nextTrack) return newState;
+			if (state.nextTracks.length === 0) return newState;
 
-			newState.currentTrack = state.nextTrack;
-			newState.nextTrack = undefined;
+			newState.currentTrack = newState.nextTracks.shift();
 			newState.currentTime = 0.0;
-			newState.previousTrack = state.currentTrack;
+			newState.previousTracks = [state.currentTrack, ...newState.previousTracks];
       audio.src = srcUrl(newState.currentTrack.id);
 
       if (newState.playing)
@@ -121,9 +121,10 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			return newState;
 
     case PLAY_TRACKS:
+      if(newState.currentTrack)
+        newState.previousTracks = [newState.currentTrack, ...newState.previousTracks];
       newState.currentTrack = deepAssign({}, action.tracks[0]);
-      newState.previousTrack = deepAssign({}, state.currentTrack);
-      newState.nextTrack = deepAssign({}, action.tracks[1]);
+      newState.nextTracks = action.tracks.slice(1);
       newState.playing = true;
       newState.currentTime = 0.0;
 
