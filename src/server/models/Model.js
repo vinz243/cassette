@@ -190,6 +190,8 @@ class Model {
         if (field.validator && !field.validator(value)) {
           if (field._required)
             throw new Error(`Field ${field.name} is required but has invalid value`);
+          // else
+            // console.warn(`Dropping field ${field.name} with ${value}`);
         } else {
           payload[field.name] = value;
         }

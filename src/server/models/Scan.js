@@ -30,6 +30,10 @@ export const processResult = async (res) => {
             track.data.artistId = artist.data._id;
             track.data.albumId = album.data._id;
             track.data.duration = t.duration;
+            // console.log("ADDING TRACK", t.trackNumber);
+            if(t.trackNumber) {
+              track.data.trackNumber = (t.trackNumber + '').match(/^\d+/)[0] - 0;
+            }
             await track.create();
           }
           let dup = await File.find({path: t.path});

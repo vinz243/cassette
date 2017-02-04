@@ -28,7 +28,10 @@ export default class AlbumStreamView extends Component {
     let tracksDOM = album.tracks.map((t) => (
       <div className="trackItem" key={t.id}>
         <Row onClick={t.play}>
-          <Col span={18}>
+          <Col span={1} className="trackNumber">
+            {t.number}
+          </Col>
+          <Col span={17}>
             {t.name}
             <span className="nameExt">
               {t.originalName.substr(t.name.length)}

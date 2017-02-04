@@ -34,38 +34,48 @@ export default class LibraryLayout extends Component {
     if (library.loading) {
       content = <span>Loading...</span>
     } else {
-      let albums = library.items.reduce((acc, val) => {
-        let res = {
-          id: val.album.id,
-          name: val.album.name,
-          artist: Object.assign({}, val.artist),
-          tracks: [].concat({
-            name: val.name,
-            originalName: val.originalName,
-            duration: val.duration,
-            id: val.id,
-            play: () => {
-              let artist = {
-                id: val.artist.id,
-                name: val.artist.name
-              }
-              actions.playTracks([{
-                id: val.id,
-                name: val.name,
-                originalName: val.originalName,
-                duration: val.duration,
-                artist: Object.assign({}, artist),
-                album: {
-                  id: val.album.id,
-                  name: val.album.name,
-                  artist: Object.assign({}, artist)
-                }
-              }])
+      let albums = library.items
+        // .sort((a, b) => (a.number || 0) - (b.number || 0))
+        .reduce((acc, val) => {
+          let getPlayData = () => {
+            let artist = {
+              id: val.artist.id,
+              name: val.artist.name
             }
-          }, ((acc[val.album.id] || {}).tracks || []))
-        };
-        acc[val.album.id] = res;
-        return acc;
+            return {
+              id: val.id,
+              name: val.name,
+              originalName: val.originalName,
+              duration: val.duration,
+              artist: Object.assign({}, artist),
+              album: {
+                id: val.album.id,
+                name: val.album.name,
+                artist: Object.assign({}, artist)
+              }
+            };
+          };
+          let oldValue = (acc[val.album.id] || {}).tracks || [];
+          let res = {
+            id: val.album.id,
+            name: val.album.name,
+            artist: Object.assign({}, val.artist),
+            tracks: [].concat({
+              name: val.name,
+              originalName: val.originalName,
+              duration: val.duration,
+              number: val.number,
+              id: val.id,
+              getPlayData,
+              play: () => {
+                actions.playTracks([getPlayData()].concat(oldValue.map(
+                  (track) => track.getPlayData()
+                )))
+              }
+            }, oldValue)
+          };
+          acc[val.album.id] = res;
+          return acc;
       }, {});
       content = Object.values(albums).map(a => <AlbumStreamView key={a.id} album={a} />);
       // content = <ListView {...this.props}/>

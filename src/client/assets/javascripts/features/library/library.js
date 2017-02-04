@@ -44,6 +44,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
                 id: track._id,
                 name: track.name.replace(/\(.+\)$/, ''),
                 originalName: track.name,
+                number: track.trackNumber,
                 duration: track.duration * 1000,
                 artist: {
                   id: track.artistId,
@@ -55,7 +56,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
                 },
               }
             );
-          });
+          }).sort((a, b) => (b.number || 0) - (a.number || 0));
           return newState;
       }
       return state;
