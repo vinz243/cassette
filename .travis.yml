@@ -17,3 +17,4 @@ cache:
 install:
   - npm i -g npm@latest yarn
   - yarn
+  - cp ./secure.json.template ./secure.json
