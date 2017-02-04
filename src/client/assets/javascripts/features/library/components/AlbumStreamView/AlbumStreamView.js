@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import './AlbumStreamView.scss';
-import {Row, Col} from 'antd';
+import {Row, Col, Spin} from 'antd';
 import classnames from 'classnames';
 
 export default class AlbumStreamView extends Component {
@@ -30,7 +30,11 @@ export default class AlbumStreamView extends Component {
       <div className={classnames('trackItem', {'playing': t.playing})} key={t.id}>
         <Row onClick={t.play} gutter={16}>
           <Col span={2} className="trackNumber">
-            {t.playing ? '►' : t.number}
+            {t.playing ? <div className="spinner">
+  <div className="bounce1"></div>
+  <div className="bounce2"></div>
+  <div className="bounce3"></div>
+</div>: t.number}
           </Col>
           <Col span={16}>
             {t.name}
