@@ -1,3 +1,5 @@
+$transitionTime: 250ms;
+
 .albumArt {
   width: 100%;
   margin-top: 0.5em;
@@ -18,13 +20,29 @@
 }
 
 .trackItem {
-  margin: 0.12em 0;
-  cursor: pointer;
-  .duration {
-    color: #9f9f9f;
-  }
-  .nameExt, .trackNumber {
-    color: #9f9f9f;
-  }
+  padding: 0.12em 0;
+  margin: 0;
 
+  cursor: pointer;
+
+  border-radius: 0.12em;
+  -webkit-transition: background-color $transitionTime ease-in-out;
+  -ms-transition: background-color $transitionTime ease-in-out;
+  transition: background-color $transitionTime ease-in-out;
+
+  .duration, .nameExt, .trackNumber {
+    color: #9f9f9f;
+  }
+  .nameExt {
+    margin-left: 0.2em;
+  }
+  .trackNumber {
+    text-align: right;
+  }
+  &.playing {
+    background-color: #ebe7e7;
+    -webkit-transition: background-color $transitionTime ease-in-out;
+    -ms-transition: background-color $transitionTime ease-in-out;
+    transition: background-color $transitionTime ease-in-out;
+  }
 }

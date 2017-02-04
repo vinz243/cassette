@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import './AlbumStreamView.scss';
 import {Row, Col} from 'antd';
+import classnames from 'classnames';
 
 export default class AlbumStreamView extends Component {
   static propTypes = {
@@ -26,18 +27,18 @@ export default class AlbumStreamView extends Component {
   render() {
     const { album } = this.props;
     let tracksDOM = album.tracks.map((t) => (
-      <div className="trackItem" key={t.id}>
-        <Row onClick={t.play}>
-          <Col span={1} className="trackNumber">
-            {t.number}
+      <div className={classnames('trackItem', {'playing': t.playing})} key={t.id}>
+        <Row onClick={t.play} gutter={16}>
+          <Col span={2} className="trackNumber">
+            {t.playing ? '►' : t.number}
           </Col>
-          <Col span={17}>
+          <Col span={16}>
             {t.name}
             <span className="nameExt">
-              {t.originalName.substr(t.name.length)}
+              {t.originalName.substr(t.name.length).replace(/\(|\)/g, '')}
             </span>
           </Col>
-          <Col span={6} className="duration">
+          <Col span={3} className="duration">
             {this.msToTime(t.duration)}
           </Col>
         </Row>

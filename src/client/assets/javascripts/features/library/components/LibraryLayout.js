@@ -66,6 +66,7 @@ export default class LibraryLayout extends Component {
               duration: val.duration,
               number: val.number,
               id: val.id,
+              playing: (this.props.toolbar.currentTrack || {}).id === val.id,
               getPlayData,
               play: () => {
                 actions.playTracks([getPlayData()].concat(oldValue.map(
