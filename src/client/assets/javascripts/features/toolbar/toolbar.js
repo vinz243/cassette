@@ -63,7 +63,22 @@ export default function reducer(state: State = initialState, action: any = {}): 
 	let newState = deepAssign({}, state);
 	switch (action.type) {
     case UPDATE_TIME:
-      newState.currentTime = audio.currentTime * 1000;
+      if (!audio.ended) {
+        newState.currentTime = audio.currentTime * 1000;
+        return newState;
+      }
+      // If ended, this will play next track
+    case PLAY_NEXT:
+      if (state.nextTracks.length === 0) return newState;
+
+      newState.currentTrack = newState.nextTracks.shift();
+      newState.currentTime = 0.0;
+      newState.previousTracks = [state.currentTrack, ...newState.previousTracks];
+      audio.src = srcUrl(newState.currentTrack.id);
+
+      if (newState.playing)
+      audio.play();
+
       return newState;
 
 		case TOGGLE_PAUSE:
@@ -94,18 +109,6 @@ export default function reducer(state: State = initialState, action: any = {}): 
         audio.play();
 			return newState;
 
-		case PLAY_NEXT:
-			if (state.nextTracks.length === 0) return newState;
-
-			newState.currentTrack = newState.nextTracks.shift();
-			newState.currentTime = 0.0;
-			newState.previousTracks = [state.currentTrack, ...newState.previousTracks];
-      audio.src = srcUrl(newState.currentTrack.id);
-
-      if (newState.playing)
-        audio.play();
-
-			return newState;
 
 		case SET_VOLUME:
 			newState.volume = Math.min(Math.max(action.value, 0.0), 1.0);
