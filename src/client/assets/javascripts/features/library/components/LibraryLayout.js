@@ -78,7 +78,8 @@ export default class LibraryLayout extends Component {
           acc[val.album.id] = res;
           return acc;
       }, {});
-      content = Object.values(albums).map(a => <AlbumStreamView key={a.id} album={a} />);
+      content = Object.values(albums).map(a =>
+        <AlbumStreamView key={a.id} album={a} paused={!this.props.toolbar.playing}/>);
       // content = <ListView {...this.props}/>
     }
     return (
