@@ -52,7 +52,7 @@ export default class AlbumStreamView extends Component {
     	<div>
         <Row gutter={32} className="albumStreamItem">
           <Col span={6}>
-            <img className="albumArt" src={"http://lorempixel.com/g/400/400?"+album.id} />
+            <img className="albumArt" src={`/v1/albums/${album.id}/art`} />
           </Col>
           <Col span={18}>
             <div className="albumHeader">
