@@ -8,9 +8,12 @@ let Deserializer = require('xmlrpc/lib/deserializer');
 let net = require('net');
 let fs = require('fs');
 let Serializer = require('xmlrpc/lib/serializer');
+let mainStory = require('storyboard').mainStory;
+
 
 export default {
   methodCall: (methodName, parameters, host, port) => {
+
     let connectMethod = {port: port, host: host};
     let deserializer = new Deserializer('utf8');
     let headerLength = 0;
@@ -37,7 +40,10 @@ export default {
 
     stream.write(`${header},${xml}`);
 
+    let time = Date.now();
+
     return new Promise((resolve, reject) => {
+      mainStory.info('scgi', `Called ${methodName} on ${host}:${port} in ${Date.now() - time}ms`);
       deserializer.deserializeMethodResponse(stream, (error, response) => {
         if (error) {
           return reject(error);

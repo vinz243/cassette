@@ -3,8 +3,8 @@ import config from '../../config';
 import {pull} from '../store/database';
 
 export const api = new GazelleAPI({
-  username: config.pthUsername,
-  password: config.pthPassword
+  username: config.get('pthUsername'),
+  password: config.get('pthPassword')
 });
 
 export default {

@@ -2,15 +2,18 @@ import {getClosestSize} from './sizes';
 import {Album, Artist} from '../../models';
 import qs from 'querystring';
 import request from 'request-promise-native';
+import {mainStory} from 'storyboard';
+import chalk from 'chalk';
+
 export default {
   '/v1/albums/:id/art': {
     get: async (ctx) => {
       const {size = 300} = ctx.request.query;
       const album = await Album.findById(ctx.params.id);
-      if (!album) {
-        console.log('No album');
+
+      if (!album)
         return ctx.throw(404);
-      }
+
       const params = {
         method: 'album.getinfo',
         api_key: '85d5b036c6aa02af4d7216af592e1eea',
@@ -18,10 +21,11 @@ export default {
         album: album.data.name,
         format: 'json'
       };
-      
-      const url = 'http://ws.audioscrobbler.com/2.0/?' + qs.stringify(params);
 
+      const url = 'http://ws.audioscrobbler.com/2.0/?' + qs.stringify(params);
+      const time = Date.now();
       let json = await request(url);
+      mainStory.info('artwork', `GET ${chalk.dim(url)} - ${Date.now() - time}ms`);
       const data = JSON.parse(json);
       const availableSizes = data.album.image.map(s => s.size);
 
@@ -35,6 +39,7 @@ export default {
       ctx.body = await request({
         url: imageUrl, encoding: null
       });
+      mainStory.info('artwork', `GET ${chalk.dim(imageUrl)} - ${Date.now() - time}ms`);
 
     }
   }

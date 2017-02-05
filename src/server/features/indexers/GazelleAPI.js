@@ -4,6 +4,8 @@ import querystring from 'querystring';
 import Release from './Release';
 import {push} from '../store/database';
 import shortid from 'shortid';
+import {mainStory} from 'storyboard';
+import chalk from 'chalk';
 
 export default class GazelleAPI {
   defaultConfig = {
@@ -29,6 +31,12 @@ export default class GazelleAPI {
     if(!this._loggedIn) throw new Error('Not logged in');
 
     return new Promise((resolve, reject) => {
+      let delay = nextCallDelay(this._calls,
+        this._config.rateLimitMaxCalls,
+        this._config.rateLimitTimeFrame);
+      if (delay > 0)
+        mainStory.info('indexers', `delaying request of ${delay}ms to avoid reaching rate`);
+
       setTimeout(() => {
         this._calls.push(Date.now());
 
@@ -39,10 +47,10 @@ export default class GazelleAPI {
         let {protocol, hostname, port} = this._config;
         let url = `${protocol}://${hostname}:${port}/${endpoint}?${qs}`
 
-        console.log('Calling ' + url);
-
+        let time = Date.now();
         this._request.get(Object.assign({}, {url}, ropts), (err, res, data) => {
           if (err) return reject(err);
+          mainStory.info('indexers', `request ${chalk.dim(url)} ${Date.now() - time}ms`);
           try {
             const json = Object.assign({}, JSON.parse(data));
             resolve(json);
@@ -50,9 +58,7 @@ export default class GazelleAPI {
             resolve(data);
           }
         });
-      }, nextCallDelay(this._calls,
-        this._config.rateLimitMaxCalls,
-        this._config.rateLimitTimeFrame));
+      }, delay);
     });
   }
   searchTorrents(q = '') {
@@ -68,6 +74,7 @@ export default class GazelleAPI {
     // });
   }
   static parseTorrents(res) {
+    if (!res || !res.response) return [];
     return Promise.resolve(expandArray(res.response.results, 'torrents', false)
                   .map(GazelleAPI.toRelease));
   }
@@ -96,6 +103,7 @@ export default class GazelleAPI {
         resolve();
       } else {
         let {protocol, hostname, port, endpoint, username, password} = this._config;
+        mainStory.info('indexers', `Trying to logging you in as ${username}...`);
         let url = `${protocol}://${hostname}:${port}/login.php`
         this._request.post({
           uri: url,
@@ -107,6 +115,7 @@ export default class GazelleAPI {
           if (res.statusCode >= 400)
             return reject(new Error(res.statusCode));
           this._loggedIn = true;
+          mainStory.info('indexers', `Logged in as ${username}`);
           resolve();
         });
       }

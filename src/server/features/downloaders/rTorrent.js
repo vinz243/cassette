@@ -1,6 +1,6 @@
 import mkdirp from 'mkdirp';
 import scgi from './scgi';
-
+import {mainStory} from 'storyboard';
 
 // var detectCharacterEncoding = require('detect-character-encoding');
 
@@ -23,8 +23,12 @@ export default class RTorrent {
     parameters.push(content);
     parameters.push(`d.directory.set="${this.opts.targetPath}"`);
     // parameters.push(`d.custom.set=x-filename,RATM-Album`);
-
-    return scgi.methodCall('load.raw_start', parameters,
-      this.opts.scgiHost, this.opts.scgiPort);
+    try {
+      return scgi.methodCall('load.raw_start', parameters,
+        this.opts.scgiHost, this.opts.scgiPort);
+    } catch (err) {
+      mainStory.err('scgi', 'Error while calling scgi', {attach: err});
+      return Promise.reject(err);
+    }
   }
 };

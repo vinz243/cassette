@@ -6,6 +6,8 @@ import Track from './Track';
 import File from './File';
 import Model from './Model';
 import process from 'process';
+import chalk from 'chalk';
+import { mainStory } from 'storyboard';
 
 export const processResult = async (res) => {
   if(res.status === 'done') {
@@ -78,14 +80,26 @@ let Scan = new Model('scan')
     // console.log('start');
     this.data.statusCode = 'STARTED';
     this.data.statusMessage = 'Scan started...';
-
+    let story = mainStory.child({
+      src: 'libscan',
+      title: 'Library scan',
+      level: 'info'
+    });
+    story.debug('Running scan on `nextTick()`');
     process.nextTick(() => {
       if (this.data.dryRun) {
         this.data.statusCode = 'DONE';
         this.data.statusMessage = 'Scan was a dry run';
+        story.warn(`${chalk.bold('dryRun')} flag was set`);
+        story.close();
       } else {
         Library.findById(this.data.libraryId).then((dir) => {
           let child = child_process.fork(require.resolve('../scripts/music_scanner'));
+          story.debug('Child process forked');
+
+          story.debug(`${chalk.dim('Executing action ')} 'set_config'`, {
+            dir: dir.data.path
+          });
 
           child.send({
             action: 'set_config',
@@ -93,21 +107,25 @@ let Scan = new Model('scan')
               dir: dir.data.path
             }
           });
-
+          story.debug(`${chalk.dim('Executing action ')} 'execute'`);
           child.send({action: 'execute'});
 
           child.on('message', (res) => {
             if (res.status === 'LOG') {
-              console.log('child: ' + res.msg);
+              story.info(res.msg);
               return;
             }
             processResult(res).then(() => {
               this.data.statusCode = 'DONE';
               this.data.statusMessage = 'Scan finished without errors';
               this.update();
+              story.info('Scan finished !');
+              story.close();
             }).catch((err) => {
               this.data.statusCode = 'FAILED';
               this.data.statusMessage = err;
+              story.error('Scan errored', err);
+              story.close();
             });
           });
         });

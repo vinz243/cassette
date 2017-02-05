@@ -1,6 +1,7 @@
 import Datastore from 'nedb-promise';
 import conf from '../config.js';
 import config from './config.js';
+import { mainStory } from 'storyboard';
 
 import assert from 'assert';
 import events from 'events';
@@ -138,7 +139,7 @@ class Model {
     self.emitter.emit('done:before');
 
     if (databases[self.dbPath]) {
-      console.log('Not loading db again...');
+      mainStory.warn('db', 'Not loading DB again..');
       db = databases[self.dbPath];
     } else {
       db = new Datastore(self.dbPath);
@@ -190,8 +191,8 @@ class Model {
         if (field.validator && !field.validator(value)) {
           if (field._required)
             throw new Error(`Field ${field.name} is required but has invalid value`);
-          // else
-            // console.warn(`Dropping field ${field.name} with ${value}`);
+          else
+            mainStory.info('db', `Dropping field ${field.name} with ${value}`);
         } else {
           payload[field.name] = value;
         }
@@ -218,6 +219,7 @@ class Model {
 
 
      let res = await db.insert(this.getPayload());
+     mainStory.debug('db', `created ${self.name}#${this._id}`);
 
       this._id = this.data._id = res._id;
       self.emitter.emit('create:after', this);
@@ -238,6 +240,7 @@ class Model {
 
       await db.update({_id: this._id}, this.getPayload());
       self.emitter.emit('update:after', this);
+      mainStory.debug('db', `updated ${self.name}#${this._id}`);
       return;
     }
 
