@@ -1,0 +1,21 @@
+.albumCard {
+  padding: 1em;
+  cursor: pointer;
+  h3 {
+    font-size: 1.4em;
+    margin: 0.6em 0.6em 0.6em 0.6em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  span {
+    // padding: 0.1em 0.6em 0.6em 0.6em;
+    color: #7a7878;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+.albumsView {
+  margin-top: 2em;
+}
