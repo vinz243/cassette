@@ -16,6 +16,11 @@ $transitionTime: 250ms;
   color: #6a6a6a;
   .album {
     color: #111111;
+    margin-left: 0.6em;
+  }
+  .artist {
+    cursor: pointer;
+    margin-right: 0.6em;
   }
 }
 .spinner {

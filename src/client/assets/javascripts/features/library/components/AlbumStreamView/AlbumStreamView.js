@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import './AlbumStreamView.scss';
 import {Row, Col, Spin} from 'antd';
 import classnames from 'classnames';
+import { browserHistory } from 'react-router';
 
 export default class AlbumStreamView extends Component {
   static propTypes = {
@@ -56,7 +57,10 @@ export default class AlbumStreamView extends Component {
           </Col>
           <Col span={18}>
             <div className="albumHeader">
-              {album.artist.name} &#8210;
+              <span   className="artist" onClick={browserHistory.push.bind(null, `/app/library/artists/${album.artist.id}/albums`)}>
+                {album.artist.name}
+              </span>
+              &#8210;
               <span className="album">
                 {' ' + album.name}
               </span>
