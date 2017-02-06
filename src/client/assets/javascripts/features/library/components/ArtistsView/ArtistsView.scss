@@ -1,0 +1,14 @@
+.artistCard {
+  padding: 1em;
+  cursor: pointer;
+  h3 {
+    font-size: 1.4em;
+    margin: 0.6em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+.artistsView {
+  margin-top: 2em;
+}

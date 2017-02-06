@@ -42,5 +42,44 @@ export default {
       mainStory.info('artwork', `GET ${chalk.dim(imageUrl)} - ${Date.now() - time}ms`);
 
     }
+  },
+  '/v1/artists/:id/art': {
+    get: async (ctx) => {
+      const {size = 300} = ctx.request.query;
+      const artist = await Artist.findById(ctx.params.id);
+
+      if (!artist)
+        return ctx.throw(404);
+
+      const params = {
+        method: 'artist.getinfo',
+        api_key: '85d5b036c6aa02af4d7216af592e1eea',
+        artist: artist.data.name,
+        format: 'json'
+      };
+
+      const url = 'http://ws.audioscrobbler.com/2.0/?' + qs.stringify(params);
+      const time = Date.now();
+      let json = await request(url);
+
+      mainStory.info('artwork', `GET ${chalk.dim(url)} - ${Date.now() - time}ms`);
+      const data = JSON.parse(json);
+      const availableSizes = data.artist.image.map(s => s.size);
+
+      if (availableSizes.length === 0) return ctx.throws(404);
+
+      const target = getClosestSize(size, availableSizes);
+      const imageUrl = data.artist.image.find(el => el.size === target)['#text'];
+
+      ctx.status = 200;
+      ctx.set('Content-Type', 'image/png');
+
+      const time2 = Date.now();
+      ctx.body = await request({
+        url: imageUrl, encoding: null
+      });
+      mainStory.info('artwork', `GET ${chalk.dim(imageUrl)} - ${Date.now() - time2}ms`);
+
+    }
   }
 }
