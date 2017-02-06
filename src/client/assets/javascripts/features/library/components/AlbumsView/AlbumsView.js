@@ -5,6 +5,7 @@ import chunk from 'lodash/chunk';
 import {Row, Col, Card} from 'antd';
 import classnames from 'classnames';
 import ViewScope from '../ViewScope';
+import { browserHistory } from 'react-router';
 
 export default class AlbumsView extends Component {
   componentDidMount() {
@@ -14,14 +15,19 @@ export default class AlbumsView extends Component {
   }
   render() {
     const COLUMNS = 6;
+    let artistId = this.props.params.id;
+    let artistName = (this.props.library.items.find(
+      ((el) => el.artist.id === artistId)
+    )  || {artist: {}}).artist.name;
     let albums = chunk(uniqBy(
       this.props.library.items.map((el) => Object.assign({}, el.album, {
         artist: el.artist
-      })),
-      (el) => el.id), COLUMNS).map((arr, index) => {
+      })).filter(el =>  artistId ? el.artist.id === artistId : true)
+      , (el) => el.id), COLUMNS)
+      .map((arr, index) => {
         let arts = arr.map((album) => (
           <Col span={Math.floor(24 / COLUMNS)} className="albumCard" key={album.id}>
-            <Card bodyStyle={{ padding: 0 }}>
+            <Card bodyStyle={{ padding: 0 }} onClick={browserHistory.push.bind(null, `/app/library/albums/${album.id}/tracks`)}>
               <div className="custom-image">
                 <img alt="example" width="100%" src={
                     `/v1/albums/${album.id}/art`
@@ -38,6 +44,9 @@ export default class AlbumsView extends Component {
         </Row>
       });
 
-    return <div className="albumsView"><ViewScope selection='albums'/> {albums}</div>
+    return <div className="albumsView">
+      <ViewScope selection='albums' title={artistName}/>
+      {albums}
+    </div>
   }
 }

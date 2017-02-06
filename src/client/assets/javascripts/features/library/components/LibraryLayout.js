@@ -4,6 +4,7 @@ import AlbumStreamView from './AlbumStreamView';
 import './LibraryApp.scss';
 import {Row, Col} from 'antd';
 import 'antd/dist/antd.css';
+import ViewScope from './ViewScope';
 import assert from 'assert';
 
 export default class LibraryLayout extends Component {
@@ -16,25 +17,14 @@ export default class LibraryLayout extends Component {
 
   }
   render() {
-    const { library, actions } = this.props;
-    // {
-    //    "id":"aQU74XNiCv3QedVW",
-    //    "name":"MRAZ ",
-    //    "duration":294060.408,
-    //    "artist":{
-    //       "id":"7UjxpvBRNstzbVz2",
-    //       "name":"Flatbush ZOMBiES"
-    //    },
-    //    "album":{
-    //       "id":"ljSlVUQCk13tFCtN",
-    //       "name":"BetterOffDEAD"
-    //    }
-    // }
+    const { library, actions, params } = this.props;
     let content;
     if (library.loading) {
       content = <span>Loading...</span>
     } else {
       let albums = library.items
+        .filter((el) => params.artistId ? el.artist.id === params.artistId : true)
+        .filter((el) => params.albumId ? el.album.id === params.albumId : true)
         // .sort((a, b) => (a.number || 0) - (b.number || 0))
         .reduce((acc, val) => {
           let getPlayData = () => {
@@ -83,7 +73,8 @@ export default class LibraryLayout extends Component {
       // content = <ListView {...this.props}/>
     }
     return (
-    	<div className="libraryContainer">
+      <div className="albumsView">
+        <ViewScope selection='tracks' title=''/>
         {content}
       </div>
     );

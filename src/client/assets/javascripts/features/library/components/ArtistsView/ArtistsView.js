@@ -2,9 +2,10 @@ import React, { Component, PropTypes } from 'react';
 import './ArtistsView.scss';
 import uniqBy from 'lodash/uniqBy';
 import chunk from 'lodash/chunk';
+import ViewScope from '../ViewScope';
 import {Row, Col, Card} from 'antd';
 import classnames from 'classnames';
-
+import { browserHistory } from 'react-router';
 export default class ArtistsView extends Component {
   componentDidMount() {
     const { library, actions } = this.props;
@@ -18,7 +19,7 @@ export default class ArtistsView extends Component {
       (el) => el.id), COLUMNS).map((arr, index) => {
         let arts = arr.map((artist) => (
           <Col span={Math.floor(24 / COLUMNS)} className="artistCard" key={artist.id}>
-            <Card bodyStyle={{ padding: 0 }}>
+            <Card bodyStyle={{ padding: 0 }} onClick={browserHistory.push.bind(null, `/app/library/artists/${artist.id}/albums`)}>
               <div className="custom-image">
                 <img alt="example" width="100%" src={
                     `/v1/artists/${artist.id}/art`
@@ -35,6 +36,6 @@ export default class ArtistsView extends Component {
         </Row>
       });
 
-    return <div className="artistsView">{artists}</div>
+    return <div className="artistsView"><ViewScope selection='artists'/>  {artists}</div>
   }
 }
