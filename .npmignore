@@ -1,0 +1,10 @@
+node_modules/
+config.json
+.nyc_output/
+coverage/
+config.local.json
+downloads
+secure.json
+test
+data
+src
