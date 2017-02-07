@@ -15,7 +15,7 @@ const app = express();
 const host = config.get('ip');
 const port = config.get('port');
 
-assert.is(config.get('env'), 'production');
+assert.equal(config.get('env'), 'production');
 
 const callback = backend.app.callback();
 
