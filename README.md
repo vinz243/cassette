@@ -36,7 +36,7 @@ cassette-www
 
 Latest command should start cassette, you can close it now (`^C`) so we can configure it.
 
-### Configuring rTorrent
+#### Configuring rTorrent
 
 Open with your favorite text editor `~/.rtorrent.rc`. Inside, find the line that begins with `network.scgi.open_port`. 
 If you can't find it, add this line somewhere: 
