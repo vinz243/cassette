@@ -1,6 +1,6 @@
 {
   "name": "cassette",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Cassette is a modern music database manager and grabber buit on NodeJS",
   "main": "server.js",
   "scripts": {
