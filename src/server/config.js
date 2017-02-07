@@ -4,6 +4,13 @@ const path = require('path');
 const shortid = require('shortid');
 const finder = require('find-package-json');
 const fs = require('fs');
+const mainStory = require('storyboard').mainStory;
+
+const story = mainStory.child({
+  src: 'config',
+  title: 'Configuration module',
+  level: 'INFO',
+})
 
 const conf = convict({
   env: {
@@ -47,18 +54,35 @@ const conf = convict({
     format: "*",
     default: "",
     env: "PTH_PASSWORD"
+  },
+  scgiPort: {
+    doc: "The SCGI port of rTorrent",
+    format: "port",
+    default: "52461",
+    env: "SCGI_PORT"
+  },
+  scgiHost: {
+    doc: "The SCGI host of rTorrent",
+    format: "ipaddress",
+    default: "127.0.0.1",
+    env: "SCGI_HOST"
   }
 });
 // Load environment dependent configuration
 var env = conf.get('env');
 
 let paths = [
-  path.join(__dirname, '../../config/backend.' + env + '.json'),
-  path.join(__dirname, '../../secure.json')
+  path.join(__dirname, '../../config/backend.' + env + '.json')
 ];
 
+let secureConfig = path.join(__dirname, '../../secure.json');
+if (fs.existsSync(secureConfig)) {
+  paths.push(secureConfig);
+  story.info('config', `loading configuration from '${secureConfig}'...`);
+}
 let localConfig = path.join(os.homedir(), '/.cassette/config.json');
 if (fs.existsSync(localConfig)) {
+  story.info('config', `loading configuration from '${localConfig}'...`);
   paths.push(localConfig);
 }
 conf.loadFile(paths);
@@ -73,40 +97,14 @@ if (env === 'test') {
   conf.set('configPath', path.join(conf.get('configRoot'),
     conf.get('configDir')));
 }
+let props = conf.getProperties();
+props['pthPassword'] = props['pthPassword'].length > 0 ? '<written out>' : '';
+story.debug('config', 'resolved configuration is', {attach: props});
 
+let username = conf.get('pthUsername');
+if (!username || username === '') {
+  story.warn('config', 'no PTH username specified. store will NOT work');
+}
+
+story.close();
 module.exports = conf;
-
-//
-// const process = require('process');
-// const shortid = require('shortid');
-// const os = require('os');
-//
-// if (!process.argv.includes('--dev')) {
-//   var env = 'test';
-// } else {
-//   var env = 'dev';
-// }
-// let localConfig = {
-//   dev: {},
-//   test: {}
-// };
-// try {
-//   localConfig = require('./config.local.json');
-// } catch (err) {
-//   if (env !== 'production') {
-//     localConfig[env].rootDir = os.homedir() + '/';
-//   } else {
-//     throw err;
-//   }
-// }
-//
-// env = localConfig.env || env;
-//
-// let root = localConfig[env].rootDir;
-// module.exports = {
-//   rootDir: env === 'test' ? root + 'test/' + shortid.generate() : root,
-//   baseDir: root,
-//   pthUsername: localConfig.pthUsername,
-//   pthPassword: localConfig.pthPassword
-// };
-// console.log(module.exports.rootDir);

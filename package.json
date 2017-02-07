@@ -77,6 +77,7 @@
     "request-promise-native": "^1.0.3",
     "reselect": "2.5.3",
     "scanpel": "1.0.x",
+    "serve-static": "^1.11.2",
     "shortid": "^2.2.6",
     "snake-case": "^2.1.0",
     "storyboard": "^2.3.1",
@@ -145,6 +146,9 @@
     "webpack-dev-middleware": "1.6.1",
     "webpack-hot-middleware": "2.12.2",
     "webpack-merge": "0.14.1"
+  },
+  "bin": {
+    "cassette-www": "cross-env NODE_ENV=production ./prod-server.js"
   },
   "babel": {
     "presets": [

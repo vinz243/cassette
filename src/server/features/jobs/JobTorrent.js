@@ -2,13 +2,15 @@ import shortid from 'shortid';
 import parseTorrent from 'parse-torrent';
 import assert from 'assert';
 import scgi from '../downloaders/scgi';
+import config from '../../config';
 
 let jobs = [];
+
 export default class JobTorrent {
   defaultProps = {
     scgi: scgi.methodCall,
-    scgiPort: 52461,
-    scgiHost: '0.0.0.0'
+    scgiPort: config.get('scgiPort'),
+    scgiHost: config.get('scgiHost')
   }
   constructor (props) {
     this.props = Object.assign({}, this.defaultProps, props);

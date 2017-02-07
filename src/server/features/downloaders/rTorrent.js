@@ -1,14 +1,15 @@
 import mkdirp from 'mkdirp';
 import scgi from './scgi';
 import {mainStory} from 'storyboard';
-
+import path from 'path';
+import config from '../../config';
 // var detectCharacterEncoding = require('detect-character-encoding');
 
 export default class RTorrent {
   defaultOpts = {
-    scgiPort: 52461,
-    scgiHost: '0.0.0.0',
-    targetPath: '/home/vincent/.cassette/downloads'
+    scgiPort: config.get('scgiPort'),
+    scgiHost: config.get('scgiHost'),
+    targetPath: path.join(config.get('configRoot'), '/downloads')
   }
   constructor(opts) {
     this.opts = Object.assign({}, this.defaultOpts, opts);
