@@ -3,7 +3,7 @@
 require('babel-polyfill');
 // console.log(require('config.js'));
 const path = require('path');
-const config = require('./lib/server/config')
+const config = require('./lib/server/config');
 const express = require('express');
 const backend = require('./lib/server/server').default;
 // const serveStatic = require('serve-static');
@@ -12,10 +12,10 @@ const processResult = require('./lib/server/models/Scan').processResult;
 const assert = require('assert');
 const app = express();
 
-const host = config.get('ip');
+const host = config.get('host');
 const port = config.get('port');
 
-assert.equal(config.get('env'), 'production');
+assert.is(config.get('env'), 'production');
 
 const callback = backend.app.callback();
 
