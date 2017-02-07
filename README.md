@@ -4,7 +4,7 @@
 
 Cassette is music manager supporting major torrents site to download, sync and stream tracks on-the-go :headphones:
 
-[![alt](http://i.imgur.com/NkAHEK0l.png)](http://i.imgur.com/NkAHEK0m.png)
+[![alt](http://i.imgur.com/NkAHEK0l.png)](http://imgur.com/NkAHEK0)
 
 ### Features
 
