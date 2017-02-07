@@ -148,7 +148,7 @@
     "webpack-merge": "0.14.1"
   },
   "bin": {
-    "cassette-www": "./prod-server"
+    "cassette-www": "./prod-server.js"
   },
   "babel": {
     "presets": [
