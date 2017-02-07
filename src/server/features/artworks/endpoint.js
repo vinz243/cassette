@@ -65,7 +65,8 @@ export default {
       if (availableSizes.length === 0) return ctx.throws(404);
 
       const target = getClosestSize(size, availableSizes);
-      const imageUrl = data.album.image.find(el => el.size === target)['#text'];
+      const imageUrl = data.album.image.find(el => el.size === target)['#text']
+        || `http://lorempixel.com/g/${size}/${size}`;
 
       ctx.status = 200;
       ctx.set('Content-Type', 'image/png')
@@ -132,7 +133,8 @@ export default {
       if (availableSizes.length === 0) return ctx.throws(404);
 
       const target = getClosestSize(size, availableSizes);
-      const imageUrl = data.artist.image.find(el => el.size === target)['#text'];
+      const imageUrl = data.artist.image.find(el => el.size === target)['#text']
+        || `http://lorempixel.com/g/${size}/${size}`;
 
       ctx.status = 200;
       ctx.set('Content-Type', 'image/png');

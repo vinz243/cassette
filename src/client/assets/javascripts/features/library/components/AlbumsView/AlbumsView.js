@@ -30,7 +30,7 @@ export default class AlbumsView extends Component {
             <Card bodyStyle={{ padding: 0 }} onClick={browserHistory.push.bind(null, `/app/library/albums/${album.id}/tracks`)}>
               <div className="custom-image">
                 <img alt="example" width="100%" src={
-                    `/v1/albums/${album.id}/art`
+                    `/v1/albums/${album.id}/art?size=200`
                   } />
               </div>
               <div className="custom-card">

@@ -22,7 +22,7 @@ export default class ArtistsView extends Component {
             <Card bodyStyle={{ padding: 0 }} onClick={browserHistory.push.bind(null, `/app/library/artists/${artist.id}/albums`)}>
               <div className="custom-image">
                 <img alt="example" width="100%" src={
-                    `/v1/artists/${artist.id}/art`
+                    `/v1/artists/${artist.id}/art?size=200`
                   } />
               </div>
               <div className="custom-card">

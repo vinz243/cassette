@@ -20,11 +20,11 @@ assert.equal(config.get('env'), 'production');
 const callback = backend.app.callback();
 
 app.use((req, res, next) => {
-  if(req.path.startsWith('/v1/')) {
+  if (req.path.startsWith('/v1/')) {
     callback(req, res);
-} else {
-  next();
-}
+  } else {
+    next();
+  }
 });
 
 app.use(express.static('./build/client'));
