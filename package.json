@@ -150,7 +150,7 @@
     "webpack-merge": "0.14.1"
   },
   "bin": {
-    "cassette-www": "./prod-server.js"
+    "cassette-www": "./bootstrap.js"
   },
   "babel": {
     "presets": [
