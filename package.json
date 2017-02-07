@@ -1,5 +1,5 @@
 {
-  "name": "cassette",
+  "name": "node-cassette",
   "version": "0.1.0",
   "description": "Cassette is a modern music database manager and grabber buit on NodeJS",
   "main": "server.js",
@@ -148,7 +148,7 @@
     "webpack-merge": "0.14.1"
   },
   "bin": {
-    "cassette-www": "cross-env NODE_ENV=production ./prod-server.js"
+    "cassette-www": "./bin/www"
   },
   "babel": {
     "presets": [
