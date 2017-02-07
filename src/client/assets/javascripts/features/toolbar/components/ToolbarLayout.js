@@ -24,7 +24,7 @@ export default class ToolbarLayout extends Component {
            <CurrentTrackStatus {...this.props} />
   	      </Col>
           <Col span={7}>
-             <BrowserControls  {...this.props} />
+             {/*<BrowserControls  {...this.props} />*/}
   	      </Col>
           <Col span={2}></Col>
         </Row>
