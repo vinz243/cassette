@@ -3,6 +3,7 @@ const os = require('os');
 const path = require('path');
 const shortid = require('shortid');
 const finder = require('find-package-json');
+const fs = require('fs');
 
 const conf = convict({
   env: {
@@ -50,10 +51,17 @@ const conf = convict({
 });
 // Load environment dependent configuration
 var env = conf.get('env');
-conf.loadFile([
+
+let paths = [
   path.join(__dirname, '../../config/backend.' + env + '.json'),
   path.join(__dirname, '../../secure.json')
-]);
+];
+
+let localConfig = path.join(os.homedir(), '/.cassette/config.json');
+if (fs.existsSync(localConfig)) {
+  paths.push(localConfig);
+}
+conf.loadFile(paths);
 
 // Perform validation
 conf.validate({strict: true});
