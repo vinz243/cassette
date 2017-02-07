@@ -4,6 +4,8 @@
 
 Cassette is music manager supporting major torrents site to download, sync and stream tracks on-the-go :headphones:
 
+[![alt](http://i.imgur.com/NkAHEK0l.png)](http://i.imgur.com/NkAHEK0m.png)
+
 ### Features
 
  - [x] scan a music folder for tracks and artists
@@ -43,12 +45,12 @@ If you can't find it, add this line somewhere:
 ```
 network.scgi.open_port = localhost:58081
 ```
-If you found it, just wite the done the port number somewhere.
+If you found it, just write the down the port number somewhere.
 
 #### Editing configuration
 
 This steps is only if you have a PTH account and you want to download from cassette. If you don't, skip this step, you will still be able to remotely play music.
-Use your favorite text editor to edit `~/.cassette/config.json` (create folder if it doesn't work).
+Use your favorite text editor to edit `~/.cassette/config.json` (create folder if it doesn't exists).
 
 Make it look like that:
 
@@ -59,7 +61,7 @@ Make it look like that:
   "scgiPort": "58081"
 }
 ```
-Please note that `scgiPort` have to take you rtorrent scgi port value, as configured/found above.
+Please note that `scgiPort` has to take your rtorrent scgi port value, as configured/found above.
 
 #### Proxying via nginx:
 
