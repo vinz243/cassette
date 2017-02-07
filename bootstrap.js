@@ -1,17 +1,19 @@
-const express = require('express'),
-  http = require('http'),
-  cp = require('child_process'),
-  spawn = cp.spawn,
-  exec = cp.exec,
-  app = express()
-shortid = require('shortid');
+#! /usr/bin/env node
+const express = require('express');
+const http = require('http');
+const cp = require('child_process');
+const path = require('path');
+const spawn = cp.spawn;
+const exec = cp.exec;
+const app = express();
+const shortid = require('shortid');
 const recordToLine = require('storyboard/lib/listeners/helpers/recordToLines').default;
+
 let child;
 
 const random_port = require('random-port');
 const uid = shortid.generate();
 const throttle = require('lodash/throttle');
-
 
 function updateApp(req, res) {
   spawn('yarn', ['global', 'add', 'node-cassette']).on('close', function() {
@@ -30,7 +32,7 @@ function log(msg, level) {
 }
 random_port(function(port) {
   function startApp() {
-    child = spawn('node', ['./prod-server.js',
+    child = spawn('node', [path.join(__dirname, 'prod-server.js'),
       'http://localhost:' + port + '/' + uid
     ], {
       env: Object.assign({}, process.env, {
