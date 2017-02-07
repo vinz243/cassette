@@ -12,7 +12,7 @@ const processResult = require('./lib/server/models/Scan').processResult;
 const assert = require('assert');
 const app = express();
 
-const host = config.get('host');
+const host = config.get('ip');
 const port = config.get('port');
 
 assert.is(config.get('env'), 'production');
