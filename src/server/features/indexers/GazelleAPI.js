@@ -74,7 +74,11 @@ export default class GazelleAPI {
     // });
   }
   static parseTorrents(res) {
-    if (!res || !res.response) return [];
+    if (!res || !res.response) {
+      mainStory.warn('indexers', 'search failed', {attach: res})
+      return [];
+    }
+    mainStory.info('indexers', `yielded ${res.response.results.length} results`);
     return Promise.resolve(expandArray(res.response.results, 'torrents', false)
                   .map(GazelleAPI.toRelease));
   }

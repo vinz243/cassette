@@ -1,9 +1,8 @@
 // 52461
 const fs = require('fs');
-const RTorrent = require('./lib/server/features/downloaders/rTorrent');
-// console.log(RTorrent);
-let rt = new RTorrent.default();
+const JobTorrent = require('./lib/server/features/jobs/JobTorrent').default;
+let infoHash = '9589F6F719290577D0BA5472CFBE7DFC054EFF1B';
 
-var detectCharacterEncoding = require('detect-character-encoding');
+let job = new JobTorrent({infoHash});
 
-console.log(detectCharacterEncoding(fs.readFileSync('../Downloads/led.torrent')));
+job.getProgress().then(console.log);

@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import './SidebarLibraryItem.scss';
-import {Row, Col} from 'antd';
+import {Row, Col, notification} from 'antd';
 import 'antd/dist/antd.css';
 import IonRefresh from 'react-icons/lib/io/refresh';
 import IonMinusRound from 'react-icons/lib/io/minus-round';
@@ -9,6 +9,10 @@ export default class SidebarLibraryItem extends Component {
   static propTypes = {
   };
   handleScan(e) {
+    notification.success({
+      message: 'Library scan started',
+      description: 'The library is being scanned. You don\'t need to refresh the page or anything',
+    });
     this.props.actions.scanLibrary(this.props.libraryId);
   }
   render() {
@@ -26,7 +30,7 @@ export default class SidebarLibraryItem extends Component {
             <IonRefresh className="libraryAction" onClick={boundHandleScan}/>
           </Col>
           <Col span={2}>
-            <IonMinusRound className="libraryAction" />
+          { /* <IonMinusRound className="libraryAction" />*/}
           </Col>
         </Row>
 

@@ -20,7 +20,6 @@ const boundConnect = connect.bind(null, createStructuredSelector({
 @boundConnect()
 export default class LibraryView extends Component {
   render() {
-    console.log(this.props);
     return (
       <div>
         <LibraryLayout {...this.props} />

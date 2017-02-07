@@ -2,6 +2,8 @@ import RTorrent from './rTorrent';
 import config from '../../config.js';
 import {pull} from '../store/database';
 import {api} from '../indexers';
+import JobTorrent from '../jobs/JobTorrent';
+
 const rTorrent = new RTorrent();
 
 export default {
@@ -18,6 +20,11 @@ export default {
         return;
       }
       let raw = await api.getRawTorrent(release.torrentId);
+
+      let job = JobTorrent.fromTorrent(raw);
+      // job.name = release.
+      JobTorrent.push(job);
+
       let res = await rTorrent.addTorrent(raw);
       ctx.status = 201;
       ctx.body = {

@@ -6,6 +6,7 @@ import {Row, Col} from 'antd';
 import ToolbarView from 'features/toolbar/components/ToolbarView';
 import LibraryView from 'features/library/components/LibraryView';
 import SidebarView from 'features/sidebar/components/SidebarView';
+import JobsView from 'features/jobs/components/JobsView';
 
 export default class AppView extends Component {
   render() {
@@ -15,6 +16,7 @@ export default class AppView extends Component {
         <Row gutter={32}>
           <Col span={4}>
             <SidebarView {...this.props} />
+            <JobsView />
           </Col>
           <Col span={16}>
             {this.props.children}
