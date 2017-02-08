@@ -112,7 +112,8 @@ export default class GazelleAPI {
         this._request.post({
           uri: url,
           form: {
-            username, password
+            username, password,
+            keeplogged: 1
           }
         }, (err, res, data) => {
           if (err) return reject(err);
