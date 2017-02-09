@@ -6,6 +6,7 @@ import sidebar, {NAME as sidebarName} from 'features/sidebar';
 import library, {NAME as libraryName} from 'features/library';
 import store, {NAME as storeName} from 'features/store';
 import jobs, {NAME as jobsName} from 'features/jobs';
+import updater, {NAME as updaterName} from 'features/updater';
 
 export default combineReducers({
   routing,
@@ -14,4 +15,5 @@ export default combineReducers({
   [sidebarName]: sidebar,
   [storeName]: store,
   [jobsName]: jobs,
+  [updaterName]: updater,
 });

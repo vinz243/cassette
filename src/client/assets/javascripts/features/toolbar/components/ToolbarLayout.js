@@ -15,7 +15,7 @@ export default class ToolbarLayout extends Component {
     const { toolbar, actions } = this.props;
     return (
     	<div>
-        <Row className="mainRow" gutter={64}>
+        <Row className="mainRow">
           <Col span={1}></Col>
           <Col span={7}>
             <PlayerControls {...this.props} />
