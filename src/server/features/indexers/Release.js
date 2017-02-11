@@ -165,7 +165,7 @@ export default class Release {
     return {seeders, hasLog, freelech, bitrate, score: {
       total: score,
       details: scores
-    }, isVbr, lossless, artist, album, torrentId, format, encoding, _id} 
+    }, isVbr, lossless, artist, album, torrentId, format, encoding, _id}
   }
 
 }

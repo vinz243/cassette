@@ -1,8 +1,9 @@
 import React, { Component, PropTypes } from 'react';
 // import ListView from './ListView';
 import './StoreApp.scss';
-import {Row, Col, Input, Tooltip, notification} from 'antd';
+import {Row, Col, Input, Modal, notification, Card, Switch, Table, Button} from 'antd';
 import 'antd/dist/antd.css';
+import chunk from 'lodash/chunk';
 import axios from 'axios';
 
 export default class LibraryLayout extends Component {
@@ -25,28 +26,17 @@ export default class LibraryLayout extends Component {
     actions.searchAndUpdateResults(this.state.searchString);
   }
   makeSelectItem(el) {
-    const { search, actions } = this.props;
+    const { store, actions } = this.props;
     return () => {
-      actions.findReleases(el);
+      actions.findReleases(el, store.lossless);
     }
   }
   componentDidMount() {
     const { search, actions } = this.props;
   }
-  scoreDetailsDOM(r) {
-    let scores = r.score.details.map((d) => (
-
-      <Row>
-        <Col span={18}>{d.desc}</Col>
-        <Col span={6}>{d.amount}</Col>
-      </Row>
-    ))
-    return (
-        <div>{scores}</div>
-    )
-  }
   download(id) {
     return () => {
+      this.props.actions.hideReleases();
       axios.post(`/v1/releases/${id}/downloads`).then((res) => {
         if (res.data.sucess) { // sic: fix typo
           notification.success({
@@ -62,29 +52,78 @@ export default class LibraryLayout extends Component {
       });
     }
   }
+  setLossless (flag) {
+    this.props.actions.setLossless(flag);
+  }
   render() {
     const { store, actions } = this.props;
     const boundSearchStringChange = this.searchStringChange.bind(this);
     const boundSearch = this.search.bind(this);
-    const albums = store.results.albums.map((a) =>
-    <Row gutter={24} key={a.id} onClick={this.makeSelectItem(a.id)} >
-      <Col span={8} className="albumSelect">{a.album}</Col>
-      <Col span={8} className="albumSelect">{a.artist}</Col>
-    </Row>)
-    const releases = store.releases.map((r) =>
-    <Row gutter={24} key={r._id} onClick={this.download(r._id)}>
-      <Col span={6} className="releaseSelect">{r.album}</Col>
-      <Col span={6} className="releaseSelect">{r.artist}</Col>
-      <Col span={3} className="releaseSelect">{r.format}</Col>
-      <Col span={5} className="releaseSelect">{r.encoding}</Col>
-      <Col span={2} className="releaseSelect">{r.seeders}</Col>
-      <Col span={2} className="releaseSelect">
-        <Tooltip title={this.scoreDetailsDOM(r)}>
-          <span>{r.score.total}</span>
-        </Tooltip>
-      </Col>
-    </Row>)
-
+    const COLUMNS = 6;
+    const albums = chunk(store.results.albums, COLUMNS).map((arr, index) => {
+      let arts = arr.map((album) => (
+        <Col span={Math.floor(24 / COLUMNS)} className="searchAlbumCard"
+          key={album.id}>
+          <Card bodyStyle={{ padding: 0 }}
+            onClick={this.makeSelectItem(album.id)}>
+            <div className="custom-image">
+              <img alt="example" width="100%" src={album.art} />
+            </div>
+            <div className="custom-card">
+              <h3>{album.album} — <span>{album.artist}</span></h3>
+            </div>
+          </Card>
+        </Col>
+      ));
+      return <Row key={`albums-row-${index}`}>
+        {arts}
+      </Row>
+    })
+    const releases = store.releases.map((el) => ({
+      album: el.album,
+      artist: el.artist,
+      format: el.format,
+      encoding: el.encoding,
+      seeders: el.seeders,
+      score: el.score.total,
+      id: el._id
+    }));
+    const columns = [{
+      title: 'Album',
+      dataIndex: 'album',
+      key: 'album'
+    }, {
+      title: 'Artist',
+      dataIndex: 'artist',
+      key: 'artist'
+    }, {
+      title: 'Format',
+      dataIndex: 'format',
+      key: 'format'
+    }, {
+      title: 'Encoding',
+      dataIndex: 'encoding',
+      key: 'encoding'
+    }, {
+      title: 'Seeders',
+      dataIndex: 'seeders',
+      key: 'seeders'
+    }, {
+      title: 'Score',
+      dataIndex: 'score',
+      key: 'score'
+    }, {
+      title: 'Actions',
+      key: 'actions',
+      render: (text, r) => (
+        <span>
+          <Button onClick={this.download(r.id)}>Download</Button>
+        </span>
+      )
+    }];
+    const rowKey = (record) => {
+      return record._id;
+    }
     return (
     	<div className="storeContainer" >
           <Row gutter={24}>
@@ -96,19 +135,26 @@ export default class LibraryLayout extends Component {
                 onPressEnter={boundSearch}
                 placeholder="Search for a track, an album..."/>
             </Col>
-            <Col span={8}></Col>
+            <Col span={8}>
+              <Switch checked={store.lossless} onChange={this.setLossless.bind(this)}/>
+              <span className="lossless">Lossless</span>
+            </Col>
           </Row>
+          <Modal title="Found releases" visible={store.showReleases}
+              cancelText="Cancel"
+              width={900}
+              okText="OK"
+              onOk={actions.hideReleases}
+              onCancel={actions.hideReleases}>
+              <Table dataSource={releases} columns={columns} size="middle"
+                rowKey={rowKey}/>
+          </Modal>
           <Row>
-            <Col span={12}>
+            <Col span={24}>
               <div className="albumsTitle">
                 Albums
               </div>
               {albums}
-            </Col>
-            <Col span={12}>
-              <div className="releases">
-              {releases}
-              </div>
             </Col>
           </Row>
       </div>

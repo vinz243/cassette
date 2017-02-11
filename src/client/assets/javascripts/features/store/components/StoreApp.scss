@@ -1,5 +1,8 @@
 .storeContainer {
   margin-top: 6em;
+  .lossless {
+    margin-left: 1em;
+  }
 }
 
 .storeSearch {
@@ -9,4 +12,23 @@
 
 .albumSelect, .releaseSelect {
   cursor: pointer;
+}
+
+.searchAlbumCard {
+  padding: 1em;
+  cursor: pointer;
+  h3 {
+    font-size: 1.2em;
+    margin: 0.6em 0.6em 0.6em 0.6em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  span {
+    // padding: 0.1em 0.6em 0.6em 0.6em;
+    color: #7a7878;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }

@@ -16,7 +16,7 @@ export default class JobsLayout extends Component {
   render() {
     const { jobs, actions } = this.props;
     let content = jobs.jobs.map((job) => (
-      <Card className="card" bodyStyle={{ padding: '1.2em' }}>
+      <Card className="card" bodyStyle={{ padding: '1.2em' }} key={job._id}>
         <div className="progress">
           <Progress percent={Math.round(job.progress * 100)}
             strokeWidth={5}

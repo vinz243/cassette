@@ -61,8 +61,10 @@ export default class GazelleAPI {
       }, delay);
     });
   }
-  searchTorrents(q = '') {
-    return this.call('browse', {searchstr: q}).then(GazelleAPI.parseTorrents);
+  searchTorrents(q = '', lossless) {
+    return this.call('browse', {searchstr: q}).then((res) => (
+      GazelleAPI.parseTorrents(res, lossless)
+    ));
   }
   getRawTorrent(id) {
     return this.call('download', {id}, 'torrents.php', {encoding: null});
@@ -73,17 +75,17 @@ export default class GazelleAPI {
     //
     // });
   }
-  static parseTorrents(res) {
+  static parseTorrents(res, lossless) {
     if (!res || !res.response) {
       mainStory.warn('indexers', 'search failed', {attach: res})
       return [];
     }
     mainStory.info('indexers', `yielded ${res.response.results.length} results`);
     return Promise.resolve(expandArray(res.response.results, 'torrents', false)
-                  .map(GazelleAPI.toRelease));
+                  .map((el) => GazelleAPI.toRelease(el, lossless)));
   }
   static toRelease({groupName, encoding, isFreeleech, format, hasLog,
-    torrentId, artist, seeders, groupYear}) {
+    torrentId, artist, seeders, groupYear}, lossless = false) {
     let id = shortid.generate();
     let release = new Release({
       _id: id,
@@ -97,6 +99,8 @@ export default class GazelleAPI {
       torrentId,
       artist,
       seeders
+    }, {
+      losslessBonus: lossless ? 150 : -200
     });
     push(id, release);
     return release;

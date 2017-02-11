@@ -1,11 +1,12 @@
 import request from 'request';
 import {push, pull} from './database';
+import {getClosestSize} from '../artworks/sizes';
 
 export default class LastFM {
   constructor (apiKey = '85d5b036c6aa02af4d7216af592e1eea') {
     this._apiKey = apiKey;
   }
-  search(type, query, limit = 10, page = 1) {
+  search(type, query, limit = 25, page = 1) {
 
     let url = `https://ws.audioscrobbler.com/2.0/?method=${type}.search&${type}=${encodeURIComponent(query)}&api_key=${this._apiKey}&format=json&limit=${limit}`;
 
@@ -16,13 +17,13 @@ export default class LastFM {
       });
     });
   }
-  searchAlbum(query, limit = 10, page = 1) {
+  searchAlbum(query, limit = 25, page = 1) {
     return this.search('album', query, limit, page);
   }
-  searchArtist(query, limit = 10, page = 1) {
+  searchArtist(query, limit = 25, page = 1) {
     return this.search('artist', query, limit, page);
   }
-  searchTrack(query, limit = 10, page = 1) {
+  searchTrack(query, limit = 25, page = 1) {
     return this.search('track', query, limit, page);
   }
   static parseResult(body) {
@@ -40,12 +41,18 @@ export default class LastFM {
       }
       if (result.albummatches) {
         return resolve(result.albummatches.album.map((a) => {
+          const size = 174;
+          const availableSizes = a.image.map(s => s.size);
+          const target = getClosestSize(size, availableSizes);
+          const imageUrl = a.image.find(el => el.size === target)['#text']
+            || `http://lorempixel.com/g/${size}/${size}`;
           return {
             id: push(a),
             mbid: a.mbid,
             type: 'album',
             album: a.name,
-            artist: a.artist
+            artist: a.artist,
+            art: imageUrl
           };
         }));
       }

@@ -21,7 +21,8 @@ export default {
         return;
       }
       let res = await api.login().then(() => {
-        return api.searchTorrents(`${data.artist} ${data.name}`);
+        return api.searchTorrents(`${data.artist} ${data.name}`,
+          ctx.request.query.lossless - 0);
       });
       ctx.status = 200;
       ctx.body = {
