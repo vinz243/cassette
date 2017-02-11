@@ -7,7 +7,7 @@
     "ava": "ava",
     "clean:build": "rimraf build lib",
     "build:html": "node ./bin/buildHtml.js",
-    "prestart": "npm run clean:build && npm run backend:build ",
+    "prestart": "npm run clean:build && npm run build:server ",
     "start": "node dev-server.js",
     "start:dashboard": "webpack-dashboard -c cyan -- node dev-server.js",
     "prebuild": "npm run clean:build",

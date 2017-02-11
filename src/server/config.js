@@ -98,8 +98,11 @@ if (env === 'test') {
     conf.get('configDir')));
 }
 let props = conf.getProperties();
-props['pthPassword'] = props['pthPassword'].length > 0 ? '<written out>' : '';
-story.debug('config', 'resolved configuration is', {attach: props});
+story.debug('config', 'resolved configuration is', {
+  attach: Object.assign({}, props, {
+    pthPassword:  props['pthPassword'].length > 0 ? '<written out>' : ''
+  })
+});
 
 let username = conf.get('pthUsername');
 if (!username || username === '') {

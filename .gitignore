@@ -5,3 +5,4 @@ coverage/
 config.local.json
 downloads
 secure.json
+npm-debug.log
