@@ -82,21 +82,36 @@ export const assignFunctions = (obj, ...sources) => {
 // like undefined is not a function
 export const defaultFunctions = (state) => {
   return Object.assign({}, Object.assign.apply({},
-    ['update', 'set', 'create', 'remove'].map((method) => ({
+    ['update', 'set', 'create', 'remove', 'populate'].map((method) => ({
       [method]: notImplemented(method)
     }))
   ), {
     getProps() {
       return Object.assign({}, state._props);
     }
-  }, {
-    populate: async () => {
-      state._props = Object.assign({}, await state.db.findOne({
-        _id: state._props._id
-      }));
-    }
-  });
+  }, );
 }
+
+// call this function with a model factory to get a function that will
+// return a promise, which when fulfilled, returns the object wuth matching props
+// (unless _id is provided, then it only find by _id)
+export const findOneFactory = (model) => {
+  return (props) => {
+    let obj = model(props);
+    return obj.populate().then(() => Promise.resolve(obj));
+  }
+}
+
+// Composite that allows loading an object from the database
+// This is done by using populate. So to find an object in the db
+// create a object with the query, then populate. See findOneFactory
+export const databaseLoader = (state) => ({
+  populate: async () => {
+    state._props = Object.assign({}, await state.db.findOne(state._props._id ? {
+      _id: state._props._id
+    } : state._props));
+  }
+});
 
 // This function returns the nedb corresponding to a name
 // Useful for manyToOne
