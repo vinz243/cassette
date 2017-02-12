@@ -48,9 +48,8 @@ export const findFactory = (model, name, getDB = getDatabase) => {
     let sort = {};
     sort[opts.sort || 'name'] = opts.direction ?
       (opts.direction == 'asc' ? 1 : -1) : 1;
-
     let res = (await getDatabase(name)
-      .cfind(omit(query))
+      .cfind(omit(query, optFields))
       .sort(sort)
       .limit(opts.limit)
       .skip(opts.skip || 0)
@@ -142,21 +141,21 @@ export const publicProps = (state) => ({
     return Object.assign({}, state.props);
   },
   get props() {
-    return state.functions.getProps();
+    return Object.assign({}, state.functions.getProps());
   }
 });
 
 // This creates acomposite object that populates field `name` with
 // the child props. This is a hook.
 export const manyToOne = (state, name, getDB = getDatabase) => ({
-  postGetProps: ({[name + 'Id']: omit, ...props}) => {
-    return Object.assign({}, props, {
+  postGetProps: ({[name]: parentId, ...props}) => {
+    return Object.assign({}, props, state.populated[name] ? {
       [name]: state.populated[name]
-    });
+    } : {[name]: parentId} );
   },
   postPopulate: async () => {
-    state.populated[name] = await getDB(name).find({
-      _id: state.props[name + 'Id']
+    state.populated[name] = await getDB(name).findOne({
+      _id: state.props[name]
     });
   }
 })

@@ -1,30 +1,47 @@
-import Datastore from 'nedb-promise';
-import config from '../config.js';
-// import Artist from './Artist.js';
+import {
+  assignFunctions,
+  defaultFunctions,
+  manyToOne,
+  legacySupport,
+  updateable,
+  createable,
+  databaseLoader,
+  publicProps,
+  findOneFactory,
+  findFactory
+} from './Model';
 
-import Lazy from 'lazy.js';
-import Model from './Model';
-// schema:
-//   name: albumName
-//   artistId: id of artistId
-//   year: year
-let Album = new Model('album')
-  .field('name')
-    .string()
-    .required()
-    .defaultParam()
-    .done()
-  .field('mbid')
-    .string()
-    .done()
-  .field('artistId')
-    .oneToOne()
-    // .required()
-    .done()
-  .field('year')
-    .int()
-    .done()
-  .noDuplicates()
-  .done()
 
-export default Album;
+export const Album = function(props) {
+  if (typeof props === 'string') {
+    props = {
+      name: props
+    };
+  }
+  let state = {
+    name: 'album',
+    fields: ['name', 'year', 'artist'],
+    functions: {},
+    populated: {},
+    props
+  };
+  return assignFunctions(
+    state.functions,
+    defaultFunctions(state),
+    updateable(state),
+    createable(state),
+    databaseLoader(state),
+    publicProps(state),
+    legacySupport(state),
+    manyToOne(state, 'artist')
+  );
+}
+
+
+export const findOne = findOneFactory(Album);
+
+export const findById = (_id) => findOne({
+  _id
+});
+
+export const find = findFactory(Album, 'album');
