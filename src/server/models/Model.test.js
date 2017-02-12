@@ -122,16 +122,14 @@ test('manyToOne - calls db find and mutate populated values', async t => {
     populated: {},
     _props: {
       fooId: 42
-    },
-    db: {
-      find: (q) => {
-        t.deepEqual(q, {_id: 42});
-        called = true;
-        return Promise.resolve({foo: 'bar', _id: 42});
-      }
     }
   };
-  let props = manyToOne(state, 'foo');
+  let props = manyToOne(state, 'foo', () => ({
+    find: (q) => {
+      t.deepEqual(q, {_id: 42});
+      called = true;
+      return Promise.resolve({foo: 'bar', _id: 42});
+  }}));
   await props.postPopulate();
   t.truthy(called);
   t.deepEqual(state.populated, {
@@ -156,10 +154,9 @@ test('updateable - update calls db.update', async t => {
       number: 42,
       foo: 'bar'
     },
-    dirty: true,
-    db: {update: callback}
+    dirty: true
   };
-  updateable(state).update();
+  updateable(state, {update: callback}).update();
   t.truthy(callback.called);
   t.truthy(callback.calledWith({_id: 1337}, {
     _id: 1337,
@@ -181,4 +178,4 @@ test('updateable - set mutate props', t => {
       _id: 1337,
       value: 'foo'
   });
-})
+});

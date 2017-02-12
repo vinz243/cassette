@@ -105,9 +105,9 @@ export const findOneFactory = (model) => {
 // Composite that allows loading an object from the database
 // This is done by using populate. So to find an object in the db
 // create a object with the query, then populate. See findOneFactory
-export const databaseLoader = (state) => ({
+export const databaseLoader = (state, db = getDatabase(state.name)) => ({
   populate: async () => {
-    state._props = Object.assign({}, await state.db.findOne(state._props._id ? {
+    state._props = Object.assign({}, await db.findOne(state._props._id ? {
       _id: state._props._id
     } : state._props));
   }
@@ -121,14 +121,14 @@ export const getDatabase = (name) => {
 
 // This creates acomposite object that populates field `name` with
 // the child props. This is a hook.
-export const manyToOne = (state, name) => ({
+export const manyToOne = (state, name, getDB = getDatabase) => ({
   postGetProps: ({[name + 'Id']: omit, ...props}) => {
     return Object.assign({}, props, {
       [name]: state.populated[name]
     });
   },
   postPopulate: async () => {
-    state.populated[name] = await state.db.find({
+    state.populated[name] = await getDB(name).find({
       _id: state._props[name + 'Id']
     });
   }
@@ -142,14 +142,14 @@ export const legacySupport = (state) => ({
 });
 
 // Composite to allow updating a document
-export const updateable = (state) => ({
+export const updateable = (state, db = getDatabase(state.name)) => ({
   update: async () => {
     if (!state.dirty) {
       mainStory.info('db', 'Trying to update a non dirty document');
       return;
     }
     try {
-      let res = await state.db.update({_id: state._props._id}, state._props);
+      let res = await db.update({_id: state._props._id}, state._props);
       return;
     } catch (err) {
       throw Boom.wrap(err);
@@ -163,10 +163,10 @@ export const updateable = (state) => ({
 });
 
 // (recommended) composite to allow the creation of a document
-export const createable = (state) => ({
+export const createable = (state, db = getDatabase(state.name)) => ({
   create: async () => {
     try {
-      return await db.insert(state._props);
+      return await state.db.insert(state._props);
     } catch (err) {
       throw Boom.wrap(err);
     }
