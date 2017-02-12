@@ -166,7 +166,7 @@ export const updateable = (state, db = getDatabase(state.name)) => ({
 export const createable = (state, db = getDatabase(state.name)) => ({
   create: async () => {
     try {
-      return await state.db.insert(state._props);
+      state._props = await db.insert(state._props);
     } catch (err) {
       throw Boom.wrap(err);
     }

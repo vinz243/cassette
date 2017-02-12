@@ -3,7 +3,8 @@ import {
     defaultFunctions,
     manyToOne,
     legacySupport,
-    updateable
+    updateable,
+    createable
   } from './Model';
 import test from 'ava';
 import sinon from 'sinon';
@@ -177,5 +178,32 @@ test('updateable - set mutate props', t => {
   t.deepEqual(state._props, {
       _id: 1337,
       value: 'foo'
+  });
+});
+
+test('createable - calls db.create', async t => {
+  let state = {
+    _props: {
+      number: 42,
+      foo: 'bar'
+    }
+  };
+  let callback = sinon.spy(function () {
+    return Promise.resolve({
+      _id: 1337,
+      number: 42,
+      foo: 'bar'
+    });
+  });
+  await createable(state, {insert: callback}).create();
+  t.truthy(callback.called);
+  t.truthy(callback.calledWith({
+    number: 42,
+    foo: 'bar'
+  }));
+  t.deepEqual(state._props, {
+    _id: 1337,
+    number: 42,
+    foo: 'bar'
   });
 });
