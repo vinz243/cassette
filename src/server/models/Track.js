@@ -1,32 +1,46 @@
-import Datastore from 'nedb-promise';
-// import Artist from './Artist.js';
-import mkdirp from 'mkdirp';
-import Lazy from 'lazy.js';
+import {
+  assignFunctions,
+  defaultFunctions,
+  manyToOne,
+  legacySupport,
+  updateable,
+  createable,
+  databaseLoader,
+  publicProps,
+  findOneFactory,
+  findFactory
+} from './Model';
 
-import Model from './Model';
-import File from './File';
+export const Track = function(props) {
+  if (typeof props === 'string') {
+    props = {
+      name: props
+    };
+  }
+  let state = {
+    name: 'track',
+    fields: ['name', 'path', 'album', 'artist', 'duration'],
+    functions: {},
+    populated: {},
+    props
+  };
+  return assignFunctions(
+    state.functions,
+    defaultFunctions(state),
+    updateable(state),
+    createable(state),
+    databaseLoader(state),
+    publicProps(state),
+    legacySupport(state),
+    manyToOne(state, 'album'),
+    manyToOne(state, 'artist'),
+  );
+}
 
-let Track = (new Model('track'))
-  .field('name')
-    .defaultParam()
-    .required()
-    .string()
-    .done()
-  .field('duration')
-    .float()
-    .notIdentity()
-    .done()
-  .field('trackNumber')
-    .int()
-    .done()
-  .field('albumId')
-    .oneToOne()
-    .done()
-  .field('artistId')
-    .oneToOne()
-    .done()
-  .oneToMany(File, 'trackId')
-  .noDuplicates()
-  .done();
+export const findOne = findOneFactory(Track);
 
-export default Track;
+export const findById = (_id) => findOne({
+  _id
+});
+
+export const find = findFactory(Track, 'track');
