@@ -9,6 +9,8 @@ import mkdirp from 'mkdirp';
 import path from 'path';
 import Boom from 'boom';
 import assignWith from 'lodash/assignWith';
+import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 
 import pascalCase from 'pascal-case';
 import pluralize from 'pluralize';
@@ -21,25 +23,45 @@ let databases = {};
 
 // This function returns the nedb datastore corresponding to a name
 // Useful for manyToOne. if it wasn't found it will create it
-export const getDatabase = (name, Store = Datastore) => {
-  let dbName = pluralize(dbName);
-  let dbPath = path.join(dataDir, this.dbName + '.db');
+const getDatabase = (name, Store = Datastore) => {
+  let dbName = pluralize(name);
+  let dbPath = path.join(dataDir, dbName + '.db');
   if (databases[dbName]) {
     return databases[dbName];
   }
-  databases[name] = new Store({
-    filename: dbPath,
-    autoload: true
+  databases[dbName] = new Store({
+    filename: dbPath
   });
+  databases[dbName].loadDatabase();
   return getDatabase(name, Store);
 }
 
-// type State = {
-//   db: any,
-//   dirty: boolean,
-//   props: any,
-//   fields: string[]
-// }
+export const findFactory = (model, name, getDB = getDatabase) => {
+  return async (query) => {
+    let optFields = ['limit', 'sort', 'skip', 'direction']
+    let opts = pick(query, optFields);
+
+    if (!opts.limit || opts.limit > 500 || opts.limit < 1) {
+      opts.limit = 500;
+    }
+
+    let sort = {};
+    sort[opts.sort || 'name'] = opts.direction ?
+      (opts.direction == 'asc' ? 1 : -1) : 1;
+
+    let res = (await getDatabase(name)
+      .cfind(omit(query))
+      .sort(sort)
+      .limit(opts.limit)
+      .skip(opts.skip || 0)
+      .exec());
+
+    let models = res.map((el) => model({_id: el._id}));
+
+    await Promise.all(models.map(el => el.populate()));
+    return models;
+  }
+}
 
 // useful for defaults
 const notImplemented = (name) => {
@@ -47,17 +69,6 @@ const notImplemented = (name) => {
     throw new Boom.create(500, `Function ${name} isn't implemented yet`);
   }
 }
-
-// export const baseModel = (props) => {
-//   let state: State = {
-//     db: {},
-//     dirty: false,
-//     fields: Array.isArray(fields) ? fields : Object.keys(props),
-//     _props: props
-//   }
-//   let defaultFunctions =
-// };
-
 
 // This function is a customized version of _.assign
 // use this in models for composition !!!
@@ -95,15 +106,11 @@ export const assignFunctions = (obj, ...sources) => {
 // Any composition should use that otherwise their might be some problem
 // like undefined is not a function
 export const defaultFunctions = (state) => {
-  return Object.assign({}, Object.assign.apply({},
+  return Object.assign.apply({},
     ['update', 'set', 'create', 'remove', 'populate'].map((method) => ({
       [method]: notImplemented(method)
     }))
-  ), {
-    getProps() {
-      return Object.assign({}, state._props);
-    }
-  }, );
+  );
 }
 
 // call this function with a model factory to get a function that will
@@ -119,11 +126,17 @@ export const findOneFactory = (model) => {
 // Composite that allows loading an object from the database
 // This is done by using populate. So to find an object in the db
 // create a object with the query, then populate. See findOneFactory
-export const databaseLoader = (state, db = getDatabase(state.name)) => ({
+export const databaseLoader = (state, name, getDB = getDatabase) => ({
   populate: async () => {
-    state._props = Object.assign({}, await db.findOne(state._props._id ? {
-      _id: state._props._id
-    } : state._props));
+    state.props = Object.assign({}, await getDB(name).findOne(state.props._id ? {
+      _id: state.props._id
+    } : state.props));
+  }
+});
+
+export const publicProps = (state) => ({
+  getProps() {
+    return Object.assign({}, state.props);
   }
 });
 
@@ -137,16 +150,13 @@ export const manyToOne = (state, name, getDB = getDatabase) => ({
   },
   postPopulate: async () => {
     state.populated[name] = await getDB(name).find({
-      _id: state._props[name + 'Id']
+      _id: state.props[name + 'Id']
     });
   }
 })
 
 // Enables legacy support, the old model.data field
 export const legacySupport = (state) => ({
-  get data() {
-    return state.functions.getProps();
-  }
 });
 
 // Composite to allow updating a document
@@ -157,7 +167,7 @@ export const updateable = (state, db = getDatabase(state.name)) => ({
       return;
     }
     try {
-      let res = await db.update({_id: state._props._id}, state._props);
+      let res = await db.update({_id: state.props._id}, state.props);
       return;
     } catch (err) {
       throw Boom.wrap(err);
@@ -165,16 +175,16 @@ export const updateable = (state, db = getDatabase(state.name)) => ({
   },
   set: (key, value) => {
     if (state.fields.includes(key)) {
-      state._props = Object.assign({}, state._props, {[key]: value});
+      state.props = Object.assign({}, state.props, {[key]: value});
     }
   }
 });
 
 // (recommended) composite to allow the creation of a document
-export const createable = (state, db = getDatabase(state.name)) => ({
+export const createable = (state, name, getDB = getDatabase) => ({
   create: async () => {
     try {
-      state._props = await db.insert(state._props);
+      state.props = await getDB(name).insert(state.props);
     } catch (err) {
       throw Boom.wrap(err);
     }

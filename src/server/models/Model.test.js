@@ -121,7 +121,7 @@ test('manyToOne - calls db find and mutate populated values', async t => {
   let called = false;
   let state = {
     populated: {},
-    _props: {
+    props: {
       fooId: 42
     }
   };
@@ -150,7 +150,7 @@ test('legacySupport - calls getProps', t => {
 test('updateable - update calls db.update', async t => {
   let callback = sinon.spy();
   let state = {
-    _props: {
+    props: {
       _id: 1337,
       number: 42,
       foo: 'bar'
@@ -168,14 +168,14 @@ test('updateable - update calls db.update', async t => {
 
 test('updateable - set mutate props', t => {
   let state = {
-    _props: {
+    props: {
       _id: 1337,
       value: 42
     },
     fields: ['value']
   };
   updateable(state, {}).set('value', 'foo');
-  t.deepEqual(state._props, {
+  t.deepEqual(state.props, {
       _id: 1337,
       value: 'foo'
   });
@@ -183,7 +183,7 @@ test('updateable - set mutate props', t => {
 
 test('createable - calls db.create', async t => {
   let state = {
-    _props: {
+    props: {
       number: 42,
       foo: 'bar'
     }
@@ -201,7 +201,7 @@ test('createable - calls db.create', async t => {
     number: 42,
     foo: 'bar'
   }));
-  t.deepEqual(state._props, {
+  t.deepEqual(state.props, {
     _id: 1337,
     number: 42,
     foo: 'bar'
