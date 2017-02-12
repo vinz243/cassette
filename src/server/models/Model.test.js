@@ -174,7 +174,7 @@ test('updateable - set mutate props', t => {
     },
     fields: ['value']
   };
-  updateable(state).set('value', 'foo');
+  updateable(state, {}).set('value', 'foo');
   t.deepEqual(state._props, {
       _id: 1337,
       value: 'foo'

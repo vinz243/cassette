@@ -18,7 +18,21 @@ let dataDir = path.join(conf.get('configPath'), '/data/');
 mkdirp.sync(dataDir);
 
 let databases = {};
-// this.dbPath = path.join(dataDir, this.dbName + '.db');
+
+// This function returns the nedb datastore corresponding to a name
+// Useful for manyToOne. if it wasn't found it will create it
+export const getDatabase = (name, Store = Datastore) => {
+  let dbName = pluralize(dbName);
+  let dbPath = path.join(dataDir, this.dbName + '.db');
+  if (databases[dbName]) {
+    return databases[dbName];
+  }
+  databases[name] = new Store({
+    filename: dbPath,
+    autoload: true
+  });
+  return getDatabase(name, Store);
+}
 
 // type State = {
 //   db: any,
@@ -112,12 +126,6 @@ export const databaseLoader = (state, db = getDatabase(state.name)) => ({
     } : state._props));
   }
 });
-
-// This function returns the nedb corresponding to a name
-// Useful for manyToOne
-export const getDatabase = (name) => {
-
-}
 
 // This creates acomposite object that populates field `name` with
 // the child props. This is a hook.
