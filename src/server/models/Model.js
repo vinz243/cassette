@@ -192,6 +192,9 @@ export const updateable = (state, db = getDatabase(state.name)) => ({
 // (recommended) composite to allow the creation of a document
 export const createable =  (state, db = getDatabase(state.name)) => ({
   create: async () => {
+    if (state.props._id) {
+      throw Boom.create('Cannot create a document that already exists');
+    }
     try {
       state.props = await db.insert(state.props);
     } catch (err) {

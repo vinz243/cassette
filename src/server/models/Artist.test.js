@@ -81,7 +81,7 @@ test('can fetch several artists', async t => {
 //   t.throws(Artist.find({foo: 'bar'}));
 // });
 
-test.failing('refuses to create fetched artist', async t => {
+test('refuses to create fetched artist', async t => {
   let foo = Artist({
     name: 'test',
     genre: 'test',
