@@ -1,61 +1,56 @@
-import Lazy from 'lazy.js';
+import {
+  assignFunctions,
+  defaultFunctions,
+  manyToOne,
+  legacySupport,
+  updateable,
+  createable,
+  databaseLoader,
+  publicProps,
+  findOneFactory,
+  findFactory
+} from './Model';
 
+export const File = function(props) {
+  if (typeof props === 'string') {
+    props = {
+      name: props
+    };
+  }
+  let state = {
+    name: 'file',
+    fields: [
+      'size',
+      'path',
+      'album',
+      'track',
+      'format',
+      'artist',
+      'bitrate',
+      'duration',
+    ],
+    functions: {},
+    populated: {},
+    props
+  };
+  return assignFunctions(
+    state.functions,
+    defaultFunctions(state),
+    updateable(state),
+    createable(state),
+    databaseLoader(state),
+    publicProps(state),
+    legacySupport(state),
+    manyToOne(state, 'album'),
+    manyToOne(state, 'artist'),
+    manyToOne(state, 'track'),
+  );
+}
 
-import Artist from './Artist';
-import Album from './Album';
-import Track from './Track';
+export const findOne = findOneFactory(File);
 
-import conf from '../config.js';
+export const findById = (_id) => findOne({
+  _id
+});
 
-import Model from './Model';
-
-
-// Schema:
-//   _id: id of file
-//   path: abs path to file
-//   format: format
-//   bitrate: audio bitrate in kbps
-//   lossless: boolean
-//   size: file size in bytes
-//   duration: duration in ms
-//   trackId: track id
-//   albumId: album id
-//   artistId: artist id
-
-let File = new Model('file')
-  .field('path')
-    .defaultParam()
-    .required()
-    .string()
-    .done()
-  .field('bitrate')
-    .int()
-    .done()
-  .field('format')
-    .notIdentity()
-    .string()
-    .done()
-  .field('lossless')
-    .boolean()
-    .notIdentity()
-    .done()
-  .field('size')
-    .int()
-    .notIdentity()
-    .done()
-  .field('duration')
-    .int()
-    .notIdentity()
-    .done()
-  .field('trackId')
-    .oneToOne()
-    .done()
-  .field('artistId')
-    .oneToOne()
-    .done()
-  .field('albumId')
-    .oneToOne()
-    .done()
-  .done()
-
-export default File;
+export const find = findFactory(File, 'file');

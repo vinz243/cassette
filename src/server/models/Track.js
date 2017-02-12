@@ -19,7 +19,7 @@ export const Track = function(props) {
   }
   let state = {
     name: 'track',
-    fields: ['name', 'path', 'album', 'artist', 'duration'],
+    fields: ['name', 'album', 'artist', 'duration'],
     functions: {},
     populated: {},
     props
