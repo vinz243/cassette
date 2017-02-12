@@ -40,6 +40,15 @@ test('assignFunctions - should assign for normal object', t => {
   });
 });
 
+test('assignFunctions - shoudl support getters', t => {
+  let answer = 41;
+  t.is(assignFunctions({}, {
+    get foo() {
+      return answer + 1
+    }
+  }).foo, 42)
+})
+
 test('assignFunction - should stack post (sync)', t => {
   let object = {
     update: (up) => {

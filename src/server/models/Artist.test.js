@@ -14,7 +14,7 @@ test('accepts db object', t => {
     genre: 'Reggae'
   });
   t.is(artist.getProps()._id, '42');
-  t.is(artist.getProps().name, 'Alborosie');
+  t.is(artist.props.name, 'Alborosie');
   t.is(artist.getProps().genre, 'Reggae');
 })
 

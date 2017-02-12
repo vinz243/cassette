@@ -75,7 +75,7 @@ const notImplemented = (name) => {
 export const assignFunctions = (obj, ...sources) => {
   return assignWith(obj, ...sources,
     (objValue, srcValue, key, object, source) => {
-
+    let descriptor = Object.getOwnPropertyDescriptor(source, key);
     // if this is a post hook, we will want to stack those methods
     // a bit like middlewares. This allows things like postPopulate
     // for populating all childs with several manyToOne.
@@ -95,6 +95,9 @@ export const assignFunctions = (obj, ...sources) => {
       })(object[method])
     } else if (key.startsWith('pre')) {
 
+    } else if (descriptor.get) {
+      object.__defineGetter__(key, () => source[key]);
+      return;
     } else {
       // if this is not a post/pre, then just do as we're supposed to
       return srcValue ? srcValue : objValue;
@@ -126,17 +129,20 @@ export const findOneFactory = (model) => {
 // Composite that allows loading an object from the database
 // This is done by using populate. So to find an object in the db
 // create a object with the query, then populate. See findOneFactory
-export const databaseLoader = (state, name, getDB = getDatabase) => ({
+export const databaseLoader =  (state, db = getDatabase(state.name)) => ({
   populate: async () => {
-    state.props = Object.assign({}, await getDB(name).findOne(state.props._id ? {
+    state.props = Object.assign({}, await db.findOne(state.props._id ? {
       _id: state.props._id
     } : state.props));
   }
 });
 
 export const publicProps = (state) => ({
-  getProps() {
+  getProps:() => {
     return Object.assign({}, state.props);
+  },
+  get props() {
+    return state.functions.getProps();
   }
 });
 
@@ -157,6 +163,9 @@ export const manyToOne = (state, name, getDB = getDatabase) => ({
 
 // Enables legacy support, the old model.data field
 export const legacySupport = (state) => ({
+  get data() {
+    return state.functions.getProps();
+  }
 });
 
 // Composite to allow updating a document
@@ -181,10 +190,10 @@ export const updateable = (state, db = getDatabase(state.name)) => ({
 });
 
 // (recommended) composite to allow the creation of a document
-export const createable = (state, name, getDB = getDatabase) => ({
+export const createable =  (state, db = getDatabase(state.name)) => ({
   create: async () => {
     try {
-      state.props = await getDB(name).insert(state.props);
+      state.props = await db.insert(state.props);
     } catch (err) {
       throw Boom.wrap(err);
     }

@@ -26,12 +26,12 @@ export const Artist = function(props) {
   };
   return assignFunctions(
     state.functions,
-    defaultFunctions(state, state.name),
-    updateable(state, state.name),
-    createable(state, state.name),
-    databaseLoader(state, state.name),
-    publicProps(state, state.name),
-    legacySupport(state, state.name)
+    defaultFunctions(state),
+    updateable(state),
+    createable(state),
+    databaseLoader(state),
+    publicProps(state),
+    legacySupport(state)
   );
 }
 
