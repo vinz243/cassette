@@ -10,7 +10,7 @@ import chalk from 'chalk';
 import md5 from 'md5';
 import fs from 'fs';
 
-const dataDir = path.join(config.get('configPath'), '/cache/');
+const dataDir = path.join(config.get('configPath'), '/cache/artworks');
 mkdirp.sync(dataDir);
 
 export default {

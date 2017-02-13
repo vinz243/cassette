@@ -5,10 +5,12 @@ import {
   legacySupport,
   updateable,
   createable,
+  removeable,
   databaseLoader,
   publicProps,
   findOneFactory,
-  findFactory
+  findFactory,
+  findOrCreateFactory
 } from './Model';
 
 export const Track = function(props) {
@@ -19,7 +21,7 @@ export const Track = function(props) {
   }
   let state = {
     name: 'track',
-    fields: ['name', 'album', 'artist', 'duration'],
+    fields: ['name', 'album', 'artist', 'duration', 'trackNumber'],
     functions: {},
     populated: {},
     props
@@ -29,6 +31,7 @@ export const Track = function(props) {
     defaultFunctions(state),
     updateable(state),
     createable(state),
+    removeable(state),
     databaseLoader(state),
     publicProps(state),
     legacySupport(state),
@@ -38,6 +41,7 @@ export const Track = function(props) {
 }
 
 export const findOne = findOneFactory(Track);
+export const findOrCreate = findOrCreateFactory(Track);
 
 export const findById = (_id) => findOne({
   _id

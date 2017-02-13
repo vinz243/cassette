@@ -4,7 +4,11 @@ import {
     manyToOne,
     legacySupport,
     updateable,
-    createable
+    createable,
+    removeable,
+    databaseLoader,
+    publicProps,
+    findOneFactory
   } from './Model';
 import test from 'ava';
 import sinon from 'sinon';
@@ -115,8 +119,14 @@ test('manyToOne - assigns to passed props populated values', t => {
       }
     }
   };
+  // let getDB = sinon.spy(() => ({
+  //   findOne: (doc, cb) => {
+  //     cb()
+  //   }
+  // }))
   let props = manyToOne(state, 'sibling');
-  let res = props.postGetProps({siblingId: 'id', name: 'Thomas'});
+
+  let res = props.postGetProps({sibling: 'id', name: 'Thomas'});
   t.deepEqual(res, {
     name: 'Thomas',
     sibling: {
@@ -131,14 +141,14 @@ test('manyToOne - calls db find and mutate populated values', async t => {
   let state = {
     populated: {},
     props: {
-      fooId: 42
+      foo: 42
     }
   };
   let props = manyToOne(state, 'foo', () => ({
-    find: (q) => {
+    findOne: (q, p, cb) => {
       t.deepEqual(q, {_id: 42});
       called = true;
-      return Promise.resolve({foo: 'bar', _id: 42});
+      return cb(null, {foo: 'bar', _id: 42});
   }}));
   await props.postPopulate();
   t.truthy(called);
@@ -190,19 +200,19 @@ test('updateable - set mutate props', t => {
   });
 });
 
-test('createable - calls db.create', async t => {
+test('createable - calls db.insert', async t => {
   let state = {
     props: {
       number: 42,
       foo: 'bar'
     }
   };
-  let callback = sinon.spy(function () {
-    return Promise.resolve({
+  let callback = sinon.spy(function (doc, cb) {
+    return cb(null, [{
       _id: 1337,
       number: 42,
       foo: 'bar'
-    });
+    }]);
   });
   await createable(state, {insert: callback}).create();
   t.truthy(callback.called);
@@ -215,4 +225,140 @@ test('createable - calls db.create', async t => {
     number: 42,
     foo: 'bar'
   });
+});
+
+let character = null,
+    weapon = null,
+    gandalf = {
+      name: 'Gandalf The White',
+      race: 'Wizard'
+    },
+    aragorn = {
+      name: 'Aragorn',
+      race: 'Human'
+    },
+    merry = {
+      name: 'Merry',
+      race: 'Hobbit'
+    },
+    pippin = {
+      name: 'Pippin',
+      race: 'Hobbit'
+    },
+    gandalfStaff = {
+      type: 'staff',
+    },
+    anduril = {
+      name: 'Andùril',
+      type: 'Sword'
+    };
+
+test.serial('integration - create the models', t => {
+  weapon = function(props) {
+    if (typeof props === 'string') {
+      props = {
+        name: props
+      };
+    }
+    let state = {
+      name: 'weapon',
+      fields: ['name', 'type'],
+      functions: {},
+      populated: {},
+      props
+    };
+    return assignFunctions(
+      state.functions,
+      defaultFunctions(state),
+      updateable(state),
+      createable(state),
+      removeable(state),
+      databaseLoader(state),
+      publicProps(state),
+      legacySupport(state)
+    );
+  };
+
+  character = function(props) {
+    if (typeof props === 'string') {
+      props = {
+        name: props
+      };
+    }
+    let state = {
+      name: 'character',
+      fields: ['name', 'weapon', 'race', 'age'],
+      functions: {},
+      populated: {},
+      props: Object.assign(props)
+    };
+    return assignFunctions(
+      state.functions,
+      defaultFunctions(state),
+      updateable(state),
+      createable(state),
+      removeable(state),
+      databaseLoader(state),
+      publicProps(state),
+      legacySupport(state),
+      manyToOne(state, 'weapon')
+    );
+  };
+});
+
+test.serial('integration - create the characters', async t => {
+  let staff = weapon(Object.assign(gandalfStaff));
+  let aragornSword = weapon(Object.assign(anduril));
+
+  await Promise.all([staff.create(), aragornSword.create()]);
+  anduril._id = aragornSword.props._id;
+  gandalfStaff._id = staff.props._id;
+
+  t.deepEqual(anduril, aragornSword.props);
+  t.deepEqual(gandalfStaff, staff.props);
+  gandalf.weapon = gandalfStaff._id;
+
+  let mithrandir = character(Object.assign({}, gandalf));
+  await mithrandir.create();
+  gandalf._id = mithrandir.props._id;
+
+  t.deepEqual(mithrandir.props, gandalf);
+  t.truthy(gandalf._id);
+
+  aragorn.weapon = anduril._id;
+  let ranger = character(Object.assign({}, aragorn));
+  await ranger.create();
+  aragorn._id = ranger.props._id;
+
+  t.deepEqual(ranger.props, aragorn);
+  t.truthy(aragorn._id);
+
+  let [meriadoc, peregrin] = [merry, pippin].map(character);
+  await Promise.all([meriadoc, peregrin].map(hobbit => hobbit.create()));
+  pippin._id = peregrin.props._id;
+  merry._id = meriadoc.props._id;
+
+  t.deepEqual([peregrin, meriadoc].map(hobbit => hobbit.props), [pippin, merry]);
+});
+
+test.serial('integration - findOne by _id', async t => {
+  let findOneCharacter = findOneFactory(character);
+
+  let mithrandir = await findOneCharacter({_id: gandalf._id});
+  t.is(mithrandir.props.name, 'Gandalf The White');
+  t.deepEqual(mithrandir.props, Object.assign({}, gandalf, {
+    weapon: gandalfStaff
+  }));
+});
+
+test.serial('integration - findOne by name', async t => {
+  let findOneCharacter = findOneFactory(character);
+
+  let meriadoc = await findOneCharacter({name: merry.name});
+  t.is(meriadoc.props.name, 'Merry');
+  t.deepEqual(meriadoc.props, Object.assign({}, merry));
+
+  let peregrin = await findOneCharacter({name: pippin.name});
+  t.is(peregrin.props.name, 'Pippin');
+  t.deepEqual(peregrin.props, Object.assign({}, pippin));
 });

@@ -5,10 +5,12 @@ import {
   legacySupport,
   updateable,
   createable,
+  removeable,
   databaseLoader,
   publicProps,
   findOneFactory,
-  findFactory
+  findFactory,
+  findOrCreateFactory
 } from './Model';
 
 export const Artist = function(props) {
@@ -29,6 +31,7 @@ export const Artist = function(props) {
     defaultFunctions(state),
     updateable(state),
     createable(state),
+    removeable(state),
     databaseLoader(state),
     publicProps(state),
     legacySupport(state)
@@ -36,6 +39,8 @@ export const Artist = function(props) {
 }
 
 export const findOne = findOneFactory(Artist);
+
+export const findOrCreate = findOrCreateFactory(Artist);
 
 export const findById = (_id) => findOne({
   _id

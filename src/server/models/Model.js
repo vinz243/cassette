@@ -1,9 +1,8 @@
-import Datastore from 'nedb-promise';
 import conf from '../config.js';
-import config from './config.js';
 import { mainStory } from 'storyboard';
-
+import tingodb from 'tingodb';
 import assert from 'assert';
+
 import events from 'events';
 import mkdirp from 'mkdirp';
 import path from 'path';
@@ -12,53 +11,70 @@ import assignWith from 'lodash/assignWith';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
 
-import pascalCase from 'pascal-case';
 import pluralize from 'pluralize';
-import snakeCase from 'snake-case';
 
-let dataDir = path.join(conf.get('configPath'), '/data/');
+let dataDir = path.join(conf.get('configPath'), '/database/');
 mkdirp.sync(dataDir);
 
 let databases = {};
+let db = new (tingodb({
+  nativeObjectID: false
+}).Db)(dataDir, {});
 
 // This function returns the nedb datastore corresponding to a name
 // Useful for manyToOne. if it wasn't found it will create it
-const getDatabase = (name, Store = Datastore) => {
-  let dbName = pluralize(name);
-  let dbPath = path.join(dataDir, dbName + '.db');
-  if (databases[dbName]) {
-    return databases[dbName];
+const getDatabase = (name, database = db) => {
+  if (databases[name]) {
+    return databases[name];
   }
-  databases[dbName] = new Store({
-    filename: dbPath
-  });
-  databases[dbName].loadDatabase();
-  return getDatabase(name, Store);
+  databases[name] = database.collection(pluralize(name));
+  return getDatabase(name, database);
+}
+
+export const findOrCreateFactory = (model, name) => {
+  return (query, props = {}) => {
+
+    let obj = model(query);
+    return obj.populate().then(() => {
+      if (obj.props._id) {
+        return Promise.resolve(obj);
+      }
+      let newObj = model(Object.assign({}, query, props));
+      return newObj.create().then(() => Promise.resolve(newObj));
+    }).then((object) => {
+      return Promise.resolve(object);
+    });
+  }
 }
 
 export const findFactory = (model, name, getDB = getDatabase) => {
-  return async (query) => {
-    let optFields = ['limit', 'sort', 'skip', 'direction']
-    let opts = pick(query, optFields);
+  return (query) => {
+    return new Promise((resolve, reject) => {
+      let optFields = ['limit', 'sort', 'skip', 'direction']
+      let opts = pick(query, optFields);
 
-    if (!opts.limit || opts.limit > 500 || opts.limit < 1) {
-      opts.limit = 500;
-    }
+      if (!opts.limit || opts.limit > 500 || opts.limit < 1) {
+        opts.limit = 500;
+      }
 
-    let sort = {};
-    sort[opts.sort || 'name'] = opts.direction ?
-      (opts.direction == 'asc' ? 1 : -1) : 1;
-    let res = (await getDatabase(name)
-      .cfind(omit(query, optFields))
-      .sort(sort)
-      .limit(opts.limit)
-      .skip(opts.skip || 0)
-      .exec());
+      let sort = {};
+      sort[opts.sort || 'name'] = opts.direction ?
+        (opts.direction == 'asc' ? 1 : -1) : 1;
+      let res = getDatabase(name)
+        .find(omit(query, optFields))
+        .sort(sort)
+        .limit(opts.limit)
+        .skip(opts.skip || 0)
+        .toArray((err, docs) => {
+          if (err) return reject(err);
 
-    let models = res.map((el) => model({_id: el._id}));
+          let models = docs.map((el) => model({_id: el._id}));
 
-    await Promise.all(models.map(el => el.populate()));
-    return models;
+          Promise.all(models.map(el => el.populate())).then(() => {
+            resolve(models);
+          });
+        });
+    });
   }
 }
 
@@ -83,7 +99,6 @@ export const assignFunctions = (obj, ...sources) => {
       object[method] = (function (fun) {
         return (...args) => {
           let res = fun(...args);
-
           // If the result is a promise we wait and call next after that
           if (res && res.then) {
             return res.then(srcValue);
@@ -129,10 +144,17 @@ export const findOneFactory = (model) => {
 // This is done by using populate. So to find an object in the db
 // create a object with the query, then populate. See findOneFactory
 export const databaseLoader =  (state, db = getDatabase(state.name)) => ({
-  populate: async () => {
-    state.props = Object.assign({}, await db.findOne(state.props._id ? {
+  populate: () => {
+    let query = state.props._id ? {
       _id: state.props._id
-    } : state.props));
+    } : Object.assign({}, state.props);
+    return new Promise((resolve, reject) => {
+      db.findOne(query, {}, (err, doc) => {
+        if (err) return reject(err);
+        state.props = Object.assign({}, doc || {});
+        resolve();
+      });
+    });
   }
 });
 
@@ -149,13 +171,21 @@ export const publicProps = (state) => ({
 // the child props. This is a hook.
 export const manyToOne = (state, name, getDB = getDatabase) => ({
   postGetProps: ({[name]: parentId, ...props}) => {
-    return Object.assign({}, props, state.populated[name] ? {
-      [name]: state.populated[name]
-    } : {[name]: parentId} );
+    let pop = state.populated[name];
+    return Object.assign({}, props, (pop && Object.keys(pop).length > 0) ? {
+      [name]: pop
+    } : (parentId ? {[name]: parentId} : {}));
   },
   postPopulate: async () => {
-    state.populated[name] = await getDB(name).findOne({
-      _id: state.props[name]
+    return new Promise((resolve, reject) => {
+      if (!state.props[name]) return resolve();
+      getDB(name).findOne({
+        _id: state.props[name]
+      }, {}, (err, doc) => {
+        if (err) return reject(err);
+        state.populated[name] = doc;
+        resolve();
+      });
     });
   }
 })
@@ -174,12 +204,12 @@ export const updateable = (state, db = getDatabase(state.name)) => ({
       mainStory.info('db', 'Trying to update a non dirty document');
       return;
     }
-    try {
-      let res = await db.update({_id: state.props._id}, state.props);
-      return;
-    } catch (err) {
-      throw Boom.wrap(err);
-    }
+    return new Promise((resolve, reject) => {
+      db.update({_id: state.props._id}, state.props, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
   },
   set: (key, value) => {
     if (state.fields.includes(key)) {
@@ -189,15 +219,33 @@ export const updateable = (state, db = getDatabase(state.name)) => ({
 });
 
 // (recommended) composite to allow the creation of a document
-export const createable =  (state, db = getDatabase(state.name)) => ({
+export const createable = (state, db = getDatabase(state.name)) => ({
   create: async () => {
     if (state.props._id) {
       throw Boom.create('Cannot create a document that already exists');
     }
-    try {
-      state.props = await db.insert(state.props);
-    } catch (err) {
-      throw Boom.wrap(err);
+    return new Promise((resolve, reject) => {
+       db.insert(state.props, (err, [props]) => {
+        if (err)
+          return reject(Boom.wrap(err));
+        state.props = Object.assign({}, props);
+        resolve();
+      });
+    });
+  }
+});
+
+export const removeable = (state, db = getDatabase(state.name)) => ({
+  remove: async () => {
+    if (state.props._id) {
+      return new Promise((resolve, reject) => {
+        db.remove({_id: this.props._id}, {}, (err) => {
+          if (err) return reject(err);
+          delete state.props._id;
+          resolve();
+        });
+      });
     }
+    return;
   }
 })
