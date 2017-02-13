@@ -8,7 +8,9 @@ import {
     removeable,
     databaseLoader,
     publicProps,
-    findOneFactory
+    findOneFactory,
+    findFactory,
+    findOrCreateFactory,
   } from './Model';
 import test from 'ava';
 import sinon from 'sinon';
@@ -251,6 +253,10 @@ let character = null,
     anduril = {
       name: 'Andùril',
       type: 'Sword'
+    },
+    frodo = {
+      name: 'Frodo',
+      race: 'Hobbit'
     };
 
 test.serial('integration - create the models', t => {
@@ -362,3 +368,118 @@ test.serial('integration - findOne by name', async t => {
   t.is(peregrin.props.name, 'Pippin');
   t.deepEqual(peregrin.props, Object.assign({}, pippin));
 });
+
+test.serial('integration - findOne non existing document', async t => {
+  let findOneCharacter = findOneFactory(character);
+  let boromir = await findOneCharacter({name: 'boromir'});
+  t.is(boromir, undefined);
+});
+
+test.serial('integration - find one document from _id', async t => {
+  let find = findFactory(character, 'character');
+
+  let [mithrandir] = await find({_id: gandalf._id});
+  t.is(mithrandir.props.name, 'Gandalf The White');
+  t.deepEqual(mithrandir.props, Object.assign({}, gandalf, {
+    weapon: gandalfStaff
+  }));
+});
+
+test.serial('integration - find by race', async t => {
+  let find = findFactory(character, 'character');
+
+  let res = await find({race: 'Hobbit'});
+  t.deepEqual(res.map(el => el.props), [
+    merry,
+    pippin
+  ]);
+})
+
+test.serial('integration - support sort and limit', async t => {
+  let find = findFactory(character, 'character');
+
+  let res = await find({limit: 2, sort: 'name', direction: -1});
+  t.deepEqual(res.map(el => el.props), [
+    pippin,
+    merry
+  ]);
+});
+
+test.serial('integration - support skip', async t => {
+  let find = findFactory(character, 'character');
+
+  let res = await find({limit: 1, sort: 'name', direction: -1});
+  t.deepEqual(res.map(el => el.props), [
+    pippin
+  ]);
+});
+
+test.serial('integration - findOrCreate find if it exists', async t => {
+  let findOrCreate = findOrCreateFactory(character);
+  let find = findFactory(character, 'character');
+
+  let res = await findOrCreate({name: 'Gandalf The White'}, {race: 'Hobbit'});
+  t.deepEqual(res.props, Object.assign({}, gandalf, {
+    weapon: gandalfStaff
+  }));
+
+  let docs = await find({name: 'Gandalf The White'});
+  t.is(docs.length, 1);
+});
+
+test.serial('integration - findOrCreate creates if it does not exists', async t => {
+  let findOrCreate = findOrCreateFactory(character);
+  let find = findFactory(character, 'character');
+
+  let res = await findOrCreate({name: 'Frodo'}, {race: 'Hobbit'});
+  t.deepEqual(res.props, {
+    _id: res.props._id,
+    name: 'Frodo',
+    race: 'Hobbit'
+  });
+
+  let docs = await find({name: 'Frodo'});
+  t.is(docs.length, 1);
+});
+
+test.serial('integration - updateable set changes props', async t => {
+  let find = findFactory(character, 'character');
+
+  let [meriadoc] = await find({name: 'Merry'});
+  meriadoc.set('name', 'Meriadioc Brandybuck');
+  merry.name = 'Meriadioc Brandybuck';
+  t.deepEqual(meriadoc.props, merry);
+  t.is(meriadoc.props.name, 'Meriadioc Brandybuck');
+});
+
+test.serial('integration - updateable update', async t => {
+  let find = findFactory(character, 'character');
+
+  let [meriadoc] = await find({name: 'Merry'});
+  meriadoc.set('name', 'Meriadioc Brandybuck');
+
+  await meriadoc.update();
+
+  merry.name = 'Meriadioc Brandybuck';
+  t.deepEqual(meriadoc.props, merry);
+  t.is(meriadoc.props.name, 'Meriadioc Brandybuck');
+
+  let none = await find({name: 'Merry'});
+  t.is(none.length, 0);
+
+  let [meriadocBrandybuck] = await find({name: 'Meriadioc Brandybuck'});
+  t.deepEqual(meriadocBrandybuck.props, merry);
+  t.is(meriadocBrandybuck.props.name, 'Meriadioc Brandybuck');
+});
+
+test.serial('integration - remove', async t => {
+  let find = findFactory(character, 'character');
+
+  let [meriadoc] = await find({name: 'Meriadioc Brandybuck'});
+  meriadoc.set('name', 'Meriadioc Brandybuck');
+
+  await meriadoc.remove();
+
+  let none = await find({name: 'Meriadioc Brandybuck'});
+  t.is(none.length, 0);
+})

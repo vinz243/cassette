@@ -31,7 +31,7 @@ const getDatabase = (name, database = db) => {
   return getDatabase(name, database);
 }
 
-export const findOrCreateFactory = (model, name) => {
+export const findOrCreateFactory = (model) => {
   return (query, props = {}) => {
 
     let obj = model(query);
@@ -136,7 +136,11 @@ export const defaultFunctions = (state) => {
 export const findOneFactory = (model) => {
   return (props) => {
     let obj = model(props);
-    return obj.populate().then(() => Promise.resolve(obj));
+    return obj.populate().then(() => {
+      if (!obj.props._id)
+        return Promise.resolve();
+      return Promise.resolve(obj)
+    });
   }
 }
 
@@ -199,7 +203,7 @@ export const legacySupport = (state) => ({
 
 // Composite to allow updating a document
 export const updateable = (state, db = getDatabase(state.name)) => ({
-  update: async () => {
+  update: () => {
     if (!state.dirty) {
       mainStory.info('db', 'Trying to update a non dirty document');
       return;
@@ -214,6 +218,7 @@ export const updateable = (state, db = getDatabase(state.name)) => ({
   set: (key, value) => {
     if (state.fields.includes(key)) {
       state.props = Object.assign({}, state.props, {[key]: value});
+      state.dirty = true;
     }
   }
 });
@@ -239,7 +244,7 @@ export const removeable = (state, db = getDatabase(state.name)) => ({
   remove: async () => {
     if (state.props._id) {
       return new Promise((resolve, reject) => {
-        db.remove({_id: this.props._id}, {}, (err) => {
+        db.remove({_id: state.props._id}, {}, (err) => {
           if (err) return reject(err);
           delete state.props._id;
           resolve();
