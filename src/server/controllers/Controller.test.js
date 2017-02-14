@@ -140,3 +140,23 @@ test('updateable - updates an object', async t => {
   t.deepEqual(update.args, [[]]);
   t.is(ctx.status, 200);
 });
+
+test('oneToMany - allows fetch child', async t => {
+  let find = sinon.spy(() => Promise.resolve([{props: {
+   name: 'Jon Snow', sword: 'Longclaw'
+  }}]));
+
+  let ctx = {
+    params: {
+      id: 0x2A
+    }
+  };
+  let controller = oneToMany('character', 'son', find);
+  await controller['/api/v2/characters/:id/sons'].get(ctx);
+
+  t.deepEqual(ctx.body, [{
+    name: 'Jon Snow',
+    sword: 'Longclaw'
+  }]);
+  t.is(ctx.status, 200);
+})
