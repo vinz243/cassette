@@ -26,12 +26,13 @@ export const fetchable = (name, find, findById) => ({
 export const createable = (name, model) => ({
   [`/api/v2/${pluralize(name)}`]: {
     post: async (ctx) => {
-      let object = model(ctx.request.fields || ctx.request.body);
+      let object = model(Object.assign({}, ctx.request.fields || {},
+        ctx.request.body || {}));
       if (!Object.keys(object.props)) {
         return ctx.throws(400, `None of the properties provided are acceptable`);
       }
       await object.create();
-      ctx.status = doc.props._id ? 201 : 202;
+      ctx.status = object.props._id ? 201 : 202;
       ctx.body = object.props;
     }
   }
