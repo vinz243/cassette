@@ -38,7 +38,7 @@ export const createable = (name, model) => ({
   }
 });
 
-export const removeable = (name, model, findById) => ({
+export const removeable = (name, findById) => ({
   [`/api/v2/${pluralize(name)}/:id`]: {
     del: async (ctx) => {
       let doc = await findById(ctx.params.id);
@@ -51,14 +51,15 @@ export const removeable = (name, model, findById) => ({
   }
 });
 
-export const updateable = (name, model, findById) => ({
+export const updateable = (name, findById) => ({
   [`/api/v2/${pluralize(name)}/:id`]: {
     put: async (ctx) => {
       let doc = await findById(ctx.params.id);
       if (!doc) {
         return ctx.throws(404, `Entity #${ctx.params.id} not found`);
       }
-      let props = (ctx.request.fields || ctx.request.body);
+      let props = Object.assign({}, ctx.request.fields || {},
+        ctx.request.body || {});
 
       Object.keys(props).forEach(key => {
         doc.set(key, props[key]);

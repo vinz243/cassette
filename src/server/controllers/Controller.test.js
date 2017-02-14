@@ -98,3 +98,45 @@ test('creatable - create an object from fields', async t => {
     sword: 'Dawn'
   }]);
 });
+
+
+test('removeable - removes an object', async t => {
+  let remove = sinon.spy(() => Promise.resolve());
+  let findById = sinon.spy(() => Promise.resolve({
+    props: {
+      name: 'Ser Ulrick Dayne',
+      sword: 'Dawn'
+    }, remove
+  }));
+  let ctx = {
+    params: {id: 42}
+  }
+
+  await removeable('character', findById)['/api/v2/characters/:id'].del(ctx);
+  t.is(ctx.status, 200);
+  t.deepEqual(remove.args, [[]]);
+  t.deepEqual(findById.args, [[42]]);
+});
+
+test('updateable - updates an object', async t => {
+  let set = sinon.spy();
+  let update = sinon.spy(() => Promise.resolve());
+
+  let findById = sinon.spy(() => Promise.resolve({
+    set, update
+  }));
+  let ctx = {
+    request: {body: {
+      dead: true,
+      killedBy: 'Howland Reed'
+    }},
+    params: {
+      id: 42
+    }
+  }
+  await updateable('character', findById)['/api/v2/characters/:id'].put(ctx);
+
+  t.deepEqual(set.args, [['dead', true], ['killedBy', 'Howland Reed']]);
+  t.deepEqual(update.args, [[]]);
+  t.is(ctx.status, 200);
+});
