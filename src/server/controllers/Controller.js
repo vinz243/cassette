@@ -15,7 +15,7 @@ export const fetchable = (name, find, findById) => ({
     get: async (ctx) => {
       let doc = await findById(ctx.params.id);
       if (!doc) {
-        return ctx.throws(404, 'Object not found in database');
+        return ctx.throw(404, 'Object not found in database');
       }
       ctx.status = 200;
       ctx.body = doc.props;
@@ -29,7 +29,7 @@ export const createable = (name, model) => ({
       let object = model(Object.assign({}, ctx.request.fields || {},
         ctx.request.body || {}));
       if (!Object.keys(object.props)) {
-        return ctx.throws(400, `None of the properties provided are acceptable`);
+        return ctx.throw(400, `None of the properties provided are acceptable`);
       }
       await object.create();
       ctx.status = object.props._id ? 201 : 202;
@@ -43,7 +43,7 @@ export const removeable = (name, findById) => ({
     del: async (ctx) => {
       let doc = await findById(ctx.params.id);
       if (!doc) {
-        return ctx.throws(404, `Entity #${ctx.params.id} not found`);
+        return ctx.throw(404, `Entity #${ctx.params.id} not found`);
       }
       await doc.remove();
       ctx.status = doc.props._id ? 202 : 200;
@@ -56,7 +56,7 @@ export const updateable = (name, findById) => ({
     put: async (ctx) => {
       let doc = await findById(ctx.params.id);
       if (!doc) {
-        return ctx.throws(404, `Entity #${ctx.params.id} not found`);
+        return ctx.throw(404, `Entity #${ctx.params.id} not found`);
       }
       let props = Object.assign({}, ctx.request.fields || {},
         ctx.request.body || {});
@@ -75,8 +75,8 @@ export const updateable = (name, findById) => ({
 export const oneToMany = (name, childName, findChildren) => ({
   [`/api/v2/${pluralize(name)}/:id/${pluralize(childName)}`]: {
     get: async (ctx) => {
-      let children = await findChildren({[childName]: ctx.params.id});
-      ctx.status = 200;
+      let children = await findChildren({[name]: ctx.params.id - 0});
+      
       ctx.body = children.map(child => child.props);
       return;
     }

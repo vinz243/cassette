@@ -43,4 +43,4 @@ export const findById = (_id) => findOne({
   _id
 });
 
-export const find = findFactory(Library, 'lîbrary');
+export const find = findFactory(Library, 'library');

@@ -33,7 +33,7 @@ export const getMediastic = () => {
   return mediastic;
 }
 
-export const titleCase = (str) => {
+export const titleCase = (str = 'Unknown') => {
   if (/^((([A-Z]{2,}\b).?){2,}|([a-z]+\b.?\s?)+)$/.test(str)) {
     return str.toLowerCase().split(/(\.\s?|\s)/g)
       .filter((w) => !/^\s*$/.test(w))
@@ -42,7 +42,7 @@ export const titleCase = (str) => {
   return str;
 }
 
-export const normalizeArtist = (str) => {
+export const normalizeArtist = (str = 'Unknown') => {
   return titleCase(str.replace(/feat.+$/g, '').trim());
 }
 
@@ -55,6 +55,8 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
       });
     case 'create':
       return mediastic(filePath).then((metadata) => {
+        if (!metadata.duration)
+          return Promise.reject(new Error(`Corrupted file on '${filePath}'`));
         return models.findOrCreateArtist({
           name: normalizeArtist(metadata.artist)
         }).then((artist) => {
@@ -70,7 +72,7 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
         return models.findOrCreateTrack({
           name: titleCase(metadata.title),
           album: album.props._id,
-          trackNumber: (metadata.track + '').match(/^\d+/)[0] - 0,
+          trackNumber: ((metadata.track + '').match(/^\d+/) || [0])[0] - 0,
         }, {
           artist: artist.props._id,
           duration: metadata.duration
@@ -82,7 +84,8 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
           bitrate: metadata.bitrate,
           path: filePath,
           artist: artist.props._id,
-          album: album.props._id
+          album: album.props._id,
+          track: track.props._id
         });
         return file.create().then(() => {
           return Promise.resolve([metadata, artist, album, track, file])
@@ -91,10 +94,11 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
 
         return models.findFileById(file.props._id);
       }).then(file => {
-
-        mainStory.debug('scanner', 'Added a new track', {attach: file.props});
+        mainStory.info('scanner', `Done working on ${filePath}`);
+        mainStory.trace('scanner', 'Added a new track', {attach: file.props});
       }).catch(err => {
-        mainStory.err('scanner', 'Library scan finished with errors', {attach: err});
+        mainStory.warn('scanner', err.message);
+        mainStory.trace('scanner', 'Library scan encountered an error', {attach: err});
       });
     case 'unlink':
       return findOneFile({path: filePath}).then((file) => {
@@ -122,10 +126,11 @@ export const scan = async (libraryId, mediastic = getMediastic()) => {
   });
 
   let diff = cached.calculatePatch(current);
-  let promises = diff.map(operationMapperFactory({
+  let mapper = operationMapperFactory({
     findOrCreateTrack, findOrCreateAlbum, findOrCreateArtist, File, findFileById
-  }, mediastic.call.bind(mediastic)));
+  }, mediastic.call.bind(mediastic));
 
-  await Promise.all(promises)
+  await diff.reduce((stack, entry) => stack.then(mapper.bind(null, entry)),
+    Promise.resolve());
   return writeCachedEntries(libraryId, currentEntries);
 }

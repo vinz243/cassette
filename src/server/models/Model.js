@@ -166,6 +166,9 @@ export const publicProps = (state) => ({
   getProps:() => {
     return Object.assign({}, state.props);
   },
+  get doc () {
+    return Object.assign({}, state.props);
+  },
   get props() {
     return Object.assign({}, state.functions.getProps());
   }

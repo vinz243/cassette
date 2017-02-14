@@ -1,63 +1,65 @@
-import {Artist, Album, Track, File} from '../models';
-import Controller from './Controller';
-import fs from 'fs';
+import {find as findArtist,
+        findById as findArtistById} from '../models/Artist';
+import {find as findAlbum,
+        findById as findAlbumById} from '../models/Album';
+import {find as findTrack,
+        findById as findTrackById} from '../models/Track';
+import {find as findFile} from '../models/File';
 
-const routes = new Controller(Track).done();
+import {fetchable, oneToMany, updateable} from './Controller';
+import merge from 'lodash/merge';
 
-routes['/v1/tracks/:id/file'] = {
-  get: async (ctx, next) => {
-    let tracks = await File.find({
-      trackId: ctx.params.id,
-      sort: 'bitrate',
-      direction: 'desc',
-      limit: 3
-    });
-    if (tracks.length == 0)
-      return res.writeHead(404, {});
-    let stat = fs.statSync(tracks[0].data.path);
-    let mimeType = 'audio/mpeg';
 
-    if (tracks[0].data.path.endsWith('.flac')) {
-      mimeType = 'audio/flac';
-    }
+export default merge({},
+  fetchable('track', findTrack, findTrackById),
+  updateable('track', findTrackById),
+  oneToMany('track', 'file', findFile), {
+    '/api/v2/tracks/:id/stream':  {
+      get: async (ctx, next) => {
+        let tracks = await findFile({
+          track: ctx.params.id,
+          sort: 'bitrate',
+          direction: 'desc',
+          limit: 3
+        });
+        if (tracks.length == 0)
+          return ctx.throw(404, 'No file found');
 
-    let opts = {}, res = 200;
+        let stat = fs.statSync(tracks[0].data.path);
+        let mimeType = 'audio/mpeg';
 
-    let resHeaders = {
-      'Content-Type': mimeType,
-      'Content-Length': stat.size,
-      'Accept-Ranges': 'bytes'
-    };
-    // console.log(ctx.headers);
-    // if (ctx.headers.accept !== '*/*') {
-    //   ctx.res.writeHead(200, resHeaders);
-    //   return;
-    // }
-    if (ctx.headers['range']) {
-      let [b, range] = ctx.headers['range'].split('=');
+        if (tracks[0].data.path.endsWith('.flac')) {
+          mimeType = 'audio/flac';
+        }
 
-      if (b === 'bytes') {
-        let [start, end] = range.split('-');
+        let opts = {}, code = 200;
 
-        if (!end || end === '' || end < start)
-          end = stat.size - 1;
+        ctx.set('Content-Type', mimeType);
+        ctx.set('Content-Length', stat.size);
+        ctx.set('Accept-Ranges', 'bytes');
 
-        opts = {
-          start: start - 0,
-          end: end - 0
-        };
+        if (ctx.headers['range']) {
+          let [b, range] = ctx.headers['range'].split('=');
 
-        res = 206;
-        resHeaders['Content-Range'] = `bytes ${start}-${end}/${stat.size}`;
-        resHeaders['Content-Length'] = end - start + 1;
+          if (b === 'bytes') {
+            let [start, end] = range.split('-');
+
+            if (!end || end === '' || end < start)
+              end = stat.size - 1;
+
+            opts = {
+              start: start - 0,
+              end: end - 0
+            };
+
+            code = 206;
+            ctx.set('Content-Range',`bytes ${start}-${end}/${stat.size}`);
+            ctx.set('Content-Length', end - start + 1);
+          }
+        }
+        ctx.status = code;
+        ctx.body = fs.createReadStream(tracks[0].data.path, opts);
       }
     }
-
-    ctx.res.writeHead(res, resHeaders);
-
-    ctx.body = fs.createReadStream(tracks[0].data.path, opts);
-
-    // readStream.pipe(ctx.res);
   }
-}
-export default routes;
+);

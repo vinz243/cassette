@@ -42,7 +42,7 @@ app.use(webpackDevMiddleware(compiler, {
 app.use(webpackHotMiddleware(compiler));
 const callback = backend.app.callback();
 app.use((req, res, next) => {
-  if(req.path.startsWith('/v1/')) {
+  if(req.path.startsWith('/v1/') || req.path.startsWith('/api/')) {
     callback(req, res);
 } else {
   next();

@@ -15,16 +15,10 @@ import {
   findFactory,
   findOrCreateFactory
 } from './Model';
+import {scan} from '../features/scanner/scanner';
 import {
   mainStory
 } from 'storyboard';
-
-// track.data.trackNumber = (t.trackNumber + '').match(/^\d+/)[0] - 0;
-export const processResult = async(res) => {
-  if (res.status === 'done') {
-
-  }
-}
 
 export const Scan = function(props) {
   if (typeof props === 'string') {
@@ -34,7 +28,7 @@ export const Scan = function(props) {
   }
   let state = {
     name: 'scan',
-    fields: ['statusCode', 'statusMessage'],
+    fields: ['statusCode', 'statusMessage', 'library', 'dryRun'],
     functions: {},
     populated: {},
     props
@@ -46,7 +40,33 @@ export const Scan = function(props) {
     createable(state),
     databaseLoader(state),
     publicProps(state),
-    legacySupport(state)
+    legacySupport(state), {
+      startScan: () => {
+        if (!state.props._id) {
+          mainStory.warn('scanner', 'Scan wasn\'t created. Aborting');
+          return;
+        }
+        try {
+          scan(state.props._id).then(() => {
+            mainStory.info('scanner', 'Scan finished without raising errors');
+            state.functions.set('statusCode', 'DONE');
+            state.functions.set('statusMessage', 'Scan finished without errors.');
+
+            return;
+          }).catch((err) => {
+            mainStory.error('scanner', 'Scan failed with errors', {attach: err});
+            state.functions.set('statusCode', 'FAILED');
+            state.functions.set('statusMessage', 'Scan failed with errors. Please check the logs for more details...');
+            state.functions.update().catch(err => {
+              mainStory.fatal('scanner', 'Could not update scan', {attach: err});
+            })
+          });
+        } catch (err) {
+          mainStory.fatal('scanner', 'Scanner crashed unexpectedly.', {attach: err});
+
+        }
+      }
+    }
   );
 }
 
