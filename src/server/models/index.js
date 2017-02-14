@@ -1,15 +1,7 @@
-import Album from './Album';
-import Artist from './Artist';
-import Track from './Track';
-import File from './File';
-import Library from './Library';
-import Scan from './Scan';
 
-export {
-  Album,
-  Artist,
-  Track,
-  File,
-  Library,
-  Scan
-};
+export const Artist = require('./Artist');
+export const Album = require('./Album');
+export const Track = require('./Track');
+export const File = require('./File');
+export const Library = require('./Library');
+export const Scan = require('./Scan');

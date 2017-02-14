@@ -1,180 +1,82 @@
 import assert from 'assert';
-import Lazy from 'lazy.js';
 import pascalCase from 'pascal-case';
 import pluralize from 'pluralize';
+import omit from 'lodash/omit';
 
-class Controller {
-  constructor(model) {
-    this._model = model;
-  }
-  prefix(prefix) {
-    this._prefix = prefix;
-    return this;
-  }
-  allowPost() {
-    this._allowPost = true;
-    return this;
-  }
-  allowPut() {
-    this._allowPut = true;
-    return this;
-  }
-  allowDel() {
-    this._allowDel = true;
-    return this;
-}
-  allowSearches() {
-    this._allowSearches = true;
-    return this;
-  }
-  done() {
-    let self = this, routes = {},
-      base = '/v1' + (this._prefix || '') + '/'
-        + pluralize(this._model.model.name);
-
-    routes[base] = {
-      get: async (ctx, next) => {
-        let res = await self._model.find(ctx.query);
-        ctx.body = {
-          status: 'success',
-          data: res.map(d => d.data),
-          length: res.length,
-          payload: {
-            query: res.query
-          }
-        }
-      },
-      post: async (ctx, next) => {
-        try {
-          let doc = new self._model(ctx.request.fields ||
-              ctx.request.body || {});
-          let payload = doc.getPayload();
-          let res = await doc.create();
-          ctx.status = 201;
-          ctx.body = {
-            status: 'success',
-            data: doc.data,
-            payload: payload
-          }
-        } catch (err) {
-          ctx.status = 500;
-          ctx.body = {
-            status: 'failure',
-            data:  {
-              message: err.message
-            }
-          }
-        }
-
-      }
-    };
-
-    routes[base + '/searches'] =  {
-      post: async (ctx, next) => {
-        let q = Lazy(ctx.request.fields || ctx.request.body || {})
-            .merge(ctx.query || {}).value();
-
-        for (let key in q) {
-          let val = q[key];
-
-          if (val[0] === '/' && val[val.length - 1] === '/') {
-            q[key] = new RegExp(val.slice(1, -1), 'i');
-          }
-        }
-        // cons
-        let res = await self._model.find(q);
-
-        ctx.body = {
-          status: 'success',
-          data: res.map(d => d.data),
-          length: res.length,
-          payload: {
-            body: res.query
-          }
-        }
-        ctx.status = 200;
-      }
+export const fetchable = (name, find, findById) => ({
+  [`/api/v2/${pluralize(name)}`]: {
+    get: async (ctx) => {
+      let res = await find(ctx.query);
+      ctx.status = 200;
+      ctx.body = res.map(el => el.props);
     }
-
-    routes[base + '/:id'] = {
-      get: async (ctx, next) => {
-        if (!ctx.params.id || ctx.params.id === '') return ctx.redirect(base);
-
-        let res = await self._model.findById(ctx.params.id);
-
-        if (res) {
-          ctx.body = {
-            status: 'success',
-            data: res.data,
-            payload: {
-              params: {
-                id: ctx.params.id
-              }
-            }
-          }
-        }
-        else {
-          ctx.body = {
-            status: 'failure',
-            payload: {
-              params: {
-                id: ctx.params.id
-              }
-            }
-          }
-          ctx.status = 404;
-        }
+  },
+  [`/api/v2/${pluralize(name)}/:id`]: {
+    get: async (ctx) => {
+      let doc = await findById(ctx.params.id);
+      if (!doc) {
+        return ctx.throws(404, 'Object not found in database');
       }
+      ctx.status = 200;
+      ctx.body = doc.props;
     }
-    for (let rel of this._model.model.relations) {
-      if (rel.type === 'oneToMany') {
-        let m = 'get' + pascalCase(pluralize(rel.model.model.name));
-        let path = base + '/:id/' + pluralize(rel.model.model.name);
-        routes[path] = {
-          get: async (ctx, next) => {
-            let doc = await self._model.findById(ctx.params.id);
-            if (!doc) {
-              ctx.body = {
-                status: 'failed',
-                data: {
-                  error_message: 'Document not found',
-                  error_code: 'ENOTFOUND'
-                },
-                payload: {
-                  query: res.query,
-                }
-              };
-
-              ctx.status = 404;
-              return;
-            }
-            let res = await doc[m](ctx.query);
-            ctx.body = {
-              status: 'success',
-              data: res.map(d => d.data),
-              length: res.length,
-              payload: {
-                query: res.query
-              }
-            }
-          }
-        }
-      }
-    }
-
-    // for (let index in this._model.fields) {
-    //   let field = this._model.fields[index];
-    //   if (field.type === 'oneToMany') {
-    //     routes[base + '/:id/' + pluralize(field.name)] = {
-    //       get: async (ctx, next) => {
-    //         let res = await self.
-    //       }
-    //     }
-    //   }
-    //
-    // }
-    return routes;
   }
-}
+});
 
-export default Controller;
+export const createable = (name, model) => ({
+  [`/api/v2/${pluralize(name)}`]: {
+    post: async (ctx) => {
+      let object = model(ctx.request.fields || ctx.request.body);
+      if (!Object.keys(object.props)) {
+        return ctx.throws(400, `None of the properties provided are acceptable`);
+      }
+      await object.create();
+      ctx.status = doc.props._id ? 201 : 202;
+      ctx.body = object.props;
+    }
+  }
+});
+
+export const removeable = (name, model, findById) => ({
+  [`/api/v2/${pluralize(name)}/:id`]: {
+    del: async (ctx) => {
+      let doc = await findById(ctx.params.id);
+      if (!doc) {
+        return ctx.throws(404, `Entity #${ctx.params.id} not found`);
+      }
+      await doc.remove();
+      ctx.status = doc.props._id ? 202 : 200;
+    }
+  }
+});
+
+export const updateable = (name, model, findById) => ({
+  [`/api/v2/${pluralize(name)}/:id`]: {
+    put: async (ctx) => {
+      let doc = await findById(ctx.params.id);
+      if (!doc) {
+        return ctx.throws(404, `Entity #${ctx.params.id} not found`);
+      }
+      let props = (ctx.request.fields || ctx.request.body);
+
+      Object.keys(props).forEach(key => {
+        doc.set(key, props[key]);
+      });
+
+      await doc.update();
+      ctx.status = 200;
+      return;
+    }
+  }
+});
+
+export const oneToMany = (name, child, findChildren) => ({
+  [`/api/v2/${pluralize(name)}/:id/${pluralize(child)}`]: {
+    get: async (ctx) => {
+      let chilren = await findChildren({[child]: ctx.params.id});
+      ctx.status = 200;
+      ctx.body = children.map(child => child.props);
+      return;
+    }
+  }
+});
