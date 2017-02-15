@@ -128,6 +128,15 @@ function loadContent(opts) {
           }
         }
       });
+    case 'ALBUMS':
+      return axios.get('/api/v2/albums').then((res) => {
+        return {
+          type: LOAD_CONTENT,
+          data: {
+            albums: res.data
+          }
+        }
+      });
   }
 }
 

@@ -10,27 +10,25 @@ import { browserHistory } from 'react-router';
 export default class AlbumsView extends Component {
   componentDidMount() {
     const { library, actions } = this.props;
-    actions.loadContent();
+    actions.loadContent({scope: 'ALBUMS'});
 
   }
   render() {
     const COLUMNS = 6;
     let artistId = this.props.params.id;
-    let artistName = (this.props.library.items.find(
-      ((el) => el.artist.id === artistId)
+    let artistName = (this.props.library.items.albums.find(
+      ((el) => el.artist._id === artistId)
     )  || {artist: {}}).artist.name;
-    let albums = chunk(uniqBy(
-      this.props.library.items.map((el) => Object.assign({}, el.album, {
-        artist: el.artist
-      })).filter(el =>  artistId ? el.artist.id === artistId : true)
-      , (el) => el.id), COLUMNS)
-      .map((arr, index) => {
+    let albums = chunk(this.props.library.items.albums,
+      COLUMNS).map((arr, index) => {
         let arts = arr.map((album) => (
-          <Col span={Math.floor(24 / COLUMNS)} className="albumCard" key={album.id}>
-            <Card bodyStyle={{ padding: 0 }} onClick={browserHistory.push.bind(null, `/app/library/albums/${album.id}/tracks`)}>
+          <Col span={Math.floor(24 / COLUMNS)} className="albumCard" key={album._id}>
+            <Card bodyStyle={{ padding: 0 }} onClick={
+                browserHistory.push.bind(null,
+                  `/app/library/albums/${album._id}/tracks`)} >
               <div className="custom-image">
                 <img alt="example" width="100%" src={
-                    `/v1/albums/${album.id}/art?size=200`
+                    `/v1/albums/${album._id}/art?size=200`
                   } />
               </div>
               <div className="custom-card">
