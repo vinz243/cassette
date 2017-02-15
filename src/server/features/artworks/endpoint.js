@@ -1,5 +1,6 @@
 import {getClosestSize} from './sizes';
-import {Album, Artist} from '../../models';
+import {findById as findAlbumById} from '../../models/Album';
+import {findById as findArtistById} from '../../models/Artist';
 import config from '../../config.js';
 import qs from 'querystring';
 import mkdirp from 'mkdirp';
@@ -14,22 +15,23 @@ const dataDir = path.join(config.get('configPath'), '/cache/artworks');
 mkdirp.sync(dataDir);
 
 export default {
-  '/v1/albums/:id/art': {
+  '/api/v2/albums/:id/artwork': {
     get: async (ctx) => {
       const {size = 300} = ctx.request.query;
-      const album = await Album.findById(ctx.params.id);
+      const album = await findAlbumById(ctx.params.id);
 
       if (!album)
-        return ctx.throw(404);
+        return ctx.throw(404, 'Album not found');
 
-      const artist = await Artist.findById(album.data.artistId);
-
+      // Generate unique cache per album
       let hash = md5(qs.stringify({
         action: 'get_album_art',
         size: size,
-        id: album._id
+        id: album.props._id,
+        album: album.props.name
       }));
 
+      // First check cache
       let cachePath = path.join(dataDir, hash);
       if (fs.existsSync(cachePath)) {
         ctx.body = await (new Promise((resolve, reject) => {
@@ -47,18 +49,22 @@ export default {
         return;
       }
 
+      // Otherwise prepare Last.FM query
       const params = {
         method: 'album.getinfo',
         api_key: '85d5b036c6aa02af4d7216af592e1eea',
-        artist: artist.data.name,
-        album: album.data.name,
+        artist: album.props.artist.name,
+        album: album.props.name,
         format: 'json'
       };
 
       const url = 'http://ws.audioscrobbler.com/2.0/?' + qs.stringify(params);
+
       const time = Date.now();
       let json = await request(url);
+
       mainStory.info('artwork', `GET ${chalk.dim(url)} - ${Date.now() - time}ms`);
+
       const data = JSON.parse(json);
       const availableSizes = data.album.image.map(s => s.size);
 
@@ -69,12 +75,16 @@ export default {
         || `http://lorempixel.com/g/${size}/${size}`;
 
       ctx.status = 200;
-      ctx.set('Content-Type', 'image/png')
+      ctx.set('Content-Type', 'image/png');
+
       let buffer = await request({
         url: imageUrl, encoding: null
       });
+
       mainStory.info('artwork', `GET ${chalk.dim(imageUrl)} - ${Date.now() - time}ms`);
+
       ctx.body = buffer;
+
       fs.writeFile(cachePath, buffer, (err) => {
         if (err) {
           return mainStory.error('artwork', `could not write to cache artwork (${cachePath})`, {
@@ -85,10 +95,10 @@ export default {
       });
     }
   },
-  '/v1/artists/:id/art': {
+  '/api/v2/artists/:id/artwork': {
     get: async (ctx) => {
       const {size = 300} = ctx.request.query;
-      const artist = await Artist.findById(ctx.params.id);
+      const artist = await findArtistById(ctx.params.id);
 
       if (!artist)
         return ctx.throw(404);
@@ -96,7 +106,8 @@ export default {
       let hash = md5(qs.stringify({
         action: 'get_artist_art',
         size: size,
-        id: artist._id
+        id: artist.props._id,
+        name: artist.props.name
       }));
 
       let cachePath = path.join(dataDir, hash);

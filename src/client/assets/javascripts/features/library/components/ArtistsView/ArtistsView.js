@@ -24,7 +24,7 @@ export default class ArtistsView extends Component {
                 }>
               <div className="custom-image">
                 <img alt="example" width="100%" src={
-                    `/v1/artists/${artist._id}/art?size=200`
+                    `/api/v2/artists/${artist._id}/artwork?size=200`
                   } />
               </div>
               <div className="custom-card">

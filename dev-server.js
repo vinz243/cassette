@@ -29,6 +29,13 @@ function log() {
   arguments[0] = '\nWebpack: ' + arguments[0];
   console.log.apply(console, arguments);
 }
+app.use((req, res, next) => {
+  if(req.path.startsWith('/v1/') || req.path.startsWith('/api/')) {
+    callback(req, res);
+} else {
+  next();
+}
+});
 
 app.use(webpackDevMiddleware(compiler, {
   noInfo: true,
@@ -41,13 +48,6 @@ app.use(webpackDevMiddleware(compiler, {
 
 app.use(webpackHotMiddleware(compiler));
 const callback = backend.app.callback();
-app.use((req, res, next) => {
-  if(req.path.startsWith('/v1/') || req.path.startsWith('/api/')) {
-    callback(req, res);
-} else {
-  next();
-}
-});
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, './src/client/assets/index.html'));
