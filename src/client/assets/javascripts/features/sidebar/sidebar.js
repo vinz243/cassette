@@ -55,10 +55,10 @@ function selectLibrary(id: string) {
 }
 
 function addLibrary(name, path) {
-  return axios.post('/v1/libraries', {
+  return axios.post('/api/v2/libraries', {
     name, path
   }).then((res) => {
-    let data = res.data.data;
+    let data = res.data;
     return Promise.resolve({
       type: ADD_LIBRARY,
       library: data
@@ -69,10 +69,10 @@ function addLibrary(name, path) {
 function waitScan(libId, scanId) {
   return new Promise((resolve, reject) => {
     let wait = (res) => {
-      if (res.data.data.statusCode === 'DONE')
+      if (res.data.statusCode === 'DONE')
         return resolve();
       setTimeout(() => {
-        axios.get(`/v1/libraries/${libId}/scans/${scanId}`).then(wait);
+        axios.get(`/v2/api/libraries/${libId}/scans/${scanId}`).then(wait);
       }, 700);
     };
     wait({
@@ -84,8 +84,8 @@ function waitScan(libId, scanId) {
 }
 
 function scanLibrary(id: string) {
-  return axios.post(`/v1/libraries/${id}/scans`, {}).then((res) => {
-    let data = res.data.data;
+  return axios.post(`/api/v2/libraries/${id}/scans`, {}).then((res) => {
+    let data = res.data;
     return waitScan(id, data._id);
   }).then(() => {
     return libraryActionCreators.loadContent();
@@ -93,9 +93,9 @@ function scanLibrary(id: string) {
 }
 
 function loadContent() {
-  return axios.get('/v1/libraries').then((res) => Promise.resolve({
+  return axios.get('/api/v2/libraries').then((res) => Promise.resolve({
     type: LOAD_CONTENT,
-    libraries: res.data.data
+    libraries: res.data
   }));
 }
 
