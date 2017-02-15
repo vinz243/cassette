@@ -18,7 +18,11 @@ const PLAY_TRACKS       = 'cassette/shared/PLAY_TRACKS';
 export const NAME = 'library';
 
 const initialState: State = {
-  items: [ ],
+  items:  {
+    artists: [],
+    albums: [],
+    tracks: []
+  },
   loading: true,
   viewType: 'LIST',
   viewScope: 'TRACKS'
@@ -39,24 +43,25 @@ export default function reducer(state: State = initialState, action: any = {}): 
       switch (state.viewScope) {
         case 'TRACKS':
           newState.loading = false;
-          newState.items = action.data.map((track) => {
-              return deepAssign({}, {
-                id: track._id,
-                name: track.name.replace(/\(.+\)$/, ''),
-                originalName: track.name,
-                number: track.trackNumber,
-                duration: track.duration * 1000,
-                artist: {
-                  id: track.artistId,
-                  name: track.artist.name
-                },
-                album: {
-                  id: track.albumId,
-                  name: track.album.name.replace(/\(.+\).*$/, '')
-                },
-              }
-            );
-          }).sort((a, b) => (b.number || 0) - (a.number || 0));
+          newState.items = Object.assign({}, newState.items, action.data);
+          // newState.items.artist = newState.items.artists..map((track) => {
+          //     return deepAssign({}, {
+          //       id: track._id,
+          //       name: track.name.replace(/\(.+\)$/, ''),
+          //       originalName: track.name,
+          //       number: track.trackNumber,
+          //       duration: track.duration * 1000,
+          //       artist: {
+          //         id: track.artistId,
+          //         name: track.artist.name
+          //       },
+          //       album: {
+          //         id: track.albumId,
+          //         name: track.album.name.replace(/\(.+\).*$/, '')
+          //       },
+          //     }
+          //   );
+          // }).sort((a, b) => (b.number || 0) - (a.number || 0));
           return newState;
       }
       return state;
@@ -112,39 +117,18 @@ function playTracks(tracks) {
 //     ]
 //   }
 // }
-function loadContent() {
-
-  let doneIds = [];
-  let identifiers = {};
-  return axios.get('/v1/tracks').then((res) => {
-    let data = res.data.data;
-    let albums = uniq(data.map((t) => t.albumId)).map((id) => {
-      return axios.get(`/v1/albums/${id}`).then((res) => {
-        identifiers[id] = res.data.data;
-      })
-    });
-
-    let artists = uniq(data.map((t) => t.artistId)).map((id) => {
-      return axios.get(`/v1/artists/${id}`).then((res) => {
-        identifiers[id] = res.data.data;
-      });
-    })
-
-    return Promise.all([...albums, ...artists]).then(() => {
-
-
-      return {
-        type: LOAD_CONTENT,
-        data: data.map((track) => {
-          return Object.assign({}, track, {
-            artist: identifiers[track.artistId],
-            album: identifiers[track.albumId],
-            duration: track.duration || 0
+function loadContent(opts) {
+  switch (opts.scope) {
+    case 'ARTISTS':
+      return axios.get('/api/v2/artists').then((res) => {
+        return {
+          type: LOAD_CONTENT,
+          data: {
+            artists: res.data
           }
-        )}).sort((a, b) => a.album.name.localeCompare(b.album.name))
-      };
-    });
-  })
+        }
+      });
+  }
 }
 
 function pushContent(data) {
