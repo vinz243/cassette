@@ -35,7 +35,6 @@ export default class LibraryLayout extends Component {
           })
         });
       }, {});
-      console.log(albums);
       content = Object.values(albums).map(a =>
         <AlbumStreamView key={a._id} album={a} paused={!this.props.toolbar.playing}
           playTracks={actions.playTracks} />);

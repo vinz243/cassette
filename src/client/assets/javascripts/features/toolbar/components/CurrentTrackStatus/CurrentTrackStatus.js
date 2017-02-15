@@ -35,11 +35,11 @@ export default class CurrentTrackStatus extends Component {
   }
   handleTimeChange(val) {
     const { toolbar, actions } = this.props;
-    actions.seek((val/100) * (toolbar.currentTrack || {}).duration);
+    actions.seek((val/100) * (toolbar.currentTrack || {}).duration * 1000);
   }
   tipFormatter(val) {
     const { toolbar, actions } = this.props;
-    return this.msToTime((val/100) * (toolbar.currentTrack || {}).duration);
+    return this.msToTime((val/100) * (toolbar.currentTrack || {}).duration * 1000);
   }
   componentDidMount() {
     setInterval(() => {
@@ -70,17 +70,14 @@ export default class CurrentTrackStatus extends Component {
                 </Col>
                 <Col span={20}>
                   <Slider className="trackTimeSlider"
-                    value={(toolbar.currentTime / (toolbar.currentTrack || {duration: 1}).duration) * 100}
+                    value={(toolbar.currentTime / ((toolbar.currentTrack || {duration: 1}).duration * 1000)) * 100}
                     tipFormatter={boundTipFormattter}
                     onChange={boundHandleTimeChange} />
                 </Col>
                 <Col span={2}>
                   <span className="timeLeft" onClick={boundHandleTimeStatusChange}>
-                    {false ?
-                      this.msToTime((toolbar.currentTrack ||
-                        {duration: 0}).duration) :
-                      this.msToTime(toolbar.currentTime
-                        - (toolbar.currentTrack || {duration: 0}).duration)}
+                    {this.msToTime(toolbar.currentTime
+                        - (toolbar.currentTrack || {duration: 0}).duration * 1000 ) }
                   </span>
                 </Col>
               </Row>

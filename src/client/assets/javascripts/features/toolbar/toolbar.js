@@ -55,7 +55,7 @@ const initialState: State = {
 };
 
 let srcUrl = (id) => {
-  return `/v1/tracks/${id}/file`;
+  return `/api/v2/tracks/${id}/stream`;
 };
 
 let audio = new Audio();
@@ -71,10 +71,11 @@ export default function reducer(state: State = initialState, action: any = {}): 
     case PLAY_NEXT:
       if (state.nextTracks.length === 0) return newState;
 
-      newState.currentTrack = newState.nextTracks.shift();
+      newState.currentTrack = newState.nextTracks[0];
+      newState.nextTracks = newState.nextTracks.slice(1);
       newState.currentTime = 0.0;
       newState.previousTracks = [state.currentTrack, ...newState.previousTracks];
-      audio.src = srcUrl(newState.currentTrack.id);
+      audio.src = srcUrl(newState.currentTrack._id);
 
       if (newState.playing)
       audio.play();
@@ -104,7 +105,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			newState.currentTime = 0.0;
 			newState.nextTracks.unshift(state.currentTrack);
 
-      audio.src = srcUrl(newState.currentTrack.id);
+      audio.src = srcUrl(newState.currentTrack._id);
       if (newState.playing)
         audio.play();
 			return newState;
@@ -118,7 +119,8 @@ export default function reducer(state: State = initialState, action: any = {}): 
 		case SET_TRACK_TIME:
 			if (!state.currentTrack) return newState;
 
-			newState.currentTime = Math.min(Math.max(action.value, 0.0), state.currentTrack.duration);
+			newState.currentTime = Math.min(Math.max(action.value, 0.0),
+        state.currentTrack.duration * 1000);
       audio.currentTime = newState.currentTime / 1000;
 
 			return newState;
@@ -131,7 +133,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
       newState.playing = true;
       newState.currentTime = 0.0;
 
-      audio.src = srcUrl(newState.currentTrack.id);
+      audio.src = srcUrl(newState.currentTrack._id);
       audio.play();
 
       return newState;

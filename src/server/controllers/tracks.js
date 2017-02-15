@@ -8,7 +8,7 @@ import {find as findFile} from '../models/File';
 
 import {fetchable, oneToMany, updateable} from './Controller';
 import merge from 'lodash/merge';
-
+import fs from 'fs';
 
 export default merge({},
   fetchable('track', findTrack, findTrackById),
@@ -17,7 +17,7 @@ export default merge({},
     '/api/v2/tracks/:id/stream':  {
       get: async (ctx, next) => {
         let tracks = await findFile({
-          track: ctx.params.id,
+          track: ctx.params.id - 0,
           sort: 'bitrate',
           direction: 'desc',
           limit: 3
@@ -25,10 +25,10 @@ export default merge({},
         if (tracks.length == 0)
           return ctx.throw(404, 'No file found');
 
-        let stat = fs.statSync(tracks[0].data.path);
+        let stat = fs.statSync(tracks[0].props.path);
         let mimeType = 'audio/mpeg';
 
-        if (tracks[0].data.path.endsWith('.flac')) {
+        if (tracks[0].props.path.endsWith('.flac')) {
           mimeType = 'audio/flac';
         }
 
