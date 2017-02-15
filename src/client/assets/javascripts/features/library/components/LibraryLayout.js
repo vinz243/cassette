@@ -6,6 +6,7 @@ import {Row, Col} from 'antd';
 import 'antd/dist/antd.css';
 import ViewScope from './ViewScope';
 import assert from 'assert';
+import merge from 'lodash/merge';
 
 export default class LibraryLayout extends Component {
   static propTypes = {
@@ -13,7 +14,7 @@ export default class LibraryLayout extends Component {
   };
   componentDidMount() {
     const { library, actions } = this.props;
-    actions.loadContent();
+    actions.loadContent({scope: 'TRACKS'});
 
   }
   render() {
@@ -22,54 +23,22 @@ export default class LibraryLayout extends Component {
     if (library.loading) {
       content = <span>Loading...</span>
     } else {
-      let albums = library.items
-        .filter((el) => params.artistId ? el.artist.id === params.artistId : true)
-        .filter((el) => params.albumId ? el.album.id === params.albumId : true)
-        // .sort((a, b) => (a.number || 0) - (b.number || 0))
-        .reduce((acc, val) => {
-          let getPlayData = () => {
-            let artist = {
-              id: val.artist.id,
-              name: val.artist.name
-            }
-            return {
-              id: val.id,
-              name: val.name,
-              originalName: val.originalName,
-              duration: val.duration,
-              artist: Object.assign({}, artist),
-              album: {
-                id: val.album.id,
-                name: val.album.name,
-                artist: Object.assign({}, artist)
-              }
-            };
-          };
-          let oldValue = (acc[val.album.id] || {}).tracks || [];
-          let res = {
-            id: val.album.id,
-            name: val.album.name,
-            artist: Object.assign({}, val.artist),
-            tracks: [].concat({
-              name: val.name,
-              originalName: val.originalName,
-              duration: val.duration,
-              number: val.number,
-              id: val.id,
-              playing: (this.props.toolbar.currentTrack || {}).id === val.id,
-              getPlayData,
-              play: () => {
-                actions.playTracks([getPlayData()].concat(oldValue.map(
-                  (track) => track.getPlayData()
-                )))
-              }
-            }, oldValue)
-          };
-          acc[val.album.id] = res;
-          return acc;
+      let albums = library.items.tracks.reduce((acc, item) => {
+        return Object.assign({}, acc, {
+          [item.album._id]: Object.assign({}, item.album, {
+            tracks: ((acc[item.album._id] || {}).tracks || []).concat(
+              Object.assign({}, item, {
+                playing:  (this.props.toolbar.currentTrack || {})._id === item._id
+              }))
+          }, {
+            artist: item.artist
+          })
+        });
       }, {});
+      console.log(albums);
       content = Object.values(albums).map(a =>
-        <AlbumStreamView key={a.id} album={a} paused={!this.props.toolbar.playing}/>);
+        <AlbumStreamView key={a._id} album={a} paused={!this.props.toolbar.playing}
+          playTracks={actions.playTracks} />);
       // content = <ListView {...this.props}/>
     }
     return (

@@ -24,27 +24,30 @@ export default class AlbumStreamView extends Component {
 
     return sign + minStr + ':' + secStr;
   }
-
+  playTracks (number) {
+    const { album } = this.props;
+    this.props.playTracks(album.tracks.filter(t => t.trackNumber >= number));
+  }
   render() {
     const { album } = this.props;
     let tracksDOM = album.tracks.map((t) => (
-      <div className={classnames('trackItem', {'playing': t.playing})} key={t.id}>
-        <Row onClick={t.play} gutter={16}>
+      <div className={classnames('trackItem', {'playing': t.playing})} key={t._id}>
+        <Row onClick={this.playTracks.bind(this, t.trackNumber)} gutter={16}>
           <Col span={2} className="trackNumber">
             {t.playing ? <div className={classnames('spinner', {'paused': this.props.paused})}>
               <div className="bounce1"></div>
               <div className="bounce2"></div>
               <div className="bounce3"></div>
-            </div>: t.number}
+            </div>: t.trackNumber}
           </Col>
           <Col span={16}>
             {t.name}
             <span className="nameExt">
-              {t.originalName.substr(t.name.length).replace(/\(|\)/g, '')}
+              {/*t.name*/}
             </span>
           </Col>
           <Col span={3} className="duration">
-            {this.msToTime(t.duration)}
+            {this.msToTime(t.duration * 1000)}
           </Col>
         </Row>
       </div>
@@ -53,7 +56,7 @@ export default class AlbumStreamView extends Component {
     	<div>
         <Row gutter={32} className="albumStreamItem">
           <Col span={6}>
-            <img className="albumArt" src={`/v1/albums/${album.id}/art`} />
+            <img className="albumArt" src={`/api/v2/albums/${album._id}/artwork`} />
           </Col>
           <Col span={18}>
             <div className="albumHeader">

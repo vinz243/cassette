@@ -137,6 +137,15 @@ function loadContent(opts) {
           }
         }
       });
+    case 'TRACKS':
+      return axios.get('/api/v2/tracks?sort=trackNumber').then((res) => {
+        return {
+          type: LOAD_CONTENT,
+          data: {
+            tracks: res.data
+          }
+        }
+      });
   }
 }
 
