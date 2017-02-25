@@ -116,21 +116,38 @@ export const operationMapperFactory = (models, mediastic) => {
 
 export const scan = async (libraryId, mediastic = getMediastic()) => {
   let library = await findLibraryById(libraryId);
-
+  let cachedEntries = await getCachedEntries(libraryId);
+  
   let cached = new FSTree({
-    entries: getCachedEntries(libraryId)
+    entries: cachedEntries.map((entry) => {
+      return Object.assign({}, entry, {
+
+        isDirectory: () => {
+          return entry.dir || false;
+        }
+      });
+    })
   });
+
   let currentEntries = getFolderEntries(library.props.path);
+
   let current = new FSTree({
     entries: currentEntries
   });
-
+  mainStory.info('scanner', 'Loaded', {attach: {cached, current}});
   let diff = cached.calculatePatch(current);
+  if (!diff.length) {
+    mainStory.info('scanner', 'Library wasn\'t changed since last scan');
+    return;
+  }
+
   let mapper = operationMapperFactory({
     findOrCreateTrack, findOrCreateAlbum, findOrCreateArtist, File, findFileById
   }, mediastic.call.bind(mediastic));
 
   await diff.reduce((stack, entry) => stack.then(mapper.bind(null, entry)),
     Promise.resolve());
-  return writeCachedEntries(libraryId, currentEntries);
+  return writeCachedEntries(libraryId, currentEntries.map((entry) => {
+    return Object.assign({}, entry, {dir: entry.isDirectory()});
+  }));
 }

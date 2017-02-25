@@ -47,7 +47,7 @@ export const Scan = function(props) {
           return;
         }
         try {
-          scan(state.props._id).then(() => {
+          scan(state.props.library).then(() => {
             mainStory.info('scanner', 'Scan finished without raising errors');
             state.functions.set('statusCode', 'DONE');
             state.functions.set('statusMessage', 'Scan finished without errors.');

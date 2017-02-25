@@ -61,7 +61,9 @@ export const findFactory = (model, name, getDB = getDatabase) => {
       sort[opts.sort || 'name'] = opts.direction ?
         (opts.direction == 'asc' ? 1 : -1) : 1;
       let res = getDatabase(name)
-        .find(omit(query, optFields))
+        .find(Object.assign({}, omit(query, optFields), query._id ? {
+          _id: query._id - 0
+        } : {}))
         .sort(sort)
         .limit(opts.limit)
         .skip(opts.skip || 0)
@@ -135,7 +137,9 @@ export const defaultFunctions = (state) => {
 // (unless _id is provided, then it only find by _id)
 export const findOneFactory = (model) => {
   return (props) => {
-    let obj = model(props);
+    let obj = model(Object.assign({}, props, props._id ? {
+      _id: props._id - 0
+    } : {}));
     return obj.populate().then(() => {
       if (!obj.props._id)
         return Promise.resolve();
@@ -150,7 +154,7 @@ export const findOneFactory = (model) => {
 export const databaseLoader =  (state, db = getDatabase(state.name)) => ({
   populate: () => {
     let query = state.props._id ? {
-      _id: state.props._id
+      _id: state.props._id - 0
     } : Object.assign({}, state.props);
     return new Promise((resolve, reject) => {
       db.findOne(query, {}, (err, doc) => {
