@@ -65,6 +65,7 @@
     "scanpel": "1.0.x",
     "semver": "^5.3.0",
     "serve-static": "^1.11.2",
+    "sharp": "^0.17.2",
     "shortid": "^2.2.6",
     "snake-case": "^2.1.0",
     "storyboard": "^2.3.1",

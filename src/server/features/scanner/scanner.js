@@ -13,23 +13,39 @@ import {File,
   findOrCreate as findOrCreateFile,
   findOne as findOneFile,
   findById as findFileById} from '../../models/File';
+import {fetchEntityArtworkFactory,
+  agentFactory as artworkAgentFactory} from '../artworks/artwork-agent';
 
 import FSTree from 'fs-tree-diff';
 import Mediastic from 'mediastic';
 import {mainStory} from 'storyboard';
 import path from 'path';
+import fs from 'fs-promise';
+import request from 'request-promise-native';
+import touch from 'touch';
+import qs from 'qs';
+import md5 from 'md5';
 
-export const getMediastic = () => {
-  let mediastic = new Mediastic();
+const fetchArtwork = fetchEntityArtworkFactory(
+  fs, path, touch, request, qs, md5
+);
+
+export function getMediastic () {
+  const mediastic = new Mediastic();
+  const artworkAgent = artworkAgentFactory(fetchArtwork);
 
   mediastic.use((metadata, next) => {
     mainStory.info('scanner', 'Working on '+ metadata.path);
-    next();
+    try {
+      next();
+    } catch (err) {
+      mainStory.error('scanner', 'Uncaught exception', {attach: err});
+    }
   });
 
   mediastic.use(Mediastic.tagParser());
   mediastic.use(Mediastic.fileNameParser());
-
+  mediastic.use(artworkAgent());
   return mediastic;
 }
 
@@ -117,7 +133,7 @@ export const operationMapperFactory = (models, mediastic) => {
 export const scan = async (libraryId, mediastic = getMediastic()) => {
   let library = await findLibraryById(libraryId);
   let cachedEntries = await getCachedEntries(libraryId);
-  
+
   let cached = new FSTree({
     entries: cachedEntries.map((entry) => {
       return Object.assign({}, entry, {
@@ -134,7 +150,7 @@ export const scan = async (libraryId, mediastic = getMediastic()) => {
   let current = new FSTree({
     entries: currentEntries
   });
-  mainStory.info('scanner', 'Loaded', {attach: {cached, current}});
+  // mainStory.info('scanner', 'Loaded', {attach: {cached, current}});
   let diff = cached.calculatePatch(current);
   if (!diff.length) {
     mainStory.info('scanner', 'Library wasn\'t changed since last scan');

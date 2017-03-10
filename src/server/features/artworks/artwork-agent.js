@@ -100,20 +100,18 @@ export function fetchEntityArtworkFactory (fsp, path, touch, request, qs, md5,
     conf);
 }
 
-export function agent (fetchArtwork, options) {
+function agent (fetchArtwork) {
   return function (metadata, next) {
-    let opts = defaults(options, defaultOpts);
-
+    next();
     process.nextTick(() => {
       const album = () => {
         fetchArtwork('album', metadata.album, metadata.artist);
       };
       fetchArtwork('artist', metadata.artist).then(album);
     });
-    next();
   }
 }
 
-export function agentFactory (fetchArtistArtwork, fetchAlbumArtwork) {
-  return agent.bind(null, fetchArtistArtwork, fetchAlbumArtwork);
+export function agentFactory (fetch) {
+  return agent.bind(null, fetch);
 }

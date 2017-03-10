@@ -66,6 +66,12 @@ const conf = convict({
     format: "ipaddress",
     default: "127.0.0.1",
     env: "SCGI_HOST"
+  },
+  lastFMAPIKey: {
+    doc: "Last.fm API key",
+    format: '*',
+    default: '85d5b036c6aa02af4d7216af592e1eea',
+    env: 'LAST_FM_API_KEY'
   }
 });
 // Load environment dependent configuration
