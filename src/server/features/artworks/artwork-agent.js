@@ -3,9 +3,7 @@ import config from '../../config.js';
 import {mainStory} from 'storyboard';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
-
-
-
+import {getClosestSize} from './sizes';
 const defaultOpts = {
   apiKey: '85d5b036c6aa02af4d7216af592e1eea'
 }
@@ -37,25 +35,28 @@ function fetchArtistArtwork (fs, path, touch, request, qs, md5, conf, artist) {
 
     const params = {
       method: 'artist.getinfo',
-      api_key: conf.get('lastFMAPIKey'),
+      api_key: config.get('lastFMAPIKey'),
       artist: artist,
       format: 'json'
     };
 
     const url = 'http://ws.audioscrobbler.com/2.0/?' + qs.stringify(params);
     const time = Date.now();
-
-    let json = request(url).then(json => {
-
+    return request(url).then(json => {
       // Log time
       mainStory.info('artwork-agent',
         `GET ${chalk.dim(url)} - ${Date.now() - time}ms`);
 
       const data = JSON.parse(json);
-
+      if (data.error) {
+        return Promise.resolve([]);
+      }
       // Create a list of available sizes
-      const availableSizes = data.artist.image.map(s => s.size);
-      if (availableSizes.length === 0) {
+      // We remove the mega size because it isn't a regular square
+      const availableSizes = data.artist.image.map(s => s.size)
+        .filter(size => size !== 'mega');
+
+      if (!availableSizes.length) {
         return Promise.resolve([]);
       }
 
@@ -65,7 +66,6 @@ function fetchArtistArtwork (fs, path, touch, request, qs, md5, conf, artist) {
       // Get corresponding url
       const imageUrl = data.artist.image
         .find(el => el.size === target)['#text'];
-
       // if nothing found, resolve empty
       if (!imageUrl) {
         return Promise.resolve([]);
@@ -74,8 +74,8 @@ function fetchArtistArtwork (fs, path, touch, request, qs, md5, conf, artist) {
       // Try to fetch image
       return request({
         url: imageUrl, encoding: null
-      }).then((buffer) => Promise.resolve([buffer, Date.now()]));
-    }).then(([buffer, date]) => {
+      }).then((buffer) => Promise.resolve([buffer, Date.now(), imageUrl]));
+    }).then(([buffer, date, url]) => {
 
       // No buffer, image does not exists
       if (!buffer) {
@@ -84,7 +84,7 @@ function fetchArtistArtwork (fs, path, touch, request, qs, md5, conf, artist) {
       }
 
       mainStory.info('artwork-agent',
-        `GET ${chalk.dim(imageUrl)} - ${Date.now() - date}ms`);
+        `GET ${chalk.dim(url)} - ${Date.now() - date}ms`);
 
       // Save image to disk
       return fs.writeFile(filePath, buffer).then(() => Promise.resolve());
