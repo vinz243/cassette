@@ -66,7 +66,7 @@ function fetchEntityArtwork (fs, path, touch, request, qs, md5, conf, entity,
       const target = getClosestSize(1200, availableSizes);
 
       // Get corresponding url
-      const imageUrl = data.artist.image
+      const imageUrl = data[entity].image
         .find(el => el.size === target)['#text'];
       // if nothing found, resolve empty
       if (!imageUrl) {

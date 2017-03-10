@@ -109,4 +109,16 @@ test('fetchEntityArtwork - fetch the largest image', async t => {
   t.is(spies.request.args[1][0].encoding, null);
 });
 
-test.todo('fetchEntityArtwork - works for an album');
+test('fetchEntityArtwork - works for an album', async t => {
+  const spies = createSpies();
+  await spies.fetch('album', 'Indigoism', 'The Underachievers');
+  t.deepEqual(spies.request.args[0], [
+    'http://ws.audioscrobbler.com/2.0/?method=album.getinfo&api_key=' +
+      '85d5b036c6aa02af4d7216af592e1eea&album=Indigoism&format=json' +
+       '&artist=The%20Underachievers'
+  ]);
+  t.true(spies.request.args[1][0].url.startsWith(
+    'https://lastfm-img2.akamaized.net/i/u/300x300/'
+  ));
+  t.is(spies.request.args[1][0].encoding, null);
+});
