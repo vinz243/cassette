@@ -4,12 +4,14 @@ import {mainStory} from 'storyboard';
 import chalk from 'chalk';
 import mkdirp from 'mkdirp';
 import {getClosestSize} from './sizes';
-const defaultOpts = {
-  apiKey: '85d5b036c6aa02af4d7216af592e1eea'
-}
+import assert from 'assert';
 
-function fetchArtistArtwork (fs, path, touch, request, qs, md5, conf, artist) {
-  if (!artist) {
+function fetchEntityArtwork (fs, path, touch, request, qs, md5, conf, entity,
+  entityName, parent) {
+
+  assert(['artist', 'album'].includes(entity));
+
+  if (!entityName) {
     return Promise.resolve();
   }
 
@@ -17,28 +19,28 @@ function fetchArtistArtwork (fs, path, touch, request, qs, md5, conf, artist) {
   mkdirp.sync(dataDir);
 
   let hash = md5(qs.stringify({
-    entity: 'artist_artwork',
-    artist: artist
+    entity: `${entity}_artwork`,
+    [entity]: entityName
   }));
 
   let filePath = path.join(dataDir, hash);
 
   if (fs.existsSync(filePath)) {
-    mainStory.trace('artwork-agent', `Artwork for ${artist} already exists`);
+    mainStory.trace('artwork-agent', `Artwork for ${entityName} already exists`);
     return Promise.resolve();
 
   } else {
     // This creates the file at specified path, like a lock file
     touch.sync(filePath);
 
-    mainStory.info('artwork-agent', `Trying to find artwork for ${artist}`);
+    mainStory.info('artwork-agent', `Trying to find artwork for ${entityName}`);
 
-    const params = {
-      method: 'artist.getinfo',
+    const params = Object.assign({}, {
+      method: `${entity}.getinfo`,
       api_key: config.get('lastFMAPIKey'),
-      artist: artist,
+      [entity]: entityName,
       format: 'json'
-    };
+    }, parent ? {artist: parent} : {});
 
     const url = 'http://ws.audioscrobbler.com/2.0/?' + qs.stringify(params);
     const time = Date.now();
@@ -53,7 +55,7 @@ function fetchArtistArtwork (fs, path, touch, request, qs, md5, conf, artist) {
       }
       // Create a list of available sizes
       // We remove the mega size because it isn't a regular square
-      const availableSizes = data.artist.image.map(s => s.size)
+      const availableSizes = data[entity].image.map(s => s.size)
         .filter(size => size !== 'mega');
 
       if (!availableSizes.length) {
@@ -79,7 +81,7 @@ function fetchArtistArtwork (fs, path, touch, request, qs, md5, conf, artist) {
 
       // No buffer, image does not exists
       if (!buffer) {
-        mainStory.warn('artwork-agent', `No artwork found for ${artist}`);
+        mainStory.warn('artwork-agent', `No artwork found for ${entityName}`);
         return Promise.resolve();
       }
 
@@ -92,20 +94,21 @@ function fetchArtistArtwork (fs, path, touch, request, qs, md5, conf, artist) {
   }
 }
 
-export function fetchArtistArtworkFactory (fsp, path, touch, request, qs, md5,
+export function fetchEntityArtworkFactory (fsp, path, touch, request, qs, md5,
   conf) {
-  return fetchArtistArtwork.bind(null, fsp, path, touch, request, qs, md5,
+  return fetchEntityArtwork.bind(null, fsp, path, touch, request, qs, md5,
     conf);
 }
 
-export function agent (fetchArtistArtwork, fetchAlbumArtwork, options) {
+export function agent (fetchArtwork, options) {
   return function (metadata, next) {
     let opts = defaults(options, defaultOpts);
 
     process.nextTick(() => {
-      fetchArtistArtwork(metadata.artist).then(
-        () => fetchAlbumArtwork(metadata.album)
-      );
+      const album = () => {
+        fetchArtwork('album', metadata.album, metadata.artist);
+      };
+      fetchArtwork('artist', metadata.artist).then(album);
     });
     next();
   }
