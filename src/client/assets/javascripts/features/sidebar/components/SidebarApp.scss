@@ -1,5 +1,6 @@
 .sidebar {
-  margin: 2.5em;
+  // margin: 2.5em;
+  height: 100vh;
 }
 
 .addButton {
@@ -41,4 +42,7 @@
   text-transform: uppercase;
   text-decoration: none;
   color: rgba(0, 0, 0, 0.35);
+}
+.menuItem {
+  font-size: 1.3em;
 }

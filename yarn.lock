@@ -33,6 +33,23 @@
   dependencies:
     ansi-styles "^2.2.1"
 
+"@blueprintjs/core@^1.11.1":
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/@blueprintjs/core/-/core-1.11.1.tgz#4140db0bf8825f39e8fdf28de3f19b2d19124ca8"
+  dependencies:
+    "@types/dom4" "^1.5.20"
+    "@types/tether" "^1.1.27"
+    classnames "^2.2"
+    dom4 "^1.8"
+    normalize.css "4.1.1"
+    pure-render-decorator "^1.1"
+    tether "^1.4"
+    tslib "^1.5.0"
+
+"@types/dom4@^1.5.20":
+  version "1.5.20"
+  resolved "https://registry.yarnpkg.com/@types/dom4/-/dom4-1.5.20.tgz#ccf636d3b794fe65a4191ebc7ff979a78efea6c2"
+
 "@types/fs-extra@0.0.37":
   version "0.0.37"
   resolved "https://registry.yarnpkg.com/@types/fs-extra/-/fs-extra-0.0.37.tgz#195f11bcd9a1b97d9e412c6b66899b545471a1f7"
@@ -48,6 +65,10 @@
 "@types/node@*":
   version "7.0.5"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-7.0.5.tgz#96a0f0a618b7b606f1ec547403c00650210bfbb7"
+
+"@types/tether@^1.1.27":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@types/tether/-/tether-1.4.1.tgz#828b38034b01edce44dc42935229067aec736f4a"
 
 "JSV@>= 4.0.x":
   version "4.0.2"
@@ -1772,7 +1793,7 @@ clap@^1.0.9:
   dependencies:
     chalk "^1.1.3"
 
-classnames@2.2.5, classnames@2.x, classnames@^2.2.0, classnames@^2.2.1, classnames@^2.2.3, classnames@^2.2.5, classnames@~2.2.0:
+classnames@2.2.5, classnames@2.x, classnames@^2.2, classnames@^2.2.0, classnames@^2.2.1, classnames@^2.2.3, classnames@^2.2.5, classnames@~2.2.0:
   version "2.2.5"
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
 
@@ -2478,6 +2499,10 @@ dom-walk@^0.1.0:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/dom-walk/-/dom-walk-0.1.1.tgz#672226dc74c8f799ad35307df936aba11acd6018"
 
+dom4@^1.8:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/dom4/-/dom4-1.8.3.tgz#2b0aa096b46368e33bbd2c2767f0e32dbb3394cd"
+
 domain-browser@^1.1.1:
   version "1.1.7"
   resolved "https://registry.yarnpkg.com/domain-browser/-/domain-browser-1.1.7.tgz#867aa4b093faa05f1de08c06f4d7b21fdf8698bc"
@@ -3000,7 +3025,7 @@ fastparse@^1.1.1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/fastparse/-/fastparse-1.1.1.tgz#d1e2643b38a94d7583b479060e6c4affc94071f8"
 
-fbjs@^0.8.3, fbjs@^0.8.4:
+fbjs@^0.8.0, fbjs@^0.8.3, fbjs@^0.8.4:
   version "0.8.8"
   resolved "https://registry.yarnpkg.com/fbjs/-/fbjs-0.8.8.tgz#02f1b6e0ea0d46c24e0b51a2d24df069563a5ad6"
   dependencies:
@@ -3120,6 +3145,10 @@ flat-cache@^1.2.1:
 flatten@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/flatten/-/flatten-1.0.2.tgz#dae46a9d78fbe25292258cc1e780a41d95c03782"
+
+flexboxgrid@^6.3.0:
+  version "6.3.1"
+  resolved "https://registry.yarnpkg.com/flexboxgrid/-/flexboxgrid-6.3.1.tgz#e99898afc07b7047722bb81a958a5fba4d4e20fd"
 
 flow-bin@^0.39.0:
   version "0.39.0"
@@ -4165,7 +4194,7 @@ jodid25519@^1.0.0:
   dependencies:
     jsbn "~0.1.0"
 
-jquery@3.1.0, jquery@>=1.7.2:
+jquery@3.1.0, jquery@>=1.7.2, jquery@>=1.9.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.1.0.tgz#129f6f1ae94b18f09010b008d0d6011e40613d7f"
 
@@ -5123,11 +5152,7 @@ mz@^2.6.0:
     object-assign "^4.0.1"
     thenify-all "^1.0.0"
 
-nan@^2.3.0, nan@^2.3.2, nan@^2.4.0:
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.5.0.tgz#aa8f1e34531d807e9e27755b234b4a6ec0c152a8"
-
-nan@^2.5.1:
+nan@^2.3.0, nan@^2.3.2, nan@^2.4.0, nan@^2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.5.1.tgz#d5b01691253326a97a2bbee9e61c55d8d60351e2"
 
@@ -5344,6 +5369,10 @@ normalize-url@^1.4.0:
     prepend-http "^1.0.0"
     query-string "^4.1.0"
     sort-keys "^1.0.0"
+
+normalize.css@4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/normalize.css/-/normalize.css-4.1.1.tgz#4f0b1d5a235383252b04d8566b866cc5fcad9f0c"
 
 npm-run-path@^2.0.0:
   version "2.0.2"
@@ -6228,6 +6257,12 @@ punycode@^1.2.4, punycode@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
 
+pure-render-decorator@^1.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/pure-render-decorator/-/pure-render-decorator-1.2.1.tgz#568870eeca17a1cee536b4fe94a3477fcd31eeb9"
+  dependencies:
+    fbjs "^0.8.0"
+
 q@^1.1.2:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/q/-/q-1.4.1.tgz#55705bcd93c5f3673530c2c2cbc0c2b3addc286e"
@@ -6283,6 +6318,12 @@ randombytes@^2.0.0, randombytes@^2.0.1:
 range-parser@^1.0.3, range-parser@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.0.tgz#f49be6b487894ddc40dcc94a322f611092e00d5e"
+
+rangeslider.js@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/rangeslider.js/-/rangeslider.js-2.3.0.tgz#e61a72903f5c61def0cee9e88d504a3c60c7f59e"
+  dependencies:
+    jquery ">=1.9.0"
 
 raven-js@3.6.1:
   version "3.6.1"
@@ -6578,6 +6619,13 @@ rc@^1.0.1, rc@^1.1.2, rc@^1.1.6, rc@~1.1.6:
     minimist "^1.2.0"
     strip-json-comments "~1.0.4"
 
+react-addons-css-transition-group@^15.4.2:
+  version "15.4.2"
+  resolved "https://registry.yarnpkg.com/react-addons-css-transition-group/-/react-addons-css-transition-group-15.4.2.tgz#b7828834dfa14229fe07750e331e8a8cb6fb7745"
+  dependencies:
+    fbjs "^0.8.4"
+    object-assign "^4.1.0"
+
 react-addons-test-utils@15.3.1:
   version "15.3.1"
   resolved "https://registry.yarnpkg.com/react-addons-test-utils/-/react-addons-test-utils-15.3.1.tgz#b3b64e15d7d85f6d190020dca641218684b1124d"
@@ -6602,6 +6650,10 @@ react-draggable@^2.1.0:
   resolved "https://registry.yarnpkg.com/react-draggable/-/react-draggable-2.2.3.tgz#17628cb8aaefed639d38e0021b978a685d80b08b"
   dependencies:
     classnames "^2.2.5"
+
+react-flexbox-grid@^0.10.2:
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/react-flexbox-grid/-/react-flexbox-grid-0.10.2.tgz#9de9b5d0b065adbb3b3b7e26033515abf9a9a2b4"
 
 react-hammerjs@~0.5.0:
   version "0.5.0"
@@ -6945,6 +6997,13 @@ redux@^3.5.2, redux@^3.6.0:
     loose-envify "^1.1.0"
     symbol-observable "^1.0.2"
 
+reflexbox@^2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/reflexbox/-/reflexbox-2.2.3.tgz#9b9ce983dbe677cebf3a94cf2c50b8157f50c0d1"
+  dependencies:
+    robox "^1.0.0-beta.8"
+    ruled "^1.0.1"
+
 regenerate@^1.2.1:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/regenerate/-/regenerate-1.3.2.tgz#d1941c67bad437e1be76433add5b385f95b19260"
@@ -7183,9 +7242,19 @@ ripemd160@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/ripemd160/-/ripemd160-1.0.1.tgz#93a4bbd4942bc574b69a8fa57c71de10ecca7d6e"
 
+robox@^1.0.0-beta.8:
+  version "1.0.0-beta.8"
+  resolved "https://registry.yarnpkg.com/robox/-/robox-1.0.0-beta.8.tgz#9aaee1dacf38a8c4ca4584a80012aebab5711c73"
+  dependencies:
+    understyle "^1.2.0"
+
 rsvp@~3.2.1:
   version "3.2.1"
   resolved "https://registry.yarnpkg.com/rsvp/-/rsvp-3.2.1.tgz#07cb4a5df25add9e826ebc67dcc9fd89db27d84a"
+
+ruled@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/ruled/-/ruled-1.0.1.tgz#8301a1accc9d2e14b6502fca7033582335c2c0f4"
 
 run-async@^0.1.0:
   version "0.1.0"
@@ -7844,6 +7913,10 @@ test-exclude@^2.1.1, test-exclude@^2.1.3:
     read-pkg-up "^1.0.1"
     require-main-filename "^1.0.1"
 
+tether@^1.4:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/tether/-/tether-1.4.0.tgz#0f9fa171f75bf58485d8149e94799d7ae74d1c1a"
+
 text-table@^0.2.0, text-table@~0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
@@ -7971,6 +8044,10 @@ tryit@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/tryit/-/tryit-1.0.3.tgz#393be730a9446fd1ead6da59a014308f36c289cb"
 
+tslib@^1.5.0:
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.6.0.tgz#cf36c93e02ae86a20fc131eae511162b869a6652"
+
 tty-browserify@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/tty-browserify/-/tty-browserify-0.0.0.tgz#a157ba402da24e9bf957f9aa69d524eed42901a6"
@@ -8056,6 +8133,12 @@ underscore.string@3.3.4:
 underscore@~1.6.0:
   version "1.6.0"
   resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.6.0.tgz#8b38b10cacdef63337b8b24e4ff86d45aea529a8"
+
+understyle@^1.2.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/understyle/-/understyle-1.3.0.tgz#df3f9a9be96779d718c3da9598fad1c2f90f24ee"
+  dependencies:
+    object-assign "^4.1.0"
 
 union@~0.4.3:
   version "0.4.6"

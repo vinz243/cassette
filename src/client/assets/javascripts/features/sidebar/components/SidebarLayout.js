@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import './SidebarApp.scss';
-import {Row, Col, Tooltip, Input} from 'antd';
+import {Row, Col, Tooltip, Input, Menu, Icon} from 'antd';
 import 'antd/dist/antd.css';
 import SidebarLibraryItem from './SidebarLibraryItem';
 import IonPlusRound from 'react-icons/lib/io/plus-round';
@@ -51,34 +51,18 @@ export default class SidebarLayout extends Component {
         actions={actions} />);
 
     return (
-    	<div className="sidebar">
-        <div className="parentItem">
-          <Row gutter={24}>
-            <Col span={21}>
-              <Link to="/app/library" className="librariesLink">Libraries</Link>
-            </Col>
-            <Col span={2}>
-              <Tooltip
-                trigger="click" title={
-                  <Row gutter={4}>
-                    <Col span={8}>
-                      <Input placeholder="Name" className="newLibraryName"
-                        onChange={boundLibraryNameChange} />
-                    </Col>
-                    <Col span={16}>
-                      <Input placeholder="Path" className="newLibraryPath"
-                        onChange={boundLibraryPathChange}
-                        onPressEnter={boundLibrarySubmit}></Input>
-                    </Col>
-                  </Row>
-                }><IonPlusRound className="addButton"/></Tooltip>
-            </Col>
-          </Row>
-        </div>
-        {items}
-        <div className="storeLinkParent">
-          <Link to="/app/store" className="storeLink">Store</Link>
-        </div>
+    	<div>
+        <Menu mode="vertical" theme="dark" className="sidebar">
+          <Menu.Item key="artists">
+              <Icon className="menuItem" type="user" />
+          </Menu.Item>
+          <Menu.Item key="albums">
+            <Icon className="menuItem" type="switcher" />
+          </Menu.Item>
+          <Menu.Item key="tracks">
+            <Icon className="menuItem" type="bars" />
+          </Menu.Item>
+        </Menu>
       </div>
     );
   }

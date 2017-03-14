@@ -3,7 +3,7 @@ import PlayerControls from './PlayerControls';
 import CurrentTrackStatus from './CurrentTrackStatus';
 import BrowserControls from './BrowserControls';
 import './ToolbarApp.scss';
-import {Row, Col} from 'antd';
+import {Box, Flex} from 'reflexbox';
 import 'antd/dist/antd.css';
 
 export default class ToolbarLayout extends Component {
@@ -15,19 +15,17 @@ export default class ToolbarLayout extends Component {
     const { toolbar, actions } = this.props;
     return (
     	<div>
-        <Row className="mainRow">
-          <Col span={1}></Col>
-          <Col span={7}>
+        <Flex className="mainRow" align="center" justify="space-between">
+          <Box>
             <PlayerControls {...this.props} />
-  	      </Col>
-          <Col span={7} className="currentTrackStatusCol">
+  	      </Box>
+          <Box auto className="currentTrackStatusCol">
            <CurrentTrackStatus {...this.props} />
-  	      </Col>
-          <Col span={7}>
+  	      </Box>
+          <Box>
              {/*<BrowserControls  {...this.props} />*/}
-  	      </Col>
-          <Col span={2}></Col>
-        </Row>
+  	      </Box>
+        </Flex>
       </div>
     );
   }
