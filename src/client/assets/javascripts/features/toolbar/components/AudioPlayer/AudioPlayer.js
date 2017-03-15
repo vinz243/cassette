@@ -8,10 +8,10 @@ export default class AudioPlayer extends Component {
     super();
   }
   updateProgress (val = this.range.value) {
-    const percent = Math.ceil(
+
+    const percent =
       ((val - this.range.min) /
-        (this.range.max - this.range.min)) * 100
-    );
+        (this.range.max - this.range.min)) * 100;
 
       `-webkit-linear-gradient(left, white 0%, #5a5a61 ${
         percent
@@ -19,9 +19,9 @@ export default class AudioPlayer extends Component {
         percent
       }%)`;
     this.range.style.background = `linear-gradient(to right, #ffffff 0%,#ffffff ${
-      percent - 0.16
+      percent
     }%,#363439 ${
-      percent - 0.12
+      percent
     }%,#363439 100%)`;
 
   }
