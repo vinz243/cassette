@@ -54,9 +54,6 @@ const initialState: State = {
 	volume: 1.0
 };
 
-let srcUrl = (id) => {
-  return `/api/v2/tracks/${id}/stream`;
-};
 
 let audio = new Audio();
 export default function reducer(state: State = initialState, action: any = {}): State {
@@ -75,28 +72,16 @@ export default function reducer(state: State = initialState, action: any = {}): 
       newState.nextTracks = newState.nextTracks.slice(1);
       newState.currentTime = 0.0;
       newState.previousTracks = [state.currentTrack, ...newState.previousTracks];
-      audio.src = srcUrl(newState.currentTrack._id);
-
-      if (newState.playing)
-      audio.play();
 
       return newState;
 
 		case TOGGLE_PAUSE:
-      if (audio) {
-			  newState.playing = !newState.playing;
-        if (newState.playing)
-          audio.play();
-        else audio.pause();
-      }
+		  newState.playing = !newState.playing;
 			return newState;
 
 		case PLAY_PREVIOUS:
 			if (state.currentTime > PREVIOUS_TRESHOLD) {
 				newState.currentTime = 0.0;
-        audio.currentTime = 0.0;
-        if (newState.playing)
-          audio.play();
 				return newState;
 			}
 			if (state.previousTracks.length === 0) return newState;
@@ -105,15 +90,11 @@ export default function reducer(state: State = initialState, action: any = {}): 
 			newState.currentTime = 0.0;
 			newState.nextTracks.unshift(state.currentTrack);
 
-      audio.src = srcUrl(newState.currentTrack._id);
-      if (newState.playing)
-        audio.play();
 			return newState;
 
 
 		case SET_VOLUME:
 			newState.volume = Math.min(Math.max(action.value, 0.0), 1.0);
-      audio.volume = newState.volume;
 			return newState;
 
 		case SET_TRACK_TIME:
@@ -121,7 +102,6 @@ export default function reducer(state: State = initialState, action: any = {}): 
 
 			newState.currentTime = Math.min(Math.max(action.value, 0.0),
         state.currentTrack.duration * 1000);
-      audio.currentTime = newState.currentTime / 1000;
 
 			return newState;
 
@@ -133,8 +113,6 @@ export default function reducer(state: State = initialState, action: any = {}): 
       newState.playing = true;
       newState.currentTime = 0.0;
 
-      audio.src = srcUrl(newState.currentTrack._id);
-      audio.play();
 
       return newState;
 		case SET_VIEW_TYPE:

@@ -18,8 +18,8 @@ $volumIconSize: 1.2em;
   }
 }
 .controlsContainer {
-	padding-top: 25px;
-	height: 80px;
+	padding-top: 20px;
+	height: 64px;
 }
 .playbackControl {
 	font-size: 1.6em !important;
@@ -67,4 +67,7 @@ $volumIconSize: 1.2em;
     color: rgba(255, 255, 255, $iconOpacityDisabled);
   }
   cursor: pointer;
+}
+.play-pause-box {
+	margin-left: 13px !important;
 }

@@ -10,7 +10,8 @@ import GoPlaybackFastForward from 'react-icons/lib/go/playback-fast-forward';
 
 import GoMute from 'react-icons/lib/go/mute';
 import GoUnmute from 'react-icons/lib/go/unmute';
-
+import AudioPlayer from '../AudioPlayer';
+import shortid from 'shortid';
 
 export default class CurrentTrackStatus extends Component {
   static propTypes = {
@@ -42,10 +43,6 @@ export default class CurrentTrackStatus extends Component {
     return this.msToTime((val/100) * (toolbar.currentTrack || {}).duration * 1000);
   }
   componentDidMount() {
-    setInterval(() => {
-      if (this.props.toolbar.playing)
-        this.props.actions.updateTime();
-    }, 1000);
   }
   render() {
     const { toolbar, actions } = this.props;
@@ -55,32 +52,18 @@ export default class CurrentTrackStatus extends Component {
     const boundTipFormattter = this.tipFormatter.bind(this);
 
     const boundHandleTimeChange = this.handleTimeChange.bind(this);
+    console.log(AudioPlayer);
     return (
     	<div className="currentTrackStatus">
 	    	<div>
 	    		<Row gutter={24} className="currentTrackStatusRow">
-            <div className="currentTrackTitle">{(toolbar.currentTrack || {}).name}</div>
-            <div className="currentTrackSubtitle">{((toolbar.currentTrack || {}).artist || {}).name} &#8212; {((toolbar.currentTrack || {}).album || {}).name}</div>
+            <div className="currentTrackTitle">{(toolbar.currentTrack || {}).name}
+               &#8212; {((toolbar.currentTrack || {}).artist || {}).name}</div>
             <div className="currentTrackTime">
-              <Row gutter={4}>
-                <Col span={2}>
-                  <span className="currentTime">
-                    {this.msToTime(toolbar.currentTime)}
-                  </span>
-                </Col>
-                <Col span={20}>
-                  <Slider className="trackTimeSlider"
-                    value={(toolbar.currentTime / ((toolbar.currentTrack || {duration: 1}).duration * 1000)) * 100}
-                    tipFormatter={boundTipFormattter}
-                    onChange={boundHandleTimeChange} />
-                </Col>
-                <Col span={2}>
-                  <span className="timeLeft" onClick={boundHandleTimeStatusChange}>
-                    {this.msToTime(toolbar.currentTime
-                        - (toolbar.currentTrack || {duration: 0}).duration * 1000 ) }
-                  </span>
-                </Col>
-              </Row>
+            <AudioPlayer source={
+                toolbar.currentTrack ?
+                `/api/v2/tracks/${toolbar.currentTrack._id}/stream` : ''
+              } playing={toolbar.playing}/>
             </div>
 	    		</Row>
 	    	</div>

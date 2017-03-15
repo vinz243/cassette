@@ -6,7 +6,6 @@ import { Slider } from "@blueprintjs/core";
 import 'antd/dist/antd.css';
 import './PlayerControls.scss';
 import {Flex, Box} from 'reflexbox';
-
 import GoPlaybackRewind from 'react-icons/lib/go/playback-rewind';
 import GoPlaybackPause from 'react-icons/lib/go/playback-pause';
 import GoPlaybackPlay from 'react-icons/lib/go/playback-play';
@@ -49,19 +48,19 @@ export default class PlayerControls extends Component {
   render() {
     const { toolbar, actions } = this.props;
 
-    let PlayPauseButton;
-    if (toolbar.playing) {
-      PlayPauseButton = <span className="pt-icon-large pt-icon-pause playbackControl" onClick={boundPauseUnpause}></span>;
-    } else {
-      PlayPauseButton = <span className="pt-icon-large pt-icon-play playbackControl" onClick={boundPauseUnpause}></span>;
-    }
-
     const boundPauseUnpause = this.pauseUnpause.bind(this);
     const boundMute = this.mute.bind(this);
     const boundChangeVolume = this.changeVolume.bind(this);
     const boundUnmute = this.unmute.bind(this);
     const boundRewind = this.rewind.bind(this);
     const boundFastForward = this.fastForward.bind(this);
+
+    let PlayPauseButton;
+    if (toolbar.playing) {
+      PlayPauseButton = <span className="pt-icon-large pt-icon-pause playbackControl" onClick={boundPauseUnpause}></span>;
+    } else {
+      PlayPauseButton = <span className="pt-icon-large pt-icon-play playbackControl" onClick={boundPauseUnpause}></span>;
+    }
 
     return (
     	<div className="controlsContainer">
@@ -72,7 +71,7 @@ export default class PlayerControls extends Component {
                   disabled: toolbar.previousTracks.length > 0 || toolbar.currentTrack
                 }, 'pt-icon-standard pt-icon-step-backward')}></span>
             </Box>
-            <Box auto ml={2}>
+            <Box auto className="play-pause-box">
     					{PlayPauseButton}
             </Box>
             <Box>
