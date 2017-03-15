@@ -61,14 +61,14 @@ export default class PlayerControls extends Component {
     } else {
       PlayPauseButton = <span className="pt-icon-large pt-icon-play playbackControl" onClick={boundPauseUnpause}></span>;
     }
-
+    console.log(toolbar.nextTracks);
     return (
     	<div className="controlsContainer">
     		<div className="playerControls">
           <Flex justify="space-between">
             <Box ml={2}>
     					<span className={classNames('rewindControl', {
-                  disabled: toolbar.previousTracks.length > 0 || toolbar.currentTrack
+                  disabled: !(toolbar.previousTracks.length > 0 || toolbar.currentTrack)
                 }, 'pt-icon-standard pt-icon-step-backward')}></span>
             </Box>
             <Box auto className="play-pause-box">
@@ -77,7 +77,7 @@ export default class PlayerControls extends Component {
             <Box>
       				<span onClick={boundFastForward}
                 className={classNames('fastForwardControl', {
-                  disabled: toolbar.nextTracks.length > 0
+                  disabled: !(toolbar.nextTracks.length > 0)
                 }, 'pt-icon-standard pt-icon-step-forward')}>
       				</span>
             </Box>
