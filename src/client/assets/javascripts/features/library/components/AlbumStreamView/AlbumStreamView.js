@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import './AlbumStreamView.scss';
-import {Row, Col, Spin} from 'antd';
+import {Flex, Box} from 'reflexbox';
 import classnames from 'classnames';
 import { browserHistory } from 'react-router';
 
@@ -32,33 +32,35 @@ export default class AlbumStreamView extends Component {
     const { album } = this.props;
     let tracksDOM = album.tracks.map((t) => (
       <div className={classnames('trackItem', {'playing': t.playing})} key={t._id}>
-        <Row onClick={this.playTracks.bind(this, t.trackNumber)} gutter={16}>
-          <Col span={2} className="trackNumber">
+        <Flex onClick={this.playTracks.bind(this, t.trackNumber)}>
+          <Box className="trackNumber" ml={1}>
             {t.playing ? <div className={classnames('spinner', {'paused': this.props.paused})}>
               <div className="bounce1"></div>
               <div className="bounce2"></div>
               <div className="bounce3"></div>
             </div>: t.trackNumber}
-          </Col>
-          <Col span={16}>
-            {t.name}
+          </Box>
+          <Box auto ml={2} >
+            <span className="trackTitle">
+              {t.name}
+            </span>
             <span className="nameExt">
               {/*t.name*/}
             </span>
-          </Col>
-          <Col span={3} className="duration">
+          </Box>
+          <Box className="duration" mr={1}>
             {this.msToTime(t.duration * 1000)}
-          </Col>
-        </Row>
+          </Box>
+        </Flex>
       </div>
     ))
     return (
     	<div>
-        <Row gutter={32} className="albumStreamItem">
-          <Col span={6}>
+        <Flex gutter={32} className="albumStreamItem">
+          <Box col={2} m={2}>
             <img className="albumArt" src={`/api/v2/albums/${album._id}/artwork`} />
-          </Col>
-          <Col span={18}>
+          </Box>
+          <Box col={10} m={2}>
             <div className="albumHeader">
               <span   className="artist" onClick={browserHistory.push.bind(null, `/app/library/artists/${album.artist.id}/albums`)}>
                 {album.artist.name}
@@ -69,8 +71,8 @@ export default class AlbumStreamView extends Component {
               </span>
             </div>
             {tracksDOM}
-          </Col>
-        </Row>
+          </Box>
+        </Flex>
       </div>
     );
   }

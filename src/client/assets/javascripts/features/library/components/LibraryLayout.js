@@ -42,7 +42,6 @@ export default class LibraryLayout extends Component {
     }
     return (
       <div className="albumsView">
-        <ViewScope selection='tracks' title=''/>
         {content}
       </div>
     );

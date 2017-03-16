@@ -1,6 +1,49 @@
 .sidebar {
   // margin: 2.5em;
-  height: 100vh;
+  // height: 100vh;
+  // background-color: rgb(45, 45, 46);
+  color: white;
+  position: relative;
+  // box-shadow: inset -16px 0px 24px 0px rgba(0,0,0,0.30);
+  // background: linear-gradient(to right,
+  //   rgb(45, 45, 46) 0%,
+  //   rgb(45, 45, 46) 80%,
+  //   rgb(32, 31, 31) 100%);
+
+  div {
+    padding: 0.6em 1.2em;
+    display: block !important;
+    .itemName {
+      padding-left: 1.2em;
+      padding-right: 1.2em;
+      display: none;
+    }
+    &.selected {
+      background-color: rgba(255, 255, 255, 0.26);
+    }
+    &.divider {
+      height: 22px;
+    }
+    &.bottom {
+    }
+    &:not(.divider) {
+      &:hover {
+        cursor: pointer;
+        background-color: #fff;
+        //
+        // background: linear-gradient(to right,
+        //   rgb(255, 255, 255) 0%,
+        //   rgb(255, 255, 255) 80%,
+        //   rgb(201, 201, 201) 100%);
+        color: #000;
+      }
+    }
+  }
+}
+.sidebar:hover {
+  .itemName {
+    display: inline-block;
+  }
 }
 
 .addButton {

@@ -38,7 +38,11 @@ export default class SidebarLayout extends Component {
   componentDidMount() {
     this.props.actions.loadContent();
   }
+  itemSelected(re) {
+    return re.test(this.props.location.pathname) ? 'selected' : '';
+  }
   render() {
+    console.log(this);
     const { sidebar, actions } = this.props;
     const boundLibrarySubmit = this.librarySubmit.bind(this);
     const boundLibraryNameChange = this.libraryNameChange.bind(this);
@@ -51,18 +55,56 @@ export default class SidebarLayout extends Component {
         actions={actions} />);
 
     return (
-    	<div>
-        <Menu mode="vertical" theme="dark" className="sidebar">
-          <Menu.Item key="artists">
-              <Icon className="menuItem" type="user" />
-          </Menu.Item>
-          <Menu.Item key="albums">
-            <Icon className="menuItem" type="switcher" />
-          </Menu.Item>
-          <Menu.Item key="tracks">
-            <Icon className="menuItem" type="bars" />
-          </Menu.Item>
-        </Menu>
+    	<div className="sidebar">
+        <div className={this.itemSelected(/artists$/)} onClick={
+            () => this.props.history.push('/app/library/artists')
+          }>
+          <span className="pt-icon-standard pt-icon-user">
+          </span>
+          <span className="itemName">
+            Artists
+          </span>
+        </div>
+        <div className={this.itemSelected(/albums$/)} onClick={
+            () => this.props.history.push('/app/library/albums')
+          }>
+          <span className="pt-icon-standard pt-icon-unresolve">
+          </span>
+          <span className="itemName">
+            Albums
+          </span>
+        </div>
+          <div className={this.itemSelected(/tracks$/)} onClick={
+              () => this.props.history.push('/app/library/tracks')
+            }>
+          <span className="pt-icon-standard pt-icon-property">
+          </span>
+          <span className="itemName">
+            Tracks
+          </span>
+        </div>
+        <div className="divider"></div>
+        <div className="">
+          <span className="pt-icon-standard pt-icon-shop">
+          </span>
+          <span className="itemName">
+            Store
+          </span>
+        </div>
+        <div className="">
+          <span className="pt-icon-standard pt-icon-settings">
+          </span>
+          <span className="itemName">
+            Settings
+          </span>
+        </div>
+        <div className="bottom">
+          <span className="pt-icon-standard pt-icon-refresh">
+          </span>
+          <span className="itemName">
+            Refresh Libraries
+          </span>
+        </div>
       </div>
     );
   }

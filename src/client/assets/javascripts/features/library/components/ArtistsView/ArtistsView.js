@@ -38,6 +38,6 @@ export default class ArtistsView extends Component {
         </Row>
       });
 
-    return <div className="artistsView"><ViewScope selection='artists'/>  {artists}</div>
+    return <div className="artistsView">{artists}</div>
   }
 }

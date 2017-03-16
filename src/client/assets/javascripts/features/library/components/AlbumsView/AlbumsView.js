@@ -43,7 +43,6 @@ export default class AlbumsView extends Component {
       });
 
     return <div className="albumsView">
-      <ViewScope selection='albums' title={artistName}/>
       {albums}
     </div>
   }

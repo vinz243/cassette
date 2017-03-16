@@ -82,7 +82,11 @@ $transitionTime: 250ms;
   -webkit-transition: background-color $transitionTime ease-in-out;
   -ms-transition: background-color $transitionTime ease-in-out;
   transition: background-color $transitionTime ease-in-out;
-
+  .trackTitle {
+    // text-overflow: ellipsis;
+	  // white-space: nowrap;
+    // overflow: hidden;
+  }
   .duration, .nameExt, .trackNumber {
     color: #9f9f9f;
   }
@@ -94,6 +98,7 @@ $transitionTime: 250ms;
   }
   .trackNumber {
     text-align: right;
+    width: 30px;
   }
   &.playing {
     background-color: #ebe7e7;
