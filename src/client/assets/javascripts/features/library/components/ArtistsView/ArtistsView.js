@@ -6,6 +6,8 @@ import ViewScope from '../ViewScope';
 import {Row, Col, Card} from 'antd';
 import classnames from 'classnames';
 import { browserHistory } from 'react-router';
+import LoaderProxy from '../LoaderProxy';
+
 export default class ArtistsView extends Component {
   componentDidMount() {
     const { library, actions } = this.props;
@@ -38,6 +40,8 @@ export default class ArtistsView extends Component {
         </Row>
       });
 
-    return <div className="artistsView">{artists}</div>
+    return <LoaderProxy {...this.props}>
+      <div className="artistsView">{artists}</div>
+    </LoaderProxy>
   }
 }

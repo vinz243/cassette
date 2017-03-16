@@ -76,7 +76,6 @@ function cancel () {
 }
 function fetch() {
   return axios.get('/v1/versions').then((res) => {
-    console.log(res.data.data);
     return Promise.resolve({
       type: FETCH,
       data: res.data.data
@@ -86,7 +85,6 @@ function fetch() {
 function update() {
   return new Promise((resolve) => {
     axios.post('/v1/update').then((res) => {
-      console.log(res);
       return axios.post('/v1/restart').then(delay(3000))
     }).then((res) => {
       resolve({

@@ -65,6 +65,10 @@ export default function reducer(state: State = initialState, action: any = {}): 
           return newState;
       }
       return state;
+    case '@@router/LOCATION_CHANGE':
+      return Object.assign({}, state, {
+        loading: true
+      });
     default:
       return state;
   }
@@ -120,7 +124,7 @@ function playTracks(tracks) {
 function loadContent(opts) {
   switch (opts.scope) {
     case 'ARTISTS':
-      return axios.get('/api/v2/artists').then((res) => {
+      return axios.get(`/api/v2/artists`).then((res) => {
         return {
           type: LOAD_CONTENT,
           data: {
@@ -129,7 +133,8 @@ function loadContent(opts) {
         }
       });
     case 'ALBUMS':
-      return axios.get('/api/v2/albums').then((res) => {
+      return axios.get(`/api/v2${opts.artist ?
+        '/artists/' + opts.artist : ''}/albums`).then((res) => {
         return {
           type: LOAD_CONTENT,
           data: {
@@ -138,7 +143,9 @@ function loadContent(opts) {
         }
       });
     case 'TRACKS':
-      return axios.get('/api/v2/tracks?sort=trackNumber').then((res) => {
+      return axios.get(`/api/v2${
+        opts.album ? '/albums/' + opts.album : ''
+      }/tracks?sort=trackNumber`).then((res) => {
         return {
           type: LOAD_CONTENT,
           data: {

@@ -42,7 +42,6 @@ export default class SidebarLayout extends Component {
     return re.test(this.props.location.pathname) ? 'selected' : '';
   }
   render() {
-    console.log(this);
     const { sidebar, actions } = this.props;
     const boundLibrarySubmit = this.librarySubmit.bind(this);
     const boundLibraryNameChange = this.libraryNameChange.bind(this);

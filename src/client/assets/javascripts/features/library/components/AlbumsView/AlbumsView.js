@@ -6,11 +6,12 @@ import {Row, Col, Card} from 'antd';
 import classnames from 'classnames';
 import ViewScope from '../ViewScope';
 import { browserHistory } from 'react-router';
+import LoaderProxy from '../LoaderProxy';
 
 export default class AlbumsView extends Component {
   componentDidMount() {
     const { library, actions } = this.props;
-    actions.loadContent({scope: 'ALBUMS'});
+    actions.loadContent({scope: 'ALBUMS', artist: this.props.params.id});
 
   }
   render() {
@@ -42,8 +43,10 @@ export default class AlbumsView extends Component {
         </Row>
       });
 
-    return <div className="albumsView">
-      {albums}
-    </div>
+    return <LoaderProxy {...this.props}>
+      <div className="albumsView">
+        {albums}
+      </div>
+    </LoaderProxy>
   }
 }

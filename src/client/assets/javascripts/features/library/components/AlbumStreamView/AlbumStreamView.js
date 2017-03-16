@@ -56,13 +56,13 @@ export default class AlbumStreamView extends Component {
     ))
     return (
     	<div>
-        <Flex gutter={32} className="albumStreamItem">
+        <Flex className="albumStreamItem">
           <Box col={2} m={2}>
             <img className="albumArt" src={`/api/v2/albums/${album._id}/artwork`} />
           </Box>
           <Box col={10} m={2}>
             <div className="albumHeader">
-              <span   className="artist" onClick={browserHistory.push.bind(null, `/app/library/artists/${album.artist.id}/albums`)}>
+              <span   className="artist" onClick={browserHistory.push.bind(null, `/app/library/artists/${album.artist._id}/albums`)}>
                 {album.artist.name}
               </span>
               &#8210;

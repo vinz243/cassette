@@ -52,7 +52,6 @@ export default class CurrentTrackStatus extends Component {
     const boundTipFormattter = this.tipFormatter.bind(this);
 
     const boundHandleTimeChange = this.handleTimeChange.bind(this);
-    console.log(AudioPlayer);
     return (
     	<div className="currentTrackStatus">
 	    	<div>

@@ -1,20 +1,14 @@
 import React, { Component, PropTypes } from 'react';
-import ListView from './ListView';
 import AlbumStreamView from './AlbumStreamView';
 import './LibraryApp.scss';
-import {Row, Col} from 'antd';
-import 'antd/dist/antd.css';
-import ViewScope from './ViewScope';
-import assert from 'assert';
-import merge from 'lodash/merge';
-
+import LoaderProxy from './LoaderProxy';
 export default class LibraryLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
   };
   componentDidMount() {
     const { library, actions } = this.props;
-    actions.loadContent({scope: 'TRACKS'});
+    actions.loadContent({scope: 'TRACKS', album: this.props.params.albumId});
 
   }
   render() {
@@ -41,9 +35,11 @@ export default class LibraryLayout extends Component {
       // content = <ListView {...this.props}/>
     }
     return (
-      <div className="albumsView">
-        {content}
-      </div>
+      <LoaderProxy {...this.props}>
+        <div className="albumsView">
+          {content}
+        </div>
+      </LoaderProxy>
     );
   }
 }

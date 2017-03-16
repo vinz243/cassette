@@ -61,7 +61,6 @@ export default class PlayerControls extends Component {
     } else {
       PlayPauseButton = <span className="pt-icon-large pt-icon-play playbackControl" onClick={boundPauseUnpause}></span>;
     }
-    console.log(toolbar.nextTracks);
     return (
     	<div className="controlsContainer">
     		<div className="playerControls">
