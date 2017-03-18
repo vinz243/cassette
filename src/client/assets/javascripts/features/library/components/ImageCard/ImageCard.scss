@@ -1,0 +1,16 @@
+.imageCard {
+  border-radius: 1px;
+  box-shadow: 0px 0px 6px 0px rgba(119, 119, 119, 0.3);
+  border: 1px solid rgba(119, 119, 119, 0.3);
+  transition: all .3s ease-in-out;
+  img {
+
+  }
+  .description {
+    padding: 0.5em;
+  }
+}
+.imageCard:hover {
+  transform: scale(1.07);
+  transition: all .3s ease-in-out;
+}
