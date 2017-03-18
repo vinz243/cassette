@@ -2,7 +2,7 @@ import React, { Component, PropTypes } from 'react';
 import './AlbumsView.scss';
 import uniqBy from 'lodash/uniqBy';
 import chunk from 'lodash/chunk';
-import {Row, Col, Card} from 'antd';
+import {Box, Flex} from 'reflexbox';
 import classnames from 'classnames';
 import ViewScope from '../ViewScope';
 import { browserHistory } from 'react-router';
@@ -15,7 +15,7 @@ export default class AlbumsView extends Component {
 
   }
   render() {
-    const COLUMNS = 6;
+    const COLUMNS = 12;
     let artistId = this.props.params.id;
     let artistName = (this.props.library.items.albums.find(
       ((el) => el.artist._id === artistId)
@@ -23,24 +23,27 @@ export default class AlbumsView extends Component {
     let albums = chunk(this.props.library.items.albums,
       COLUMNS).map((arr, index) => {
         let arts = arr.map((album) => (
-          <Col span={Math.floor(24 / COLUMNS)} className="albumCard" key={album._id}>
-            <Card bodyStyle={{ padding: 0 }} onClick={
+          <Box col={Math.floor(12 / COLUMNS)} className="albumCard" key={album._id}>
+            <div className="albumCard" onClick={
                 browserHistory.push.bind(null,
-                  `/app/library/albums/${album._id}/tracks`)} >
-              <div className="custom-image">
-                <img alt="example" width="100%" src={
-                    `/api/v2/albums/${album._id}/artwork?size=200`
-                  } />
+                  `/app/library/albums/${album._id}/tracks`)}
+                  style={{
+                    'background-image': `url(/api/v2/albums/${
+                      album._id
+                    }/artwork?size=200)`
+                  }}>
+              <div className="desc">
+                <span>
+                  <div className="album">{album.name}</div>
+                  <div className="artist">{album.artist.name}</div>
+                </span>
               </div>
-              <div className="custom-card">
-                <h3>{album.name} — <span>{album.artist.name}</span></h3>
-              </div>
-            </Card>
-          </Col>
+            </div>
+          </Box>
         ));
-        return <Row key={`albums-row-${index}`}>
+        return <Flex key={`albums-row-${index}`}>
           {arts}
-        </Row>
+        </Flex>
       });
 
     return <LoaderProxy {...this.props}>
