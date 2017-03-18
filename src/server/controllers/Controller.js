@@ -75,8 +75,9 @@ export const updateable = (name, findById) => ({
 export const oneToMany = (name, childName, findChildren) => ({
   [`/api/v2/${pluralize(name)}/:id/${pluralize(childName)}`]: {
     get: async (ctx) => {
-      let children = await findChildren({[name]: ctx.params.id - 0});
-      
+      let children = await findChildren(Object.assign({},
+        {[name]: ctx.params.id - 0}, ctx.query));
+
       ctx.body = children.map(child => child.props);
       return;
     }
