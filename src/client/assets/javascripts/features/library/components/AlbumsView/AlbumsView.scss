@@ -14,9 +14,15 @@
       color: #fff;
       .album {
         font-weight: bold;
+
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
       .artist {
-
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
     }
   }

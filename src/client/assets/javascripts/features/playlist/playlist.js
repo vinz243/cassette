@@ -22,7 +22,8 @@ export default function reducer (state = initialState, action) {
   switch(action.type) {
     case SET_TRACKS:
       return Object.assign({}, state, {
-        nextStack: action.tracks
+        nextStack: action.tracks.slice(1),
+        current: action.tracks[0]
       });
     case ADD_NEXT:
       return Object.assign({}, state, {

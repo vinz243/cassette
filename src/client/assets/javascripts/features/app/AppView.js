@@ -40,11 +40,21 @@ export default class AppView extends Component {
               <SidebarView {...this.props} />
             </Box>
             <Box auto style={{
-                'margin-left': '90px'
+                'margin-left': '90px',
+                'margin-right': '300px'
               }}>
               {this.props.children}
             </Box>
-            <Box>
+            <Box style={{
+                'zIndex': 998,
+                'position': 'fixed',
+                'right': '0',
+                'box-shadow': '0px 0px 18px 0px rgba(0,0,0,0.75)',
+                'background-color': 'rgb(45, 45, 46)',
+                'top': '64px',
+                'bottom': '0px',
+                'width': '275px'
+              }}>
               <PlaylistView {...this.props} />
             </Box>
           </Flex>

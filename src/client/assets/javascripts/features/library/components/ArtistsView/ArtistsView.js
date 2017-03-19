@@ -15,7 +15,7 @@ export default class ArtistsView extends Component {
 
   }
   render() {
-    const COLUMNS = 6;
+    const COLUMNS = 12;
     let artists = chunk(this.props.library.items.artists,
       COLUMNS).map((arr, index) => {
         let arts = arr.map((artist) => (

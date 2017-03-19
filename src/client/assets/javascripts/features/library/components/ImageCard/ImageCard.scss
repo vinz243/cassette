@@ -8,6 +8,10 @@
   }
   .description {
     padding: 0.5em;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 }
 .imageCard:hover {
