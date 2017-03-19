@@ -6,6 +6,7 @@ import ToolbarView from 'features/toolbar/components/ToolbarView';
 import LibraryView from 'features/library/components/LibraryView';
 import SidebarView from 'features/sidebar/components/SidebarView';
 import UpdaterView from 'features/updater/components/UpdaterView';
+import PlaylistView from 'features/playlist/components/PlaylistView';
 import JobsView from 'features/jobs/components/JobsView';
 
 import axios from 'axios';
@@ -42,6 +43,9 @@ export default class AppView extends Component {
                 'margin-left': '90px'
               }}>
               {this.props.children}
+            </Box>
+            <Box>
+              <PlaylistView {...this.props} />
             </Box>
           </Flex>
           <UpdaterView {...this.props} />
