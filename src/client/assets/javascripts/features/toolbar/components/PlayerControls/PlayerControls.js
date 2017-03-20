@@ -3,16 +3,9 @@ import React, { Component, PropTypes } from 'react';
 // import './ToolbarApp.scss';
 import {Button, Row, Col} from 'antd';
 import { Slider } from "@blueprintjs/core";
-import 'antd/dist/antd.css';
+
 import './PlayerControls.scss';
 import {Flex, Box} from 'reflexbox';
-import GoPlaybackRewind from 'react-icons/lib/go/playback-rewind';
-import GoPlaybackPause from 'react-icons/lib/go/playback-pause';
-import GoPlaybackPlay from 'react-icons/lib/go/playback-play';
-import GoPlaybackFastForward from 'react-icons/lib/go/playback-fast-forward';
-
-import GoMute from 'react-icons/lib/go/mute';
-import GoUnmute from 'react-icons/lib/go/unmute';
 
 import classNames from 'classnames';
 
@@ -22,12 +15,10 @@ export default class PlayerControls extends Component {
     toolbar: PropTypes.object.isRequired
   };
   rewind(e) {
-    const { toolbar, actions } = this.props;
-    actions.playPrevious();
+    this.props.actions.playPreviousTrack();
   }
   fastForward(e) {
-    const { toolbar, actions } = this.props;
-    actions.playNext();
+    this.props.actions.playNextTrack();
   }
   pauseUnpause(e) {
     const { toolbar, actions } = this.props;
@@ -66,7 +57,7 @@ export default class PlayerControls extends Component {
     		<div className="playerControls">
           <Flex justify="space-between">
             <Box ml={2}>
-    					<span className={classNames('rewindControl', {
+    					<span onClick={boundRewind} className={classNames('rewindControl', {
                   disabled: !(toolbar.previousTracks.length > 0 || toolbar.currentTrack)
                 }, 'pt-icon-standard pt-icon-step-backward')}></span>
             </Box>

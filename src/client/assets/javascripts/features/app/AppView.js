@@ -18,42 +18,42 @@ export default class AppView extends Component {
       <div className="rootContainer" style={{
         }}>
         <div className="toolbarContainer" style={{
-          'box-shadow': '0px 0px 12px 0px rgba(0,0,0,0.75)',
-          'width': '100%',
-          'zIndex': 999,
-          'position': 'fixed',
+          boxShadow: '0px 0px 12px 0px rgba(0,0,0,0.75)',
+          width: '100%',
+          zIndex: 999,
+          position: 'fixed',
         }}>
           <ToolbarView {...this.props} />
         </div>
         <div className="bodyContainer" style={{
-            'padding-top': '64px'
+            paddingTop: '64px'
           }}>
           <Flex align="center" justify="space-between">
             <Box style={{
-                'zIndex': 998,
-                'position': 'fixed',
-                'box-shadow': '0px 0px 18px 0px rgba(0,0,0,0.75)',
-                'background-color': 'rgb(45, 45, 46)',
-                'top': '64px',
-                'bottom': '0px'
+                zIndex: 998,
+                position: 'fixed',
+                boxShadow: '0px 0px 18px 0px rgba(0,0,0,0.75)',
+                backgroundColor: 'rgb(45, 45, 46)',
+                top: '64px',
+                bottom: '0px'
               }} >
               <SidebarView {...this.props} />
             </Box>
             <Box auto style={{
-                'margin-left': '90px',
-                'margin-right': '300px'
+                marginLeft: '90px',
+                marginRight: '300px'
               }}>
               {this.props.children}
             </Box>
             <Box style={{
-                'zIndex': 998,
-                'position': 'fixed',
-                'right': '0',
-                'box-shadow': '0px 0px 18px 0px rgba(0,0,0,0.75)',
-                'background-color': 'rgb(45, 45, 46)',
-                'top': '64px',
-                'bottom': '0px',
-                'width': '275px'
+                zIndex: 998,
+                position: 'fixed',
+                right: '0',
+                boxShadow: '0px 0px 18px 0px rgba(0,0,0,0.75)',
+                backgroundColor: 'rgb(45, 45, 46)',
+                top: '64px',
+                bottom: '0px',
+                width: '275px'
               }}>
               <PlaylistView {...this.props} />
             </Box>

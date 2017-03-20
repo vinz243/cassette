@@ -22,7 +22,7 @@ export default class LibraryLayout extends Component {
           [item.album._id]: Object.assign({}, item.album, {
             tracks: ((acc[item.album._id] || {}).tracks || []).concat(
               Object.assign({}, item, {
-                playing:  (this.props.toolbar.currentTrack || {})._id === item._id
+                playing:  (this.props.playlist.current || {})._id === item._id
               }))
           }, {
             artist: item.artist

@@ -38,7 +38,7 @@ export default function reducer (state = initialState, action) {
     case PREVIOUS_TRACK:
       return Object.assign({}, state, {
         current: state.prevStack[0],
-        nextStack: [state.current, ...state.prevStack],
+        nextStack: [state.current, ...state.nextStack],
         prevStack: [...state.prevStack.slice(1)]
       });
     case CLEAR:

@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
 import './AudioPlayer.scss';
-import throttle from 'lodash/throttle';
 
 export default class AudioPlayer extends Component {
   constructor() {
@@ -29,16 +28,25 @@ export default class AudioPlayer extends Component {
     this.audio.addEventListener('loadedmetadata', (evt) => {
       this.range.max = this.audio.duration * 1000;
     });
-    this.audio.addEventListener('timeupdate', throttle((evt) => {
-      this.range.value = this.audio.currentTime * 1000;
-      this.updateProgress();
-    }), 0);
-    this.range.onchange = throttle((evt) => {
-      this.updateProgress(this.range.value);
+    this.audio.addEventListener('timeupdate', (evt) => {
+      window.requestAnimationFrame(() => {
+        this.range.value = this.audio.currentTime * 1000;
+        this.updateProgress();
+      });
+    });
+    this.audio.addEventListener('ended', (e) => {
+      if (this.props.onEnded) {
+        this.props.onEnded(e);
+      }
+    });
+    this.range.onchange = (evt) => {
+      window.requestAnimationFrame(() => {
+        this.updateProgress(this.range.value);
+      });
       if (this.range.value  !== this.audio.currentTime) {
         this.audio.currentTime = this.range.value / 1000;
       }
-    }, 0);
+    };
   }
   componentWillMount() {
 
