@@ -30,9 +30,16 @@ export default class AlbumStreamView extends Component {
   }
   render() {
     const { album } = this.props;
+    console.log(this.props);
     let tracksDOM = album.tracks.map((t) => (
       <div className={classnames('trackItem', {'playing': t.playing})} key={t._id}>
-        <Flex onClick={this.playTracks.bind(this, t.trackNumber)}>
+        <Flex onClick={(evt) => {
+            if (evt.altKey) {
+              this.props.playNext(t);
+            } else {
+              this.playTracks(t.trackNumber)
+            }
+          }}>
           <Box className="trackNumber" ml={1}>
             {t.playing ? <div className={classnames('spinner', {'paused': this.props.paused})}>
               <div className="bounce1"></div>
@@ -47,6 +54,14 @@ export default class AlbumStreamView extends Component {
             <span className="nameExt">
               {/*t.name*/}
             </span>
+          </Box>
+          <Box className="actions" mr={1}>
+            <span className="pt-icon-standard pt-icon-add-to-artifact" onClick={
+                (evt) => {
+                  evt.stopPropagation();
+                  this.props.playNext(t);
+                }
+              }></span>
           </Box>
           <Box className="duration" mr={1}>
             {this.msToTime(t.duration * 1000)}

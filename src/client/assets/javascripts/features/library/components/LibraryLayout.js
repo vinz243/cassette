@@ -34,7 +34,9 @@ export default class LibraryLayout extends Component {
           playTracks={(tracks) => {
             actions.playTracks(tracks);
             actions.setTracks(tracks);
-          }} />);
+          }} playNext={
+            actions.addAsNext
+          } />);
       // content = <ListView {...this.props}/>
     }
     return (

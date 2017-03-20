@@ -100,6 +100,11 @@ $transitionTime: 250ms;
     text-align: right;
     width: 30px;
   }
+  .actions {
+    span {
+      color: #31313b;
+    }
+  }
   &.playing {
     background-color: #ebe7e7;
     -webkit-transition: background-color $transitionTime ease-in-out;
