@@ -89,6 +89,7 @@ $transitionTime: 250ms;
   }
   .duration, .nameExt, .trackNumber {
     color: #9f9f9f;
+    transition: color 0.1s ease-in-out;
   }
   .spin {
     margin-bottom: 0.125em;
@@ -102,13 +103,35 @@ $transitionTime: 250ms;
   }
   .actions {
     span {
-      color: #31313b;
+      transition: color 0.1s ease-in-out;
+      color: rgba(49, 49, 59, 0);
     }
+  }
+  .trackTitle {
+    transition: color 0.1s ease-in-out;
+    color: rgba(65, 65, 75, 1);
   }
   &.playing {
     background-color: #ebe7e7;
     -webkit-transition: background-color $transitionTime ease-in-out;
     -ms-transition: background-color $transitionTime ease-in-out;
     transition: background-color $transitionTime ease-in-out;
+  }
+}
+.trackItem:hover {
+
+  .duration, .nameExt, .trackNumber {
+    color: #62646c;
+    transition: color 0.1s ease-in-out;
+  }
+  .actions {
+    span {
+      transition: color 0.1s ease-in-out;
+      color: #31313b;
+    }
+  }
+  .trackTitle {
+
+    color: rgba(16, 16, 20, 1);
   }
 }
