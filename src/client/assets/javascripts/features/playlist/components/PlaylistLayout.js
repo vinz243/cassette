@@ -63,12 +63,18 @@ export default class PlaylistLayout extends Component {
             itemKey="_id"
             template={PlaylistItem}
             onMoveEnd={this.onMoveEnd.bind(this)}
+            commonProps={{
+              play: (id) => {
+                let index = playlist.nextStack.findIndex((el) => el._id === id);
+                actions.jumpTo(index);
+              }
+            }}
             container={() => this.div} />
         </div>
         {playlist.current.album ?
           <img src={`/api/v2/albums/${
               playlist.current.album._id
-            }/artwork?size=300`} /> :
+            }/artwork?size=275`} /> :
           <span className="pt-icon-standard pt-icon-pulse"></span>}
       </div>
     );

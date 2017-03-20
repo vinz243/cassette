@@ -49,9 +49,9 @@ export default function reducer (state = initialState, action) {
     case JUMP_TO:
       if (action.index >= 0) {
         return Object.assign({}, state, {
-          nextStack: [...state.nextStack.slice(action.index)],
+          nextStack: [...state.nextStack.slice(action.index + 1)],
           prevStack: [state.current, ...state.prevStack],
-          current: state.nextStack[0]
+          current: state.nextStack[action.index]
         });
       }
       return state;
