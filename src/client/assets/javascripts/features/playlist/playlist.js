@@ -1,6 +1,6 @@
 import {createStructuredSelector} from 'reselect';
-import assign from 'lodash/assign';
 import assert from 'assert';
+import shortid from 'shortid';
 
 const SET_TRACKS      = 'cassette/playlist/SET_TRACKS';
 const ADD_NEXT        = 'cassette/playlist/ADD_NEXT';
@@ -111,16 +111,18 @@ export const selector = createStructuredSelector({
 });
 
 function setTracks (tracks) {
+  const uid = shortid.generate();
   return {
     type: SET_TRACKS,
-    tracks
+    tracks: tracks.map((track) => Object.assign({}, track, {uid}))
   }
 }
 
 function addAsNext (track) {
+  const uid = shortid.generate();
   return {
     type: ADD_NEXT,
-    track
+    track: Object.assign({}, track, {uid})
   }
 }
 

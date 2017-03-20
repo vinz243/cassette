@@ -60,7 +60,7 @@ export default class PlaylistLayout extends Component {
         <div className="playlistView" ref={(ref) => this.div = ref}>
           <DraggableList
             list={playlist.nextStack}
-            itemKey="_id"
+            itemKey="uid"
             template={PlaylistItem}
             onMoveEnd={this.onMoveEnd.bind(this)}
             commonProps={{

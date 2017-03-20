@@ -49,8 +49,7 @@ export default class CurrentTrackStatus extends Component {
   }
   render() {
     const { playlist, actions, toolbar } = this.props;
-    const boundHandleTimeStatusChange =
-      this.handleTimeStatusChange.bind(this);
+    const current = playlist.current;
 
     const boundTipFormattter = this.tipFormatter.bind(this);
 
@@ -59,12 +58,12 @@ export default class CurrentTrackStatus extends Component {
     	<div className="currentTrackStatus">
 	    	<div>
 	    		<Row gutter={24} className="currentTrackStatusRow">
-            <div className="currentTrackTitle">{(playlist.current || {}).name}
-               &#8212; {((playlist.current || {}).artist || {}).name}</div>
+            <div className="currentTrackTitle">{(current || {}).name}
+               &#8212; {((current || {}).artist || {}).name}</div>
             <div className="currentTrackTime">
             <AudioPlayer source={
-                playlist.current ?
-                `/api/v2/tracks/${playlist.current._id}/stream` : ''
+                current ?
+                `/api/v2/tracks/${current._id}/stream?${current.uid}` : ''
               } playing={toolbar.playing} onEnded={this.onEnded.bind(this)}/>
             </div>
 	    		</Row>
