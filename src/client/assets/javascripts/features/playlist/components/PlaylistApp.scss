@@ -1,7 +1,7 @@
 .playlistView {
   padding: 1.4em;
   color: #fff;
-  height: 60vh;
+  height: 47vh;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     -webkit-appearance: none;
@@ -14,6 +14,15 @@
   }
 }
 
+.currentTrackInfo {
+  color: #fff;
+  padding: 0.7em;
+  background-color: rgba(23, 25, 26, 0.37);
+
+  .title {
+    font-weight: bold;
+  }
+}
 .pt-icon-pulse {
   font-size: 3em !important;
   /* margin: auto; */

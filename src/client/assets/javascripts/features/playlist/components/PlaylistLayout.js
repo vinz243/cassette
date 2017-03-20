@@ -71,6 +71,11 @@ export default class PlaylistLayout extends Component {
             }}
             container={() => this.div} />
         </div>
+        <div className="currentTrackInfo">
+          <div className="title">{playlist.current.name}</div>
+          <div className="artist">{playlist.current.artist.name}</div>
+          <div className="album">{playlist.current.album.name}</div>
+        </div>
         {playlist.current.album ?
           <img src={`/api/v2/albums/${
               playlist.current.album._id

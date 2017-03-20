@@ -16,7 +16,15 @@ export const NAME = 'playlist';
 const initialState = {
   nextStack: [],
   prevStack: [],
-  current: {}
+  current: {
+    name: 'Nothing playing',
+    artist: {
+      name: 'Please select a track'
+    },
+    album: {
+      name: 'To listen it'
+    }
+  }
 }
 export default function reducer (state = initialState, action) {
   switch(action.type) {
