@@ -1,4 +1,24 @@
 .playlistView {
-  margin: 1.4em;
+  padding: 1.4em;
   color: #fff;
+  height: 60vh;
+  overflow-y: scroll;
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 7px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, .5);
+    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+  }
+}
+
+.pt-icon-pulse {
+  font-size: 3em !important;
+  /* margin: auto; */
+  width: 100%;
+  height: 40vh;
+  text-align: center;
+  line-height: 30vh !important;
 }

@@ -124,7 +124,7 @@ function playTracks(tracks) {
 function loadContent(opts) {
   switch (opts.scope) {
     case 'ARTISTS':
-      return axios.get(`/api/v2/artists`).then((res) => {
+      return axios.get(`/api/v2/artists?sort=name`).then((res) => {
         return {
           type: LOAD_CONTENT,
           data: {
@@ -134,7 +134,7 @@ function loadContent(opts) {
       });
     case 'ALBUMS':
       return axios.get(`/api/v2${opts.artist ?
-        '/artists/' + opts.artist : ''}/albums`).then((res) => {
+        '/artists/' + opts.artist : ''}/albums?sort=artist`).then((res) => {
         return {
           type: LOAD_CONTENT,
           data: {

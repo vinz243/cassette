@@ -1,0 +1,42 @@
+.playlistItem {
+  padding: 0.6em;
+  background-color: rgb(45, 45, 46);
+  cursor: pointer;
+  border-radius: 2px;
+
+  .dragHandle {
+    color: rgba(0, 0, 0, 0);
+    transition: color 0.2s ease-in-out;
+    float: left;
+    margin-top: 4px;
+  }
+  .artist {
+    margin-left: 20px;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  .title {
+    margin-left: 20px;
+    font-weight: bold;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+.playlistItem:hover, .playlistItem.dragged {
+  .dragHandle {
+    color: rgba(255, 255, 255, 0.76);
+    transition: color 0.2s ease-in-out;
+    cursor: ns-resize;
+  }
+}
+
+.playlistItem.playing {
+  margin-bottom: 10px;
+  background-color: rgb(66, 66, 74);
+  color: rgb(191, 191, 191);
+  cursor: default;
+}

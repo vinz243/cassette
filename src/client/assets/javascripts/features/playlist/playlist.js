@@ -61,7 +61,7 @@ export default function reducer (state = initialState, action) {
       assert(action.to >= 0);
       assert(action.to <= state.nextStack.length);
 
-      if (action.from !== action.to) {
+      if (action.from === action.to) {
         return state;
       }
 
@@ -69,9 +69,9 @@ export default function reducer (state = initialState, action) {
         return Object.assign({}, state, {
           nextStack: [
             ...state.nextStack.slice(0, action.from),
-            ...state.nextStack.slice(action.from + 1, action.to),
+            ...state.nextStack.slice(action.from + 1, action.to + 1),
             ...state.nextStack.slice(action.from, action.from + 1),
-            ...state.nextStack.slice(action.to)
+            ...state.nextStack.slice(action.to + 1)
           ]
         });
       } else if (action.from > action.to){
