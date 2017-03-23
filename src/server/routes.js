@@ -3,20 +3,20 @@ import artistsController from './controllers/artists';
 // import configController from './controllers/config';
 import librariesController from './controllers/libraries';
 import tracksController from './controllers/tracks';
+import scansController from './controllers/scans';
 // import filesController from './controllers/files';
 import features from './features';
 // import jobController from './controllers/job';
 
 let routes = {};
 
-// Object.assign(routes, configController);
-// Object.assign(routes, jobController);
-Object.assign(routes, artistsController,
-                  albumsController, tracksController, librariesController);
-// Object.assign(routes, albumsController);
-// Object.assign(routes, librariesController);
-// Object.assign(routes, tracksController);
-// Object.assign(routes, filesController);
+Object.assign(routes,
+  artistsController,
+  albumsController,
+  tracksController,
+  librariesController,
+  scansController);
+  
 Object.assign(routes, features)
 
 export default function (router) {

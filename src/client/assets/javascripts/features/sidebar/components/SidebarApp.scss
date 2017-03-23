@@ -13,10 +13,31 @@
   div {
     padding: 0.6em 1.2em;
     display: block !important;
+    cursor: pointer;
+
     .itemName {
       padding-left: 1.2em;
       padding-right: 1.2em;
       display: none;
+    }
+    &:not(.divider){
+      &:hover {
+        background-color: #fff;
+        color: #000;
+      }
+    }
+    .working {
+      animation: spin 3s infinite linear;
+    }
+    &.working {
+      cursor: default;
+      background-color: rgba(255, 255, 255, 0);
+      color: #a3a3a3;
+      &:hover {
+        cursor: default;
+        background-color: rgba(255, 255, 255, 0);
+        color: #a3a3a3;
+      }
     }
     &.selected {
       background-color: rgba(255, 255, 255, 0.26);
@@ -26,66 +47,18 @@
     }
     &.bottom {
     }
-    &:not(.divider) {
-      &:hover {
-        cursor: pointer;
-        background-color: #fff;
-        //
-        // background: linear-gradient(to right,
-        //   rgb(255, 255, 255) 0%,
-        //   rgb(255, 255, 255) 80%,
-        //   rgb(201, 201, 201) 100%);
-        color: #000;
-      }
-    }
+  }
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
   }
 }
 .sidebar:hover {
   .itemName {
     display: inline-block;
   }
-}
-
-.addButton {
-  cursor: pointer;
-}
-
-.parentItem {
-  text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.35);
-  margin-bottom: 1em;
-}
-
-.childrenItem {
-  color: rgba(0, 0, 0, 0.35);
-  margin-left: 1em;
-}
-
-.newLibraryPath {
-    background-color: rgba(255, 255, 255, 0.11);
-    border-width: 0;
-    color: white;
-}
-
-.newLibraryName {
-  background-color: rgba(255, 255, 255, 0.11);
-  border-width: 0;
-  color: white;
-}
-
-.storeLinkParent {
-    margin-top: 3.5em;
-}
-.storeLink, .storeLink:hover, .storeLink:focus{
-  text-transform: uppercase;
-  text-decoration: none;
-  color: rgba(0, 0, 0, 0.35);
-}
-.librariesLink, .librariesLink:hover, .librariesLink:focus {
-  text-transform: uppercase;
-  text-decoration: none;
-  color: rgba(0, 0, 0, 0.35);
-}
-.menuItem {
-  font-size: 1.3em;
 }

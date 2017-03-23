@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import PlayerControls from './PlayerControls';
 import CurrentTrackStatus from './CurrentTrackStatus';
-import BrowserControls from './BrowserControls';
 
 import './ToolbarApp.scss';
 

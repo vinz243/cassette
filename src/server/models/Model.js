@@ -97,7 +97,7 @@ export const assignFunctions = (obj, ...sources) => {
     // a bit like middlewares. This allows things like postPopulate
     // for populating all childs with several manyToOne.
     if (key.startsWith('post')) {
-      const method = key.slice(4)[0].toLowerCase() + key.slice(5);
+      const method = key[4].toLowerCase() + key.slice(5);
       object[method] = (function (fun) {
         return (...args) => {
           let res = fun(...args);
@@ -108,8 +108,20 @@ export const assignFunctions = (obj, ...sources) => {
             return srcValue(res);
           }
         }
-      })(object[method])
+      })(object[method]);
     } else if (key.startsWith('pre')) {
+      // const method = key[3].toLowerCase() + key.slice(4);
+      // object[method] = (function (fun) {
+      //   return (...args) => {
+      //     if (res && res.then) {
+      //       return res.then(srcValue).then((...transformedArgs) => {
+      //         let res = fun(...transformedArgs);
+      //       });
+      //     } else {
+      //       return srcValue(res);
+      //     }
+      //   }
+      // })(object[method]);
 
     } else if (descriptor.get) {
       object.__defineGetter__(key, () => source[key]);
