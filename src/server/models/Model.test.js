@@ -100,6 +100,113 @@ test('assignFunctions - should stack post async', async t => {
   t.is(await obj.update(), 'update post past');
 });
 
+
+test('assignFunctions - should stack pre sync', t => {
+  let obj = {
+    foo: (...args) => {
+      return args.map(str => str.split('').reverse().join(''));
+    }
+  };
+  t.deepEqual(obj.foo('beep', 'flop', 'pop'), ['peeb', 'polf', 'pop']);
+  let hook1 = {
+    preFoo: (beep, flip, pop) => {
+      return [`bop ${beep}`, `flop ${flip}`, `pop`];
+    }
+  }
+  let hook2 = {
+    preFoo: (bop, flop, pop) => {
+      return [`beep ${bop}`, `flip ${flop}`, `pop`];
+    }
+  }
+  let object = assignFunctions({}, obj, hook2, hook1);
+  let res = object.foo('beep', 'flip', 'pot');
+  t.deepEqual(res, ['peeb pob peeb', 'pilf polf pilf', 'pop']);
+});
+
+test('assignFunctions - should stack pre sync with async function', async t => {
+  const delay = (ms) => {
+    return new Promise((res) => setTimeout(res, ms));
+  };
+
+  let obj = {
+    foo: async (...args) => {
+      await delay(100);
+      return args.map(str => str.split('').reverse().join(''));
+    }
+  };
+  let hook1 = {
+    preFoo: ((beep, flip, pop) => {
+      return [`bop ${beep}`, `flop ${flip}`, `pop`];
+    })
+  }
+  let hook2 = {
+    preFoo: ((bop, flop, pop) => {
+      return [`beep ${bop}`, `flip ${flop}`, `pop`];
+    })
+  }
+  let object = assignFunctions({}, obj, hook2, hook1);
+  let res = await object.foo('beep', 'flip', 'pot');
+  t.deepEqual(res, ['peeb pob peeb', 'pilf polf pilf', 'pop']);
+
+});
+test('assignFunctions - should stack pre async with async function', async t => {
+  const delay = (ms) => {
+    return new Promise((res) => setTimeout(res, ms));
+  };
+
+  let obj = {
+    foo: async (...args) => {
+      await delay(100);
+      return args.map(str => str.split('').reverse().join(''));
+    }
+  };
+  let hook1 = {
+    preFoo: async (beep, flip, pop) => {
+      await delay(100);
+      return [`bop ${beep}`, `flop ${flip}`, `pop`];
+    }
+  }
+  let hook2 = {
+    preFoo: async (bop, flop, pop) => {
+      await delay(100);
+      return [`beep ${bop}`, `flip ${flop}`, `pop`];
+    }
+  }
+  let object = assignFunctions({}, obj, hook2, hook1);
+  let res = await object.foo('beep', 'flip', 'pot');
+  t.deepEqual(res, ['peeb pob peeb', 'pilf polf pilf', 'pop']);
+});
+test('assignFunctions - should support both pre and post hook', async t => {
+  const delay = (ms) => {
+    return new Promise((res) => setTimeout(res, ms));
+  };
+
+  const obj = {
+    foo: async (...args) => {
+      await delay(100);
+      return args.map(str => str.split('').reverse().join(''));
+    }
+  };
+  const hook1 = {
+    preFoo: async (beep, flip, pop) => {
+      await delay(100);
+      return [`bop ${beep}`, `flop ${flip}`, `pop`];
+    }
+  }
+  const hook2 = {
+    postFoo: async ([bop, flop, pop]) => {
+      await delay(100);
+      return [`beep ${bop}`, `flip ${flop}`, `pop`];
+    }
+  }
+  const object1 = assignFunctions({}, obj, hook1, hook2);
+  const object2 = assignFunctions({}, obj, hook2, hook1);
+  const res1 = await object1.foo('beep', 'flip', 'pot');
+  const res2 = await object2.foo('beep', 'flip', 'pot');
+  t.deepEqual(res1, [ 'beep peeb pob', 'flip pilf polf', 'pop' ])
+  t.deepEqual(res2, [ 'beep peeb pob', 'flip pilf polf', 'pop' ])
+})
+
 test('defaultFunctions - returns standard failing function', t => {
   let obj = defaultFunctions({});
   t.truthy(obj.update);

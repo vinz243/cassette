@@ -110,18 +110,28 @@ export const assignFunctions = (obj, ...sources) => {
         }
       })(object[method]);
     } else if (key.startsWith('pre')) {
-      // const method = key[3].toLowerCase() + key.slice(4);
-      // object[method] = (function (fun) {
-      //   return (...args) => {
-      //     if (res && res.then) {
-      //       return res.then(srcValue).then((...transformedArgs) => {
-      //         let res = fun(...transformedArgs);
-      //       });
-      //     } else {
-      //       return srcValue(res);
-      //     }
-      //   }
-      // })(object[method]);
+      const method = key[3].toLowerCase() + key.slice(4);
+      object[method] = (function (fun) {
+        return (...args) => {
+          let res = srcValue(...args);
+          if (res && res.then) {
+            return res.then((transformedArgs) => {
+              if (!transformedArgs.length) {
+                // Pre-hook resolved undefined, then we call source
+                // With original args
+                return fun(...args);
+              }
+              return fun(...transformedArgs);
+            });
+          } else {
+            if (res.length) {
+              return fun(...res);
+            } else {
+              return fun(...args);
+            }
+          }
+        }
+      })(object[method]);
 
     } else if (descriptor.get) {
       object.__defineGetter__(key, () => source[key]);
