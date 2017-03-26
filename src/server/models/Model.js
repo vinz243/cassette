@@ -109,6 +109,8 @@ export const assignFunctions = (obj, ...sources) => {
           }
         }
       })(object[method]);
+    // This is a pre-hook. While post-hook can mutate the result of the core
+    // function, pre-hook can mutates its arguments. Useful for defaults.
     } else if (key.startsWith('pre')) {
       const method = key[3].toLowerCase() + key.slice(4);
       object[method] = (function (fun) {

@@ -205,7 +205,30 @@ test('assignFunctions - should support both pre and post hook', async t => {
   const res2 = await object2.foo('beep', 'flip', 'pot');
   t.deepEqual(res1, [ 'beep peeb pob', 'flip pilf polf', 'pop' ])
   t.deepEqual(res2, [ 'beep peeb pob', 'flip pilf polf', 'pop' ])
-})
+});
+
+test('assignFunctions - does not call core if error raised', async t => {
+  const delay = (ms) => {
+    return new Promise((res) => setTimeout(res, ms));
+  };
+
+  const obj = {
+    foo: sinon.spy(async (...args) => {
+      await delay(100);
+      return args.map(str => str.split('').reverse().join(''));
+    })
+  };
+  const hook1 = {
+    preFoo: async (beep, flip, pop) => {
+      await delay(100);
+      throw new Error('Oops, something wrong happened');
+    }
+  }
+  const object = assignFunctions({}, obj, hook1);
+  t.throws(object.foo('beep', 'flip', 'pot'));
+  t.false(obj.foo.called);
+});
+
 
 test('defaultFunctions - returns standard failing function', t => {
   let obj = defaultFunctions({});
