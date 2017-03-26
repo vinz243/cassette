@@ -300,9 +300,26 @@ export const defaultValues = (state, mutators) => {
         }
       }
     });
-  }
+  };
   return {
     preUpdate: hook,
     preCreate: hook
-  }
+  };
+}
+
+export const validator = (state, ...validators) => {
+  const val = Object.assign({}, ...validators);
+  const hook = function () {
+    Object.keys(val).forEach((key) => {
+      let validators = [].concat(val[key]);
+      const values = validators.map(validate => validate(state.props[key]));
+      const [value] = values.slice(-1);
+      state.props[key] = value;
+    });
+  };
+
+  return {
+    preUpdate: hook,
+    preCreate: hook
+  };
 }

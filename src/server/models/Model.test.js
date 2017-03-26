@@ -11,7 +11,8 @@ import {
     findOneFactory,
     findFactory,
     findOrCreateFactory,
-    defaultValues
+    defaultValues,
+    validator
   } from './Model';
 import test from 'ava';
 import sinon from 'sinon';
@@ -645,3 +646,23 @@ test('defaultValues - mutate state props', t => {
     }
   })
 });
+
+test('validator - does not mutate valid props', t => {
+  const state = {
+    props: {
+      string: 'a string',
+      boolean: true,
+      int: 42
+    }
+  };
+  const validators = {
+    string: sinon.spy(val => val),
+    boolean: sinon.spy(val => val),
+    int: [sinon.spy(val => val)],
+  }
+  const {preUpdate} =  validator(state, validators);
+  preUpdate();
+  t.deepEqual(validators.string.args, [['a string']]);
+  t.deepEqual(validators.boolean.args, [[true]]);
+  t.deepEqual(validators.int[0].args, [[42]]);
+})
