@@ -30,7 +30,6 @@ export default class ToolbarLayout extends Component {
 
   render() {
     const { toolbar, actions } = this.props;
-    console.log(this.props);
     return (
     	<div>
         <Flex className="mainRow" align="center" justify="space-between">

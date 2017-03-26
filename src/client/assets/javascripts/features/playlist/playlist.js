@@ -111,10 +111,11 @@ export const selector = createStructuredSelector({
 });
 
 function setTracks (tracks) {
-  const uid = shortid.generate();
   return {
     type: SET_TRACKS,
-    tracks: tracks.map((track) => Object.assign({}, track, {uid}))
+    tracks: tracks.map((track) => Object.assign({}, track, {
+      uid: shortid.generate()
+    }))
   }
 }
 

@@ -53,10 +53,22 @@ export const Scan = function(props) {
         process.nextTick(() => {
           if ((state.props.mode || '').toLowerCase() === 'all') {
             let time = 0;
+            let hasErrors = false;
+
             return findLibraries({}).then((libs) => {
               time = Date.now();
               return Promise.all(libs.map(lib => scan(lib.props._id)));
             }).then(() => {
+              if (hasErrors) {
+                state.functions.set('statusCode', 'FAILED');
+                state.functions.set('statusMessage',
+                  'At least one scan failed with errors. ' +
+                  'Please check the logs for more details...');
+                state.functions.update().catch(err => {
+                  mainStory.fatal('scanner', 'Could not update scan', {attach: err});
+                });
+                return;
+              }
               mainStory.info('scanner', 'All scans finished without raising error.');
               state.functions.set('statusCode', 'DONE');
               state.functions.set('statusMessage', 'Scan finished without error.');
@@ -64,14 +76,8 @@ export const Scan = function(props) {
 
               return state.functions.update();
             }).catch((e) => {
-              mainStory.error('scanner', 'Scan failed with errors', {attach: e});
-              state.functions.set('statusCode', 'FAILED');
-              state.functions.set('statusMessage',
-                'At least one scan failed with errors. ' +
-                'Please check the logs for more details...');
-              state.functions.update().catch(err => {
-                mainStory.fatal('scanner', 'Could not update scan', {attach: err});
-              })
+              hasErrors = true;
+              mainStory.error('scanner', 'One scan failed with errors', {attach: e});
             });
           }
           if (!state.props._id) {

@@ -31,8 +31,8 @@ export default class LoaderProxy extends Component {
         </div>
       )
     }
-    return (<span>
+    return (<div>
       {this.props.children}
-    </span>)
+    </div>)
   }
 }

@@ -78,6 +78,7 @@
     "snake-case": "^2.1.0",
     "storyboard": "^2.3.1",
     "tingodb": "^0.5.1",
+    "titlecase": "^1.1.2",
     "touch": "^1.0.0",
     "underscore.string": "3.3.4",
     "walk-sync": "^0.3.1",

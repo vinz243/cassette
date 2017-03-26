@@ -30,7 +30,6 @@ export default class AlbumStreamView extends Component {
   }
   render() {
     const { album } = this.props;
-    console.log(this.props);
     let tracksDOM = album.tracks.map((t) => (
       <div className={classnames('trackItem', {'playing': t.playing})} key={t._id}>
         <Flex onClick={(evt) => {

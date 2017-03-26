@@ -44,7 +44,7 @@ function scanLibraries () {
 function waitScan(scanId) {
   return new Promise((resolve, reject) => {
     function wait (res) {
-      if (res.data.statusCode !== 'PENDING')
+      if (res.data.statusCode && res.data.statusCode !== 'PENDING')
         return resolve({
           type: WAIT_SCAN,
           res
