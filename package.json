@@ -184,15 +184,12 @@
   "ava": {
     "babel": {
       "babelrc": false,
-      "presets": [
-        "es2015",
-        "es2016",
-        "stage-0"
-      ],
+      "presets": [],
       "env": {
         "test": {
           "plugins": [
-            "istanbul"
+            "istanbul",
+            "babel-plugin-transform-es2015-modules-commonjs"
           ]
         }
       },
