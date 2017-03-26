@@ -11,6 +11,7 @@ import {
     findOneFactory,
     findFactory,
     findOrCreateFactory,
+    defaultValues
   } from './Model';
 import test from 'ava';
 import sinon from 'sinon';
@@ -613,3 +614,34 @@ test.serial('integration - remove', async t => {
   let none = await find({name: 'Meriadioc Brandybuck'});
   t.is(none.length, 0);
 })
+
+test('defaultValues - mutate state props', t => {
+  const state = {
+    props: {
+      valid: 'valid',
+      emptyString: '',
+      otherEmptyString: '',
+      boolean: false,
+      nullBool: undefined
+    }
+  };
+
+  const hook = defaultValues(state, {
+    valid: () => 'true',
+    emptyString: 'not so empty',
+    boolean: true,
+    nullBool: false,
+    someNumber: () => 42
+  });
+  hook.preUpdate()
+  t.deepEqual(state, {
+    props: {
+      valid: 'valid',
+      emptyString: 'not so empty',
+      otherEmptyString: '',
+      boolean: false,
+      nullBool: false,
+      someNumber: 42
+    }
+  })
+});

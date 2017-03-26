@@ -285,3 +285,24 @@ export const removeable = (state, db = getDatabase(state.name)) => ({
     return;
   }
 })
+
+
+export const defaultValues = (state, mutators) => {
+  const hook = function () {
+    Object.keys(mutators).forEach((name) => {
+      const mutator = mutators[name];
+      const prop = state.props[name];
+      if (!prop && !['boolean', 'number'].includes(typeof prop)) {
+        if (typeof mutator === 'function') {
+          state.props[name] = mutator();
+        } else {
+          state.props[name] = mutator;
+        }
+      }
+    });
+  }
+  return {
+    preUpdate: hook,
+    preCreate: hook
+  }
+}
