@@ -649,7 +649,7 @@ test('defaultValues - mutate state props', t => {
   })
 });
 
-test('validator - does not mutate valid props', t => {
+test('validator - does not mutate valid props', async t => {
   const state = {
     props: {
       string: 'a string',
@@ -660,11 +660,142 @@ test('validator - does not mutate valid props', t => {
   const validators = {
     string: sinon.spy(val => val),
     boolean: sinon.spy(val => val),
-    int: [sinon.spy(val => val)],
+    int: [sinon.spy(val => val + 1), sinon.spy(val => val - 1)],
   }
-  const {preUpdate} =  validator(state, validators);
-  preUpdate();
+  const {preUpdate} = validator(state, validators);
+  await preUpdate();
   t.deepEqual(validators.string.args, [['a string']]);
   t.deepEqual(validators.boolean.args, [[true]]);
   t.deepEqual(validators.int[0].args, [[42]]);
+  t.deepEqual(validators.int[1].args, [[43]]);
+});
+
+test('validators.required - does not do anything if defined', t => {
+  const fun = validators.required();
+  t.is(fun('foo'), 'foo');
+  t.is(fun('undefined'), 'undefined');
+  t.is(fun(false), false);
+  t.is(fun(true), true);
+  t.is(fun(0), 0);
 })
+
+test('validators.required - throws if undefined', t => {
+  const fun = validators.required();
+
+  t.throws(() => fun(''));
+  t.throws(() => fun(undefined));
+  t.throws(() => fun(null));
+  t.throws(() => fun());
+});
+
+test('validators.number - does not mutate if valid', t => {
+  const fun = validators.number();
+  t.is(fun(42), 42);
+  t.is(fun('42'), '42');
+  t.is(fun(1), 1);
+  t.is(fun('-1'), '-1');
+  t.is(fun(-1), -1);
+  t.is(fun(0), 0);
+})
+
+test('validators.number - mutate if not valid number', t => {
+  const fun = validators.number();
+
+  t.is(fun('42a'), undefined);
+  t.is(fun([1]), undefined);
+  t.is(fun(undefined), undefined);
+  t.is(fun(null), undefined);
+  t.is(fun({x: 42}), undefined);
+});
+
+test('validators.string - mutate anything', t => {
+  const fun = validators.string();
+  t.is(fun('42'), '42');
+  t.is(fun(1), '1');
+  t.is(fun(true), 'true');
+  t.is(fun({}), '[object Object]');
+  t.is(fun('-1'), '-1');
+})
+
+test('validators.boolean - does not mutate if valid', t => {
+  const fun = validators.boolean();
+  t.is(fun(true), true);
+  t.is(fun('true'), true);
+  t.is(fun(1), true);
+  t.is(fun('1'), true);
+  t.is(fun(false), false);
+  t.is(fun('false'), false);
+  t.is(fun(0), false);
+  t.is(fun('0'), false);
+})
+
+test('validators.boolean - mutate if not valid boolean', t => {
+  const fun = validators.boolean();
+
+  t.is(fun('42a'), undefined);
+  t.is(fun('42a'), undefined);
+  t.is(fun([1]), undefined);
+  t.is(fun([true]), undefined);
+  t.is(fun(null), undefined);
+  t.is(fun(undefined), undefined);
+  t.is(fun({x: 42}), undefined);
+});
+
+const Person = function(props) {
+  let state = {
+    name: 'person',
+    fields: ['name', 'genre', 'age', 'height', 'place'],
+    functions: {},
+    populated: {},
+    props
+  };
+  return assignFunctions(
+    state.functions,
+    defaultFunctions(state),
+    updateable(state),
+    createable(state),
+    removeable(state),
+    databaseLoader(state),
+    publicProps(state),
+    legacySupport(state),
+    validator(state, {
+      name: [validators.string(), validators.required()],
+      genre: [validators.string(
+        'male',
+        'female',
+        'transexual',
+        'androgyne',
+        'agender',
+        'fluid',
+        'pangender',
+        'other'
+      )],
+      age: [
+        validators.number(),
+        validators.range(0, 120),
+        validators.required()
+      ],
+      height: [validators.number(), validators.range(0, 250)],
+      place: validators.string()
+    }), defaultValues(state, {
+      place: 'world'
+    })
+  );
+}
+test('Person - refuses to create or update a Person without name', async t => {
+  const someone = Person({age: 1});
+  // await t.throws(someone.create());
+  t.throws(someone.create())
+  t.is(someone.props._id, undefined);
+
+  const soelse = Person({age: 1, name: 'baby'});
+  await soelse.create();
+  soelse.set('name', undefined);
+  t.throws(soelse.update());
+});
+
+test('Person - refuses to create or update a Person without age', async t => {
+  const someone = Person({name: 'foo'});
+  t.throws(someone.create());
+  t.is(someone.props._id, undefined);
+});

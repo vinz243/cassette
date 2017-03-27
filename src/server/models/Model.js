@@ -118,7 +118,7 @@ const assignFunctions = module.exports.assignFunctions = (obj, ...sources) => {
           let res = srcValue(...args) || args;
           if (res && res.then) {
             return res.then((transformedArgs) => {
-              if (!transformedArgs.length) {
+              if (!transformedArgs || !transformedArgs.length) {
                 // Pre-hook resolved undefined, then we call source
                 // With original args
                 return fun(...args);
@@ -308,19 +308,84 @@ const defaultValues = module.exports.defaultValues = (state, mutators) => {
   };
 }
 
-export const validator = (state, ...validators) => {
+// This is a hook that uses preUpdate and preCreate to validate props
+// First argument is the state, the second is ...validators
+// Each validator must be an object with, for each prop name
+// its corresponding validator function array. The array is then reduced,
+// and each validator is called with the previous value returned by the previous
+// validator (the first validator is called with the real value)
+// The prop key will then take the value returned by the last validator,
+// unless an exception is thrown. Then the object is not created/updated
+const validator = module.exports.validator = (state, ...validators) => {
   const val = Object.assign({}, ...validators);
+
   const hook = function () {
-    Object.keys(val).forEach((key) => {
-      let validators = [].concat(val[key]);
-      const values = validators.map(validate => validate(state.props[key]));
-      const [value] = values.slice(-1);
-      state.props[key] = value;
-    });
+    return new Promise((resolve, reject) => {
+      try {
+        Object.keys(val).forEach((key) => {
+          let validators = [].concat(val[key]);
+          const value = validators.reduce((value, validate) => validate(value), state.props[key]);
+          state.props[key] = value;
+        });
+        resolve();
+      } catch (err) {
+        reject(err);
+      }
+    })
   };
 
   return {
     preUpdate: hook,
     preCreate: hook
   };
+}
+const validators = module.exports.validators = {
+  required: function () {
+    return (value) => {
+      if (['null', 'undefined', ''].includes(`${value}`)
+        && (typeof value !== 'string' || value === '')) {
+        throw new Error(`Missing required field`);
+      }
+      return value;
+    }
+  },
+  number: function () {
+    return (value) => {
+      if (isNaN(+`${value}`) || Array.isArray(value)) {
+        return undefined;
+      }
+      return value;
+    }
+  },
+  string: function () {
+    return (value) => {
+      if (['null', 'undefined'].includes(`${value}`)) {
+        return undefined;
+      }
+      return `${value}`;
+    }
+  },
+  boolean: function () {
+    return (value) => {
+      if (['true', 'false', 0, 1, '0', '1'].includes(value)) {
+        return ['true', 1, '1'].includes(value) ? true : false;
+      }
+      if (typeof value !== 'boolean') {
+        return undefined;
+      }
+      return value;
+    }
+  },
+  range: function (min, max) {
+    assert(min <= max);
+    return (val) => (val >= min && val <= max) ? val : undefined;
+  },
+  oneOf: function (...array) {
+    return (value) => {
+      if ([].concat(array).includes(value)) {
+        return value;
+      }
+      return undefined;
+    }
+  }
 }
