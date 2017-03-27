@@ -1,23 +1,23 @@
-const conf = require("../config.js");
+const conf        = require("../config.js");
 const {mainStory} = require('storyboard');
-const tingodb = require("tingodb");
-const assert = require("assert");
+const tingodb     = require("tingodb");
+const assert      = require("assert");
 
 const events = require("events");
 const mkdirp = require("mkdirp");
-const path = require("path");
-const Boom = require("boom");
+const path   = require("path");
+const Boom   = require("boom");
+const pick   = require("lodash/pick");
+const omit   = require("lodash/omit");
+
 const assignWith = require("lodash/assignWith");
-const pick = require("lodash/pick");
-const omit = require("lodash/omit");
+const pluralize  = require("pluralize");
 
-const pluralize = require("pluralize");
-
-let dataDir = path.join(conf.get('configPath'), '/database/');
+const dataDir = path.join(conf.get('configPath'), '/database/');
 mkdirp.sync(dataDir);
 
-let databases = {};
-let db = new (tingodb({
+const databases = {};
+const db = new (tingodb({
   nativeObjectID: false
 }).Db)(dataDir, {});
 

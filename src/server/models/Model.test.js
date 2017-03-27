@@ -15,6 +15,7 @@ const {
     validator,
     validators
   } = require('./Model');
+
 const test = require("ava");
 const sinon = require("sinon");
 
@@ -483,7 +484,7 @@ test.serial('integration - create the characters', async t => {
 test.serial('integration - findOne by _id', async t => {
   let findOneCharacter = findOneFactory(character);
 
-  let mithrandir = await Character.findOne({_id: gandalf._id});
+  let mithrandir = await findOneCharacter({_id: gandalf._id});
   t.is(mithrandir.props.name, 'Gandalf The White');
   t.deepEqual(mithrandir.props, Object.assign({}, gandalf, {
     weapon: gandalfStaff
@@ -493,11 +494,11 @@ test.serial('integration - findOne by _id', async t => {
 test.serial('integration - findOne by name', async t => {
   let findOneCharacter = findOneFactory(character);
 
-  let meriadoc = await Character.findOne({name: merry.name});
+  let meriadoc = await findOneCharacter({name: merry.name});
   t.is(meriadoc.props.name, 'Merry');
   t.deepEqual(meriadoc.props, Object.assign({}, merry));
 
-  let peregrin = await Character.findOne({name: pippin.name});
+  let peregrin = await findOneCharacter({name: pippin.name});
   t.is(peregrin.props.name, 'Pippin');
   t.deepEqual(peregrin.props, Object.assign({}, pippin));
 });
