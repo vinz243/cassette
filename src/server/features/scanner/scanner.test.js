@@ -45,14 +45,15 @@ test('operationMapper - creates or finds a new artist', async t => {
       props: {
         _id: '539'
       },
-      create: fileCreate
-    })),
-    findFileById = sinon.spy(() => Promise.resolve({
-      props: {
-        _id: 'foo'
-      }
-    }));
+      create: fileCreate,
 
+    }));
+  File.findById = sinon.spy(() => Promise.resolve({
+    File,
+    props: {
+      _id: 'foo'
+    }
+  }));
   let mediastic = sinon.spy(() => Promise.resolve({
     artist: 'System of a Down',
     album: 'Toxicity',
@@ -92,6 +93,7 @@ test('operationMapper - creates or finds a new artist', async t => {
     bitrate: 42,
     album: '1337',
     artist: '2a',
+    track: '42',
     duration: 210
   }]);
 });
@@ -107,5 +109,14 @@ test('scan - works with directory', async t => {
     path: path.join(folder, '/04 - Cleanin Out My Closet.mp3'),
     _id: props._id,
     album: { name: 'The Eminem Show', artist: props.artist._id, _id: props.album._id },
-    artist: { name: 'Eminem', _id: props.artist._id }});
+    artist: { name: 'Eminem', _id: props.artist._id },
+    track: {
+      _id: props.track._id,
+      album: props.album._id,
+      artist: props.track._id,
+      duration: 297.900408,
+      name: 'Cleanin Out My Closet',
+      trackNumber: 4
+    }
+  });
 });
