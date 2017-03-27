@@ -1,7 +1,10 @@
-import child_process from 'child_process';
-import chalk from 'chalk';
-import {findById as findLibraryById, find as findLibraries} from './Library';
-import {
+const child_process = require("child_process");
+const chalk         = require("chalk");
+const Library       = require('./Library');
+
+const {scan}      = require('../features/scanner/scanner');
+const {mainStory} = require('storyboard');
+const {
   assignFunctions,
   defaultFunctions,
   manyToOne,
@@ -14,13 +17,9 @@ import {
   findOneFactory,
   findFactory,
   findOrCreateFactory
-} from './Model';
-import {scan} from '../features/scanner/scanner';
-import {
-  mainStory
-} from 'storyboard';
+} = require('./Model');
 
-export const Scan = function(props) {
+const Scan = module.exports.Scan = function(props) {
   if (typeof props === 'string') {
     props = {
       name: props
@@ -110,10 +109,10 @@ export const Scan = function(props) {
   );
 }
 
-export const findOne = findOneFactory(Scan);
+const findOne = module.exports.findOne = findOneFactory(Scan);
 
-export const findById = (_id) => findOne({
+const findById = module.exports.findById = (_id) => findOne({
   _id
 });
 
-export const find = findFactory(Scan, 'scan');
+const find = module.exports.find = findFactory(Scan, 'scan');

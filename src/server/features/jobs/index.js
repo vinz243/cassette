@@ -1,1 +1,1 @@
-export {default} from './endpoint';
+module.exports = require('./endpoint');

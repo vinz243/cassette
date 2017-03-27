@@ -1,4 +1,4 @@
- import config from '../models/config';
+ const config = require("../models/config");
 
 
 let routes = {
@@ -35,4 +35,4 @@ let routes = {
   }
 }
 
-export default routes;
+module.exports = routes;

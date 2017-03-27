@@ -1,16 +1,16 @@
-import {
+const {
   titleCase,
   getMediastic,
   scan,
   operationMapperFactory
-} from './scanner';
-import test from 'ava';
-import path from 'path';
-import sinon from 'sinon';
-import {find as findFile} from '../../models/File'
-import {
+} = require('./scanner');
+const test = require("ava");
+const path = require("path");
+const sinon = require("sinon");
+const {File} = require('../../models/File');
+const {
   Library
-} from '../../models/Library';
+} = require('../../models/Library');
 
 test('titleCase - change a group of word to title case', t => {
   t.is(titleCase('hello world'), 'Hello World');
@@ -62,14 +62,13 @@ test('operationMapper - creates or finds a new artist', async t => {
     bitrate: 42
   }));
   await operationMapperFactory({
-    findOrCreateTrack,
-    findOrCreateAlbum,
-    findOrCreateArtist,
-    File,
-    findFileById
-  }, mediastic)(['create', '06 - foo', {
+    Track: {findOrCreate: findOrCreateTrack},
+    Album: {findOrCreate: findOrCreateAlbum},
+    Artist: {findOrCreate: findOrCreateArtist},
+    File
+  }, mediastic)(['create', '06 - foo.mp3', {
     basePath: '/foo',
-    relativePath: '06 - foo'
+    relativePath: '06 - foo.mp3'
   }]);
   t.truthy(findOrCreateArtist.calledOnce);
   t.deepEqual(findOrCreateArtist.args[0], [{
@@ -89,7 +88,7 @@ test('operationMapper - creates or finds a new artist', async t => {
     duration: 3 * 60 + 30,
   }]);
   t.deepEqual(File.args[0], [{
-    path: '/foo/06 - foo',
+    path: '/foo/06 - foo.mp3',
     bitrate: 42,
     album: '1337',
     artist: '2a',
@@ -102,7 +101,7 @@ test('scan - works with directory', async t => {
   let library = Library({path: folder});
   await library.create();
   await scan(library.props._id);
-  let [props] = (await findFile({bitrate: 158110})).map(el => el.props);
+  let [props] = (await File.find({bitrate: 158110})).map(el => el.props);
   t.deepEqual(props,{ duration: 297.900408,
     bitrate: 158110,
     path: path.join(folder, '/04 - Cleanin Out My Closet.mp3'),

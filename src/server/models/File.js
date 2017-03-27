@@ -1,4 +1,4 @@
-import {
+const {
   assignFunctions,
   defaultFunctions,
   manyToOne,
@@ -10,9 +10,9 @@ import {
   publicProps,
   findOneFactory,
   findFactory
-} from './Model';
+} = require('./Model');
 
-export const File = function(props) {
+const File = module.exports = function(props) {
   if (typeof props === 'string') {
     props = {
       name: props
@@ -45,14 +45,15 @@ export const File = function(props) {
     legacySupport(state),
     manyToOne(state, 'album'),
     manyToOne(state, 'artist'),
-    manyToOne(state, 'track'),
+    manyToOne(state, 'track')
   );
 }
+module.exports.File = File;
 
-export const findOne = findOneFactory(File);
+const findOne = module.exports.findOne = findOneFactory(File);
 
-export const findById = (_id) => findOne({
+const findById = module.exports.findById = (_id) => findOne({
   _id
 });
 
-export const find = findFactory(File, 'file');
+const find = module.exports.find = findFactory(File, 'file');

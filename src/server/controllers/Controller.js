@@ -1,9 +1,9 @@
-import assert from 'assert';
-import pascalCase from 'pascal-case';
-import pluralize from 'pluralize';
-import omit from 'lodash/omit';
+const assert = require("assert");
+const pascalCase = require("pascal-case");
+const pluralize = require("pluralize");
+const omit = require("lodash/omit");
 
-export const fetchable = (name, find, findById) => ({
+const fetchable = module.exports.fetchable = (name, find, findById) => ({
   [`/api/v2/${pluralize(name)}`]: {
     get: async (ctx) => {
       let res = await find(ctx.query);
@@ -23,7 +23,7 @@ export const fetchable = (name, find, findById) => ({
   }
 });
 
-export const createable = (name, model) => ({
+const createable = module.exports.createable = (name, model) => ({
   [`/api/v2/${pluralize(name)}`]: {
     post: async (ctx) => {
       let object = model(Object.assign({}, ctx.request.fields || {},
@@ -38,7 +38,7 @@ export const createable = (name, model) => ({
   }
 });
 
-export const removeable = (name, findById) => ({
+const removeable = module.exports.removeable = (name, findById) => ({
   [`/api/v2/${pluralize(name)}/:id`]: {
     del: async (ctx) => {
       let doc = await findById(ctx.params.id);
@@ -51,7 +51,7 @@ export const removeable = (name, findById) => ({
   }
 });
 
-export const updateable = (name, findById) => ({
+const updateable = module.exports.updateable = (name, findById) => ({
   [`/api/v2/${pluralize(name)}/:id`]: {
     put: async (ctx) => {
       let doc = await findById(ctx.params.id);
@@ -72,12 +72,12 @@ export const updateable = (name, findById) => ({
   }
 });
 
-export const oneToMany = (name, childName, findChildren) => ({
+const oneToMany = module.exports.oneToMany = (name, childName, findChildren) => ({
   [`/api/v2/${pluralize(name)}/:id/${pluralize(childName)}`]: {
     get: async (ctx) => {
       let children = await findChildren(Object.assign({},
         {[name]: ctx.params.id - 0}, ctx.query));
-
+      ctx.status = 200;
       ctx.body = children.map(child => child.props);
       return;
     }

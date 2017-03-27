@@ -1,11 +1,11 @@
-import {fetchable, oneToMany, updateable, createable} from './Controller';
-import merge from 'lodash/merge';
-import process from 'process';
-import {Scan, findScanById} from '../models/Scan';
-import {Library, find, findById} from '../models/Library';
+const {fetchable, oneToMany, updateable, createable} = require('./Controller');
+const merge = require("lodash/merge");
+const process = require("process");
+const {Scan, findScanById} = require('../models/Scan');
+const {Library, find, findById} = require('../models/Library');
 
 
-export default merge({},
+module.exports = merge({},
   fetchable('library', find, findById), createable('library', Library), {
     '/api/v2/libraries/:id/scans': {
       post: async (ctx, next) => {
@@ -27,7 +27,7 @@ export default merge({},
       }
     }, '/api/v2/libraries/:id/scans/:scanId': {
       get: async (ctx, next) => {
-        let scan = findScanById(ctx.params.scanId);
+        let scan =Scan.findById(ctx.params.scanId);
         if (scan.doc.library !== ctx.params.id) return next();
         ctx.status = 200;
         ctx.body = scan.props;

@@ -1,20 +1,11 @@
-import {File, findOne, findById, find} from './File';
-import {Track,
-  findOne as findOneTrack,
-  findById as findTrackById,
-  find as findTrack} from './Track';
-import {Artist,
-  findOne as findOneArtist,
-  findById as findArtistById,
-  find as findArtist} from './Artist';
-import {Album,
-  findOne as findOneAlbum,
-  findById as findAlbumById,
-  find as findAlbum} from './Album';
+const {File, findOne, findById, find} = require('./File');
+const Track = require('./Track');
+const Artist = require('./Artist');
+const Album = require('./Album');
 
-import omit from 'lodash/omit';
+const omit = require("lodash/omit");
 
-import test from 'ava';
+const test = require("ava");
 
 test('creates an object with expected props and no more', t => {
   let data = {
@@ -67,8 +58,8 @@ test('creates an object and fetch it by path', async t => {
 
   t.not(file.props._id, undefined);
 
-  let res = (await find({path: '/bar/foo'}))[0];
-  t.is(res.props._id, file.props._id);
+  let [res] = await find({path: '/bar/foo'});
+  t.is(+res.props._id, +file.props._id);
 });
 
 test('populate - works', async t => {

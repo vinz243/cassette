@@ -1,20 +1,7 @@
-import {
-  assignFunctions,
-  defaultFunctions,
-  manyToOne,
-  legacySupport,
-  updateable,
-  createable,
-  removeable,
-  databaseLoader,
-  publicProps,
-  findOneFactory,
-  findFactory,
-  findOrCreateFactory
-} from './Model';
+const model = require('./Model');
 
 
-export const Album = function(props) {
+const Album = module.exports = function (props) {
   if (typeof props === 'string') {
     props = {
       name: props
@@ -27,25 +14,26 @@ export const Album = function(props) {
     populated: {},
     props
   };
-  return assignFunctions(
+  return model.assignFunctions(
     state.functions,
-    defaultFunctions(state),
-    updateable(state),
-    createable(state),
-    removeable(state),
-    databaseLoader(state),
-    publicProps(state),
-    legacySupport(state),
-    manyToOne(state, 'artist')
+    model.defaultFunctions(state),
+    model.updateable(state),
+    model.createable(state),
+    model.removeable(state),
+    model.databaseLoader(state),
+    model.publicProps(state),
+    model.legacySupport(state),
+    model.manyToOne(state, 'artist')
   );
 }
 
+module.exports.Album = Album;
 
-export const findOne = findOneFactory(Album);
-export const findOrCreate = findOrCreateFactory(Album);
+const findOne = module.exports.findOne = model.findOneFactory(Album);
+const findOrCreate = module.exports.findOrCreate = model.findOrCreateFactory(Album);
 
-export const findById = (_id) => findOne({
+const findById = module.exports.findById = (_id) => findOne({
   _id
 });
 
-export const find = findFactory(Album, 'album');
+const find = module.exports.find = model.findFactory(Album, 'album');

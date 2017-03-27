@@ -1,12 +1,12 @@
-import albumsController from './controllers/albums';
-import artistsController from './controllers/artists';
-// import configController from './controllers/config';
-import librariesController from './controllers/libraries';
-import tracksController from './controllers/tracks';
-import scansController from './controllers/scans';
-// import filesController from './controllers/files';
-import features from './features';
-// import jobController from './controllers/job';
+const albumsController = require("./controllers/albums");
+const artistsController = require("./controllers/artists");
+// const configController = require("./controllers/config");
+const librariesController = require("./controllers/libraries");
+const tracksController = require("./controllers/tracks");
+const scansController = require("./controllers/scans");
+// const filesController = require("./controllers/files");
+const features = require("./features");
+// const jobController = require("./controllers/job");
 
 let routes = {};
 
@@ -19,7 +19,7 @@ Object.assign(routes,
   
 Object.assign(routes, features)
 
-export default function (router) {
+module.exports = function (router) {
   for(let route in routes) {
     for(let verb in routes[route]) {
       // console.log(verb, route);

@@ -7,7 +7,6 @@
     "ava": "ava",
     "clean:build": "rimraf build lib",
     "build:html": "node ./bin/buildHtml.js",
-    "prestart": "npm run clean:build && npm run build:server ",
     "start": "node dev-server.js",
     "start:dashboard": "webpack-dashboard -c cyan -- node dev-server.js",
     "prebuild": "npm run clean:build",
@@ -167,43 +166,9 @@
   "bin": {
     "cassette-www": "./bootstrap.js"
   },
-  "babel": {
-    "presets": [
-      "es2015",
-      "es2016",
-      "stage-0"
-    ],
-    "env": {
-      "test": {
-        "plugins": [
-          "istanbul"
-        ]
-      }
-    }
-  },
-  "ava": {
-    "babel": {
-      "babelrc": false,
-      "presets": [],
-      "env": {
-        "test": {
-          "plugins": [
-            "istanbul",
-            "babel-plugin-transform-es2015-modules-commonjs"
-          ]
-        }
-      },
-      "plugins": []
-    },
-    "require": [
-      "babel-register",
-      "babel-polyfill"
-    ]
-  },
+  "ava": {},
   "nyc": {
-    "require": [
-      "babel-register"
-    ],
+    "require": [],
     "sourceMap": false,
     "instrument": false
   }

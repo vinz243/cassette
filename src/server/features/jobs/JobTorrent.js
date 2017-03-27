@@ -1,17 +1,16 @@
-import shortid from 'shortid';
-import parseTorrent from 'parse-torrent';
-import assert from 'assert';
-import scgi from '../downloaders/scgi';
-import config from '../../config';
+const shortid = require("shortid");
+const parseTorrent = require("parse-torrent");
+const assert = require("assert");
+const scgi = require("../downloaders/scgi");
+const config = require("../../config");
 
 let jobs = [];
-
-export default class JobTorrent {
-  defaultProps = {
-    scgi: scgi.methodCall,
-    scgiPort: config.get('scgiPort'),
-    scgiHost: config.get('scgiHost')
-  }
+const defaultProps = {
+  scgi: scgi.methodCall,
+  scgiPort: config.get('scgiPort'),
+  scgiHost: config.get('scgiHost')
+}
+module.exports = class JobTorrent {
   constructor (props) {
     this.props = Object.assign({}, this.defaultProps, props);
     assert(/^(\d|[a-f]){40}$/i.test(this.props.infoHash));

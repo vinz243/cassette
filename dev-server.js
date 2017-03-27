@@ -11,9 +11,9 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const DashboardPlugin = require('webpack-dashboard/plugin');
 const config = require('./config/webpack.config.development');
-const backend = require('./lib/server/server').default;
+const backend = require('./src/server/server');
 
-const processResult = require('./lib/server/models/Scan').processResult;
+// const processResult = require('./src/server/models/Scan').processResult;
 // console.log(backend);
 
 const app = express();

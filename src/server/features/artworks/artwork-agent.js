@@ -1,12 +1,13 @@
-import defaults from 'lodash/defaults';
-import config from '../../config.js';
-import {mainStory} from 'storyboard';
-import chalk from 'chalk';
-import mkdirp from 'mkdirp';
-import {getClosestSize} from './sizes';
-import assert from 'assert';
+const defaults  = require("lodash/defaults");
+const mainStory = require('storyboard').mainStory;
+const chalk     = require("chalk");
+const mkdirp    = require("mkdirp");
+const assert    = require("assert");
+const config     = require("../../config.js");
 
-const MAX_RETRIES = 3;
+const {getClosestSize} = require('./sizes');
+
+const MAX_RETRIES = 0;
 
 function fetchEntityArtwork (fs, path, touch, request, qs, md5, conf, entity,
   entityName, parent, retries = 0) {
@@ -127,7 +128,7 @@ function fetchEntityArtwork (fs, path, touch, request, qs, md5, conf, entity,
   }
 }
 
-export function fetchEntityArtworkFactory (fsp, path, touch, request, qs, md5,
+const fetchEntityArtworkFactory = module.exports.fetchEntityArtworkFactory = function (fsp, path, touch, request, qs, md5,
   conf) {
   return fetchEntityArtwork.bind(null, fsp, path, touch, request, qs, md5,
     conf);
@@ -148,6 +149,6 @@ function agent (fetchArtwork) {
   }
 }
 
-export function agentFactory (fetch) {
+const agentFactory = module.exports.agentFactory = function (fetch) {
   return agent.bind(null, fetch);
 }

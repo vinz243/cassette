@@ -1,16 +1,10 @@
-import {Track, findOne, findById, find} from './Track';
-import {Artist,
-  findOne as findOneArtist,
-  findById as findArtistById,
-  find as findArtist} from './Artist';
-import {Album,
-  findOne as findOneAlbum,
-  findById as findAlbumById,
-  find as findAlbum} from './Album';
+const {Track, findOne, findById, find} = require('./Track');
+const Artist = require('./Artist');
+const Album = require('./Album');
 
-import omit from 'lodash/omit';
+const omit = require("lodash/omit");
 
-import test from 'ava';
+const test = require("ava");
 
 
 test('creates an Track object with correct props', t => {

@@ -1,30 +1,30 @@
-import {getClosestSize} from './sizes';
-import {findById as findAlbumById} from '../../models/Album';
-import {findById as findArtistById} from '../../models/Artist';
+const {getClosestSize} = require('./sizes');
 
-import config from '../../config.js';
-import qs from 'querystring';
-import mkdirp from 'mkdirp';
-import path from 'path';
-import request from 'request-promise-native';
-import {mainStory} from 'storyboard';
-import chalk from 'chalk';
-import md5 from 'md5';
-import fs from 'fs';
-import sharp from 'sharp';
+const Album  = require('../../models/Album');
+const Artist = require('../../models/Artist');
+
+const config     = require("../../config.js");
+const qs        = require("querystring");
+const mkdirp    = require("mkdirp");
+const path      = require("path");
+const request   = require("request-promise-native");
+const mainStory = require('storyboard').mainStory;
+const chalk     = require("chalk");
+const md5       = require("md5");
+const fs        = require("fs");
+const sharp     = require("sharp");
 
 const dataDir = path.join(config.get('configPath'), 'artworks');
 
-export default {
+module.exports = {
   '/api/v2/albums/:id/artwork': {
     get: async (ctx) => {
       const {size = 300} = ctx.request.query;
       let filePath = '';
       if (ctx.params.id !== "undefined") {
-        const album = await findAlbumById(ctx.params.id);
+        const album = await Album.findById(ctx.params.id);
 
         if (!album) {
-          console.log('NO ALBUM');
           return ctx.throw(404, 'Album not found');
         }
         // Generate unique cache per album
@@ -62,7 +62,7 @@ export default {
   '/api/v2/artists/:id/artwork': {
     get: async (ctx) => {
       const {size = 300} = ctx.request.query;
-      const artist = await findArtistById(ctx.params.id);
+      const artist = await Artist.findById(ctx.params.id);
 
       if (!artist)
         return ctx.throw(404, 'Artist not found');

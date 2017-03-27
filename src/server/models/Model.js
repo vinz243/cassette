@@ -1,17 +1,17 @@
-import conf from '../config.js';
-import { mainStory } from 'storyboard';
-import tingodb from 'tingodb';
-import assert from 'assert';
+const conf = require("../config.js");
+const {mainStory} = require('storyboard');
+const tingodb = require("tingodb");
+const assert = require("assert");
 
-import events from 'events';
-import mkdirp from 'mkdirp';
-import path from 'path';
-import Boom from 'boom';
-import assignWith from 'lodash/assignWith';
-import pick from 'lodash/pick';
-import omit from 'lodash/omit';
+const events = require("events");
+const mkdirp = require("mkdirp");
+const path = require("path");
+const Boom = require("boom");
+const assignWith = require("lodash/assignWith");
+const pick = require("lodash/pick");
+const omit = require("lodash/omit");
 
-import pluralize from 'pluralize';
+const pluralize = require("pluralize");
 
 let dataDir = path.join(conf.get('configPath'), '/database/');
 mkdirp.sync(dataDir);
@@ -31,7 +31,7 @@ const getDatabase = (name, database = db) => {
   return getDatabase(name, database);
 }
 
-export const findOrCreateFactory = (model) => {
+const findOrCreateFactory = module.exports.findOrCreateFactory = (model) => {
   return (query, props = {}) => {
 
     let obj = model(query);
@@ -47,7 +47,7 @@ export const findOrCreateFactory = (model) => {
   }
 }
 
-export const findFactory = (model, name, getDB = getDatabase) => {
+const findFactory = module.exports.findFactory = (model, name, getDB = getDatabase) => {
   return (query) => {
     return new Promise((resolve, reject) => {
       let optFields = ['limit', 'sort', 'skip', 'direction']
@@ -89,7 +89,7 @@ const notImplemented = (name) => {
 
 // This function is a customized version of _.assign
 // use this in models for composition !!!
-export const assignFunctions = (obj, ...sources) => {
+const assignFunctions = module.exports.assignFunctions = (obj, ...sources) => {
   return assignWith(obj, ...sources,
     (objValue, srcValue, key, object, source) => {
     let descriptor = Object.getOwnPropertyDescriptor(source, key);
@@ -115,7 +115,7 @@ export const assignFunctions = (obj, ...sources) => {
       const method = key[3].toLowerCase() + key.slice(4);
       object[method] = (function (fun) {
         return (...args) => {
-          let res = srcValue(...args);
+          let res = srcValue(...args) || args;
           if (res && res.then) {
             return res.then((transformedArgs) => {
               if (!transformedArgs.length) {
@@ -148,7 +148,7 @@ export const assignFunctions = (obj, ...sources) => {
 // This function returns a composite object with the default values.
 // Any composition should use that otherwise their might be some problem
 // like undefined is not a function
-export const defaultFunctions = (state) => {
+const defaultFunctions = module.exports.defaultFunctions = (state) => {
   return Object.assign.apply({},
     ['update', 'set', 'create', 'remove', 'populate'].map((method) => ({
       [method]: notImplemented(method)
@@ -159,7 +159,7 @@ export const defaultFunctions = (state) => {
 // call this function with a model factory to get a function that will
 // return a promise, which when fulfilled, returns the object wuth matching props
 // (unless _id is provided, then it only find by _id)
-export const findOneFactory = (model) => {
+const findOneFactory = module.exports.findOneFactory = (model) => {
   return (props) => {
     let obj = model(Object.assign({}, props, props._id ? {
       _id: props._id - 0
@@ -175,7 +175,7 @@ export const findOneFactory = (model) => {
 // Composite that allows loading an object from the database
 // This is done by using populate. So to find an object in the db
 // create a object with the query, then populate. See findOneFactory
-export const databaseLoader =  (state, db = getDatabase(state.name)) => ({
+const databaseLoader = module.exports.databaseLoader =  (state, db = getDatabase(state.name)) => ({
   populate: () => {
     let query = state.props._id ? {
       _id: state.props._id - 0
@@ -190,7 +190,7 @@ export const databaseLoader =  (state, db = getDatabase(state.name)) => ({
   }
 });
 
-export const publicProps = (state) => ({
+const publicProps = module.exports.publicProps = (state) => ({
   getProps:() => {
     return Object.assign({}, state.props);
   },
@@ -204,12 +204,13 @@ export const publicProps = (state) => ({
 
 // This creates acomposite object that populates field `name` with
 // the child props. This is a hook.
-export const manyToOne = (state, name, getDB = getDatabase) => ({
-  postGetProps: ({[name]: parentId, ...props}) => {
-    let pop = state.populated[name];
-    return Object.assign({}, props, (pop && Object.keys(pop).length > 0) ? {
+const manyToOne = module.exports.manyToOne = (state, name, getDB = getDatabase) => ({
+  postGetProps: (props) => {
+    const parentId = props[name];
+    const pop      = state.populated[name];
+    return Object.assign({}, props, (pop && Object.keys(pop).length) ? {
       [name]: pop
-    } : (parentId ? {[name]: parentId} : {}));
+    } : {});
   },
   postPopulate: async () => {
     return new Promise((resolve, reject) => {
@@ -226,14 +227,14 @@ export const manyToOne = (state, name, getDB = getDatabase) => ({
 })
 
 // Enables legacy support, the old model.data field
-export const legacySupport = (state) => ({
+const legacySupport = module.exports.legacySupport = (state) => ({
   get data() {
     return state.functions.getProps();
   }
 });
 
 // Composite to allow updating a document
-export const updateable = (state, db = getDatabase(state.name)) => ({
+const updateable = module.exports.updateable = (state, db = getDatabase(state.name)) => ({
   update: () => {
     if (!state.dirty) {
       mainStory.info('db', 'Trying to update a non dirty document');
@@ -255,7 +256,7 @@ export const updateable = (state, db = getDatabase(state.name)) => ({
 });
 
 // (recommended) composite to allow the creation of a document
-export const createable = (state, db = getDatabase(state.name)) => ({
+const createable = module.exports.createable = (state, db = getDatabase(state.name)) => ({
   create: async () => {
     if (state.props._id) {
       throw Boom.create('Cannot create a document that already exists');
@@ -271,7 +272,7 @@ export const createable = (state, db = getDatabase(state.name)) => ({
   }
 });
 
-export const removeable = (state, db = getDatabase(state.name)) => ({
+const removeable = module.exports.removeable = (state, db = getDatabase(state.name)) => ({
   remove: async () => {
     if (state.props._id) {
       return new Promise((resolve, reject) => {
@@ -287,7 +288,7 @@ export const removeable = (state, db = getDatabase(state.name)) => ({
 })
 
 
-export const defaultValues = (state, mutators) => {
+const defaultValues = module.exports.defaultValues = (state, mutators) => {
   const hook = function () {
     Object.keys(mutators).forEach((name) => {
       const mutator = mutators[name];

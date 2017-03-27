@@ -1,6 +1,6 @@
-import {Artist, findOne, findById, find} from './Artist';
+const {Artist, findOne, findById, find} = require('./Artist');
 
-import test from 'ava';
+const test = require("ava");
 
 test('creates a new Artist object with correct getProps()', t => {
   let artist = Artist({name: 'Alborosie'});

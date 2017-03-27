@@ -1,6 +1,6 @@
-import {Artist, Album, Track, File} from '../models';
-import Controller from './Controller';
+const {Artist, Album, Track, File} = require('../models');
+const Controller = require("./Controller");
 
 const routes = new Controller(File).done();
 
-export default routes;
+module.exports = routes;

@@ -1,17 +1,17 @@
-import walkSync from 'walk-sync';
-import fs from 'fs';
-import path from 'path';
-import mkdirp from 'mkdirp';
-import config from '../../config';
+const walkSync = require("walk-sync");
+const fs = require("fs");
+const path = require("path");
+const mkdirp = require("mkdirp");
+const config = require("../../config");
 
 const dataDir = path.join(config.get('configPath'), '/fs/');
 mkdirp.sync(dataDir);
 
-export const getFolderEntries = (path) => {
+const getFolderEntries = module.exports.getFolderEntries = (path) => {
    return walkSync.entries(path)
 }
 
-export const getCachedEntries = (id) => {
+const getCachedEntries = module.exports.getCachedEntries = (id) => {
   let file = path.join(dataDir, `fstree-${id}.json`);
   return new Promise((resolve, reject) => {
     fs.exists(file, (exists) => {
@@ -32,7 +32,7 @@ export const getCachedEntries = (id) => {
   });
 }
 
-export const writeCachedEntries = (id, entries) => {
+const writeCachedEntries = module.exports.writeCachedEntries = (id, entries) => {
   let file = path.join(dataDir, `fstree-${id}.json`);
   return new Promise((resolve, reject) => {
     fs.writeFile(file, JSON.stringify({entries}), (err) => {

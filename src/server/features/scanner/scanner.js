@@ -1,31 +1,26 @@
-import {getFolderEntries, getCachedEntries, writeCachedEntries} from './tree';
-import {findById as findLibraryById} from '../../models/Library';
-import {Artist,
-  findOrCreate as findOrCreateArtist,
-  findOne as findOneArtist} from '../../models/Artist';
-import {Album,
-  findOrCreate as findOrCreateAlbum,
-  findOne as findOneAlbum} from '../../models/Album';
-import {Track,
-  findOrCreate as findOrCreateTrack,
-  findOne as findOneTrack} from '../../models/Track';
-import {File,
-  findOrCreate as findOrCreateFile,
-  findOne as findOneFile,
-  findById as findFileById} from '../../models/File';
-import {fetchEntityArtworkFactory,
-  agentFactory as artworkAgentFactory} from '../artworks/artwork-agent';
+const {getFolderEntries,
+  getCachedEntries,
+  writeCachedEntries } = require('./tree');
 
-import FSTree from 'fs-tree-diff';
-import Mediastic from 'mediastic';
-import {mainStory} from 'storyboard';
-import path from 'path';
-import fs from 'fs-promise';
-import request from 'request-promise-native';
-import touch from 'touch';
-import qs from 'qs';
-import md5 from 'md5';
-import titlecase from 'titlecase';
+const Library = require('../../models/Library');
+const Artist  = require('../../models/Artist');
+const Album   = require('../../models/Album');
+const Track   = require('../../models/Track');
+const File    = require('../../models/File');
+
+const {fetchEntityArtworkFactory,
+  agentFactory} = require('../artworks/artwork-agent');
+
+const FSTree    = require("fs-tree-diff");
+const Mediastic = require("mediastic");
+const mainStory = require('storyboard').mainStory;
+const path      = require("path");
+const fs        = require("fs-promise");
+const request   = require("request-promise-native");
+const touch     = require("touch");
+const qs        = require("qs");
+const md5       = require("md5");
+const titlecase = require("titlecase");
 
 const fetchArtwork = fetchEntityArtworkFactory(
   fs, path, touch, request, qs, md5
@@ -37,9 +32,9 @@ const trackCase = (title) => {
   }
   return title;
 }
-export function getMediastic () {
+const getMediastic = module.exports.getMediastic = function () {
   const mediastic = new Mediastic();
-  const artworkAgent = artworkAgentFactory(fetchArtwork);
+  const artworkAgent = agentFactory(fetchArtwork);
   mediastic.use((metadata, next) => {
     mainStory.trace('scanner', 'Working on '+ metadata.path);
     try {
@@ -71,7 +66,7 @@ export function getMediastic () {
   mediastic.use(artworkAgent());
   return mediastic;
 }
-export const titleCase = (str = 'Unknown') => {
+const titleCase = module.exports.titleCase = (str = 'Unknown') => {
   if (/^((([A-Z0-9]{2,}\b).?|(\s(-|:)\s)){2,}|((([a-z0-9])+\b.?\s?)|((-|:)\s))+)$/.test(str)) {
     return str.toLowerCase().split(/(\.\s?|\s)/g)
       .filter((w) => !/^\s*$/.test(w))
@@ -83,7 +78,7 @@ export const titleCase = (str = 'Unknown') => {
   return str;
 }
 
-export const normalizeArtist = (str = 'Unknown') => {
+const normalizeArtist = module.exports.normalizeArtist = (str = 'Unknown') => {
   return titleCase(str.replace(/feat.+$/g, '').trim());
 }
 
@@ -100,21 +95,21 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
 
           if (!metadata.duration)
             return Promise.reject(new Error(`Corrupted file on '${filePath}'`));
-          return models.findOrCreateArtist({
+          return models.Artist.findOrCreate({
             name: metadata.artist
           }).then((artist) => {
             return Promise.resolve([metadata, artist])
           });
         }).then(([metadata, artist]) => {
 
-          return models.findOrCreateAlbum({
+          return models.Album.findOrCreate({
             name: metadata.album
           }, {
             artist: artist.props._id
           }).then((album) => Promise.resolve([metadata, artist, album]));
         }).then(([metadata, artist, album]) => {
 
-          return models.findOrCreateTrack({
+          return models.Track.findOrCreate({
             name: metadata.title,
             album: album.props._id,
             trackNumber: ((metadata.track + '').match(/^\d+/) || [0])[0] - 0,
@@ -137,7 +132,7 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
           });
         }).then(([metadata, artist, album, track, file]) => {
 
-          return models.findFileById(file.props._id);
+          return models.File.findById(file.props._id);
         }).then(file => {
           // mainStory.info('scanner', `Done working on ${filePath}`);
           mainStory.trace('scanner', 'Added a new track', {attach: file.props});
@@ -148,7 +143,7 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
       }
       return Promise.resolve();
     case 'unlink':
-      return findOneFile({path: filePath}).then((file) => {
+      return File.findOne({path: filePath}).then((file) => {
         return file.remove();
       });
     case 'mkdir':
@@ -158,12 +153,12 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
   }
 }
 
-export const operationMapperFactory = (models, mediastic) => {
+const operationMapperFactory = module.exports.operationMapperFactory = (models, mediastic) => {
   return operationMapper.bind(null, models, mediastic);
 }
 
-export const scan = async (libraryId, mediastic = getMediastic()) => {
-  let library = await findLibraryById(libraryId);
+const scan = module.exports.scan = async (libraryId, mediastic = getMediastic()) => {
+  let library = await Library.findById(libraryId);
   let cachedEntries = await getCachedEntries(libraryId);
 
   let cached = new FSTree({
@@ -190,7 +185,10 @@ export const scan = async (libraryId, mediastic = getMediastic()) => {
   }
 
   let mapper = operationMapperFactory({
-    findOrCreateTrack, findOrCreateAlbum, findOrCreateArtist, File, findFileById
+    Track,
+    Album,
+    Artist,
+    File
   }, mediastic.call.bind(mediastic));
 
   await diff.reduce((stack, entry) => stack.then(mapper.bind(null, entry)),

@@ -1,5 +1,5 @@
-import test from 'ava';
-import JobTorrent from './JobTorrent';
+const test = require("ava");
+const JobTorrent = require("./JobTorrent");
 
 
 test('constructor - should accept a valid hash', t => {

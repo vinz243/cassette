@@ -1,3 +1,3 @@
-import server from 'server';
+const server = require("server");
 
 server.listen(3030);

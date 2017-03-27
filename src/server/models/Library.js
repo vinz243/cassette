@@ -1,4 +1,4 @@
-import {
+const {
   assignFunctions,
   defaultFunctions,
   manyToOne,
@@ -10,9 +10,9 @@ import {
   publicProps,
   findOneFactory,
   findFactory
-} from './Model';
+} = require('./Model');
 
-export const Library = function(props) {
+const Library = module.exports = function(props) {
   if (typeof props === 'string') {
     props = {
       name: props
@@ -36,11 +36,12 @@ export const Library = function(props) {
     legacySupport(state)
   );
 }
+module.exports.Library = Library;
 
-export const findOne = findOneFactory(Library);
+const findOne = module.exports.findOne = findOneFactory(Library);
 
-export const findById = (_id) => findOne({
+const findById = module.exports.findById = (_id) => findOne({
   _id
 });
 
-export const find = findFactory(Library, 'library');
+const find = module.exports.find = findFactory(Library, 'library');

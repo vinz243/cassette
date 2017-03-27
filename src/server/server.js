@@ -1,13 +1,15 @@
-import body from 'koa-better-body';
-import chalk from 'chalk';
-import config from './config.js';
-import convert from 'koa-convert';
-import Koa from 'koa';
-import koaRouter from 'koa-router';
-import route from './routes';
-import { mainStory, addListener } from 'storyboard';
-import consoleListener from 'storyboard/lib/listeners/console';
-addListener(consoleListener);
+const body = require("koa-better-body");
+const chalk = require("chalk");
+const config = require("./config.js");
+const convert = require("koa-convert");
+const Koa = require("koa");
+const koaRouter = require("koa-router");
+const route = require("./routes");
+const { mainStory, addListener } = require('storyboard');
+const consoleListener = require("storyboard/lib/listeners/console").default;
+if (config.get('env') !== 'test') {
+  addListener(consoleListener);
+}
 
 mainStory.info('Storyboard started');
 mainStory.info('Starting server');
@@ -41,4 +43,4 @@ app.use(router.allowedMethods());
 
 let res = app.listen();
 res.app = app;
-export default res;
+module.exports = res;

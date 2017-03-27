@@ -1,7 +1,7 @@
-import datastore from 'nedb-promise';
-import config from '../config.js';
-import mkdirp from 'mkdirp';
-import path from 'path';
+const datastore = require("nedb-promise");
+const config = require("../config.js");
+const mkdirp = require("mkdirp");
+const path = require("path");
 
 let dataDir = path.join(config.get('configPath'), '/data/');
 mkdirp.sync(dataDir);
@@ -86,4 +86,4 @@ const model = {
 
   }
 }
-export default model;
+module.exports = model;

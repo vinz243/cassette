@@ -1,4 +1,4 @@
-import {
+const {
   assignFunctions,
   defaultFunctions,
   manyToOne,
@@ -11,9 +11,9 @@ import {
   findOneFactory,
   findFactory,
   findOrCreateFactory
-} from './Model';
+} = require('./Model');
 
-export const Artist = function(props) {
+const Artist = module.exports = function(props) {
   if (typeof props === 'string') {
     props = {
       name: props
@@ -38,12 +38,14 @@ export const Artist = function(props) {
   );
 }
 
-export const findOne = findOneFactory(Artist);
+module.exports.Artist = Artist;
 
-export const findOrCreate = findOrCreateFactory(Artist);
+const findOne = module.exports.findOne = findOneFactory(Artist);
 
-export const findById = (_id) => findOne({
+const findOrCreate = module.exports.findOrCreate = findOrCreateFactory(Artist);
+
+const findById = module.exports.findById = (_id) => findOne({
   _id
 });
 
-export const find = findFactory(Artist, 'artist');
+const find = module.exports.find = findFactory(Artist, 'artist');

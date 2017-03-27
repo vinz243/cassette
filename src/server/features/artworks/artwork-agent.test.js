@@ -1,15 +1,16 @@
-import {fetchEntityArtworkFactory} from './artwork-agent';
-import querystring from 'qs';
-import originalMd5 from 'md5';
-import config from '../../config.js';
+const {fetchEntityArtworkFactory} = require('./artwork-agent');
 
-import sinon from 'sinon';
-import fsp from 'fs-promise';
-import req from 'request-promise-native';
-import paf from 'path'
-import finger from 'touch';
-import assert from 'assert';
-import test from 'ava';
+const querystring = require("qs");
+const originalMd5 = require("md5");
+const config       = require("../../config.js");
+
+const sinon  = require("sinon");
+const fsp    = require("fs-promise");
+const req    = require("request-promise-native");
+const paf    = require("path")
+const finger  = require("touch");
+const assert = require("assert");
+const test   = require("ava");
 
 assert(process.env.NODE_ENV === 'test', 'Environement must be test');
 
@@ -58,7 +59,7 @@ test('fetchEntityArtwork - resolves immediately if file exists', async t => {
   await fetch('artist', 'System of A Down');
   t.deepEqual(exists.args, [
     [paf.join(config.get('configPath'),
-      'artworks/{entity=artist_artwork&artist=System%20of%20A%20Down}')]
+      'artworks/{entity=artist_artwork&artist=System%20of%20A%20Down}.lock')]
   ]);
   t.false(spies.touch.sync.called);
   t.true(spies.qs.stringify.calledOnce);

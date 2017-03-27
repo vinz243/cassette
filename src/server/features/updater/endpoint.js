@@ -1,8 +1,8 @@
-import request from 'request-promise-native';
-import semver from 'semver'
-import pkg from '../../../../package.json';
+const request = require("request-promise-native");
+const semver = require("semver")
+const pkg = require("../../../../package.json");
 
-export default {
+module.exports = {
   '/v1/versions': {
     get: async (ctx) => {
       let url = 'https://registry.npmjs.org/node-cassette';

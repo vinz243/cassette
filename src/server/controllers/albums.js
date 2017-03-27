@@ -1,17 +1,15 @@
-import {find as findArtist,
-        findById as findArtistById} from '../models/Artist';
-import {find as findAlbum,
-        findById as findAlbumById} from '../models/Album';
-import {find as findTrack} from '../models/Track';
-import {find as findFile} from '../models/File';
+const Artist  = require('../models/Artist');
+const Album   = require('../models/Album');
+const Track   = require('../models/Track');
+const File    = require('../models/File');
 
-import {fetchable, oneToMany, updateable} from './Controller';
-import merge from 'lodash/merge';
+const {fetchable, oneToMany, updateable} = require('./Controller');
+const merge = require("lodash/merge");
 
 
-export default merge({},
-  fetchable('album', findAlbum, findAlbumById),
-  updateable('album', findAlbumById),
-  oneToMany('album', 'track', findTrack),
-  oneToMany('album', 'file', findFile)
+module.exports = merge({},
+  fetchable('album', Album.find, Album.findById),
+  updateable('album', Album.findById),
+  oneToMany('album', 'track', Track.find),
+  oneToMany('album', 'file', File.find)
 );

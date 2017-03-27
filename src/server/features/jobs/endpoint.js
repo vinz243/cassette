@@ -1,6 +1,6 @@
-import JobTorrent from './JobTorrent';
+const JobTorrent = require("./JobTorrent");
 
-export default {
+module.exports = {
 
   '/v1/jobs': {
 

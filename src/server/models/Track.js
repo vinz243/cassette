@@ -1,4 +1,4 @@
-import {
+const {
   assignFunctions,
   defaultFunctions,
   manyToOne,
@@ -11,9 +11,9 @@ import {
   findOneFactory,
   findFactory,
   findOrCreateFactory
-} from './Model';
+} = require('./Model');
 
-export const Track = function(props) {
+const Track = module.exports = function(props) {
   if (typeof props === 'string') {
     props = {
       name: props
@@ -36,15 +36,15 @@ export const Track = function(props) {
     publicProps(state),
     legacySupport(state),
     manyToOne(state, 'album'),
-    manyToOne(state, 'artist'),
+    manyToOne(state, 'artist')
   );
 }
+module.exports.Track = Track;
+const findOne = module.exports.findOne = findOneFactory(Track);
+const findOrCreate = module.exports.findOrCreate = findOrCreateFactory(Track);
 
-export const findOne = findOneFactory(Track);
-export const findOrCreate = findOrCreateFactory(Track);
-
-export const findById = (_id) => findOne({
+const findById = module.exports.findById = (_id) => findOne({
   _id
 });
 
-export const find = findFactory(Track, 'track');
+const find = module.exports.find = findFactory(Track, 'track');

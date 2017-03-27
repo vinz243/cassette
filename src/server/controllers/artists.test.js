@@ -1,10 +1,10 @@
-import {Artist} from '../models/Artist';
-import {Album} from '../models/Album';
-import {Track} from '../models/Track';
-import supertest from 'supertest-as-promised';
-import app from '../server.js';
+const Artist = require('../models/Artist');
+const Album = require('../models/Album');
+const Track = require('../models/Track');
+const supertest = require("supertest-as-promised");
+const app = require("../server.js");
 
-import test from 'ava';
+const test = require("ava");
 
 
 const request = supertest(app);
@@ -12,7 +12,6 @@ const request = supertest(app);
 
 test.serial('/api/v2/artists', async t => {
   let res = await request.get('/api/v2/artists');
-  console.log(res.body);
   t.is(res.body.length, 0);
   t.is(res.body.length, 0);
 

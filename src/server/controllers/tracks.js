@@ -1,22 +1,20 @@
-import {find as findArtist,
-        findById as findArtistById} from '../models/Artist';
-import {find as findAlbum,
-        findById as findAlbumById} from '../models/Album';
-import {find as findTrack,
-        findById as findTrackById} from '../models/Track';
-import {find as findFile} from '../models/File';
+const Artist = require('../models/Artist');
+const Album  = require('../models/Album');
+const Track  = require('../models/Track');
+const File   = require('../models/File');
 
-import {fetchable, oneToMany, updateable} from './Controller';
-import merge from 'lodash/merge';
-import fs from 'fs';
+const {fetchable, oneToMany, updateable} = require('./Controller');
 
-export default merge({},
-  fetchable('track', findTrack, findTrackById),
-  updateable('track', findTrackById),
-  oneToMany('track', 'file', findFile), {
+const merge = require("lodash/merge");
+const fs    = require("fs");
+
+module.exports = merge({},
+  fetchable('track', Track.find, Track.findById),
+  updateable('track', Track.findById),
+  oneToMany('track', 'file', File.find), {
     '/api/v2/tracks/:id/stream':  {
       get: async (ctx, next) => {
-        let tracks = await findFile({
+        let tracks = await File.find({
           track: ctx.params.id - 0,
           sort: 'bitrate',
           direction: 'desc',

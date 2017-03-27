@@ -1,12 +1,12 @@
-import {fetchable,
+const {fetchable,
         createable,
         removeable,
         updateable,
-        oneToMany} from './Controller';
-import Model from '../models/Model';
+        oneToMany} = require('./Controller');
+const Model = require("../models/Model");
 
-import test from 'ava';
-import sinon from 'sinon';
+const test = require("ava");
+const sinon = require("sinon");
 
 test('fetchable - fetch multiple document', async t => {
   let find = sinon.spy(() => Promise.resolve([{
@@ -62,7 +62,7 @@ test('fetchable - return 404 when document not found', async t => {
   let throws = sinon.spy();
   let ctx = {
     params: {id: 42},
-    throws
+    throw: throws
   };
   await fetchable('character', null, findById)['/api/v2/characters/:id'].get(ctx);
 

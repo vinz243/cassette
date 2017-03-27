@@ -1,10 +1,7 @@
-import {Album, findOne, findById, find} from './Album';
-import {Artist,
-  findOne as findOneArtist,
-  findById as findArtistById,
-  find as findArtist} from './Artist';
+const {Album, findById, find}  = require('./Album');
+const Artist = require('./Artist');
 
-import test from 'ava';
+const test = require("ava");
 
 test('creates an Album object with correct props', t => {
   let soulPirate = Album('Soul Pirate');
