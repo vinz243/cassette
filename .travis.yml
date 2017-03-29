@@ -9,6 +9,14 @@ addons:
     packages:
       - g++-4.8
 
+cache:
+  yarn: true
+  directories:
+    - node_modules
+
+dist: trusty
+sudo: required
+
 node_js:
   - "7"
 
@@ -21,7 +29,6 @@ cache:
     - node_modules
 
 install:
-  - npm i -g npm@latest yarn
   - yarn
   - cp ./secure.json.template ./secure.json
   - sudo add-apt-repository ppa:mc3man/trusty-media -y
