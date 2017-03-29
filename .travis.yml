@@ -22,7 +22,7 @@ node_js:
 
 script:
   - yarn test
-  - yarn backend:coverage-travis -- -v
+  # - yarn backend:coverage-travis -- -v
 
 cache:
   directories:
