@@ -1,3 +1,5 @@
+require('./init.js');
+
 const body = require("koa-better-body");
 const chalk = require("chalk");
 const config = require("./config.js");

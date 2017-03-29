@@ -13,7 +13,7 @@ const {
     findOrCreateFactory,
     defaultValues,
     validator,
-    validators
+    enforce
   } = require('./Model');
 
 const test = require("ava");
@@ -657,21 +657,21 @@ test('validator - does not mutate valid props', async t => {
       int: 42
     }
   };
-  const validators = {
+  const enforce = {
     string: sinon.spy(val => val),
     boolean: sinon.spy(val => val),
     int: [sinon.spy(val => val + 1), sinon.spy(val => val - 1)],
   }
-  const {preUpdate} = validator(state, validators);
+  const {preUpdate} = validator(state, enforce);
   await preUpdate();
-  t.deepEqual(validators.string.args, [['a string']]);
-  t.deepEqual(validators.boolean.args, [[true]]);
-  t.deepEqual(validators.int[0].args, [[42]]);
-  t.deepEqual(validators.int[1].args, [[43]]);
+  t.deepEqual(enforce.string.args, [['a string']]);
+  t.deepEqual(enforce.boolean.args, [[true]]);
+  t.deepEqual(enforce.int[0].args, [[42]]);
+  t.deepEqual(enforce.int[1].args, [[43]]);
 });
 
-test('validators.required - does not do anything if defined', t => {
-  const fun = validators.required();
+test('enforce.required - does not do anything if defined', t => {
+  const fun = enforce.required();
   t.is(fun('foo'), 'foo');
   t.is(fun('undefined'), 'undefined');
   t.is(fun(false), false);
@@ -679,8 +679,8 @@ test('validators.required - does not do anything if defined', t => {
   t.is(fun(0), 0);
 })
 
-test('validators.required - throws if undefined', t => {
-  const fun = validators.required();
+test('enforce.required - throws if undefined', t => {
+  const fun = enforce.required();
 
   t.throws(() => fun(''));
   t.throws(() => fun(undefined));
@@ -688,8 +688,8 @@ test('validators.required - throws if undefined', t => {
   t.throws(() => fun());
 });
 
-test('validators.number - does not mutate if valid', t => {
-  const fun = validators.number();
+test('enforce.number - does not mutate if valid', t => {
+  const fun = enforce.number();
   t.is(fun(42), 42);
   t.is(fun('42'), '42');
   t.is(fun(1), 1);
@@ -698,8 +698,8 @@ test('validators.number - does not mutate if valid', t => {
   t.is(fun(0), 0);
 })
 
-test('validators.number - mutate if not valid number', t => {
-  const fun = validators.number();
+test('enforce.number - mutate if not valid number', t => {
+  const fun = enforce.number();
 
   t.is(fun('42a'), undefined);
   t.is(fun([1]), undefined);
@@ -708,8 +708,8 @@ test('validators.number - mutate if not valid number', t => {
   t.is(fun({x: 42}), undefined);
 });
 
-test('validators.string - mutate anything', t => {
-  const fun = validators.string();
+test('enforce.string - mutate anything', t => {
+  const fun = enforce.string();
   t.is(fun('42'), '42');
   t.is(fun(1), '1');
   t.is(fun(true), 'true');
@@ -717,8 +717,8 @@ test('validators.string - mutate anything', t => {
   t.is(fun('-1'), '-1');
 })
 
-test('validators.boolean - does not mutate if valid', t => {
-  const fun = validators.boolean();
+test('enforce.boolean - does not mutate if valid', t => {
+  const fun = enforce.boolean();
   t.is(fun(true), true);
   t.is(fun('true'), true);
   t.is(fun(1), true);
@@ -729,8 +729,8 @@ test('validators.boolean - does not mutate if valid', t => {
   t.is(fun('0'), false);
 })
 
-test('validators.boolean - mutate if not valid boolean', t => {
-  const fun = validators.boolean();
+test('enforce.boolean - mutate if not valid boolean', t => {
+  const fun = enforce.boolean();
 
   t.is(fun('42a'), undefined);
   t.is(fun('42a'), undefined);
@@ -759,8 +759,8 @@ const Person = function(props) {
     publicProps(state),
     legacySupport(state),
     validator(state, {
-      name: [validators.string(), validators.required()],
-      genre: [validators.string(
+      name: [enforce.string(), enforce.required()],
+      genre: [enforce.string(
         'male',
         'female',
         'transexual',
@@ -771,12 +771,12 @@ const Person = function(props) {
         'other'
       )],
       age: [
-        validators.number(),
-        validators.range(0, 120),
-        validators.required()
+        enforce.number(),
+        enforce.range(0, 120),
+        enforce.required()
       ],
-      height: [validators.number(), validators.range(0, 250)],
-      place: validators.string()
+      height: [enforce.number(), enforce.range(0, 250)],
+      place: enforce.string()
     }), defaultValues(state, {
       place: 'world'
     })

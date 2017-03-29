@@ -12,6 +12,7 @@ const omit   = require("lodash/omit");
 
 const assignWith = require("lodash/assignWith");
 const pluralize  = require("pluralize");
+const changeCase = require('change-case');
 
 const dataDir = path.join(conf.get('configPath'), '/database/');
 mkdirp.sync(dataDir);
@@ -48,7 +49,7 @@ const findOrCreateFactory = module.exports.findOrCreateFactory = (model) => {
 }
 
 const findFactory = module.exports.findFactory = (model, name, getDB = getDatabase) => {
-  return (query) => {
+  return (query = {}) => {
     return new Promise((resolve, reject) => {
       let optFields = ['limit', 'sort', 'skip', 'direction']
       let opts = pick(query, optFields);
@@ -60,16 +61,18 @@ const findFactory = module.exports.findFactory = (model, name, getDB = getDataba
       let sort = {};
       sort[opts.sort || 'name'] = opts.direction ?
         (opts.direction == 'asc' ? 1 : -1) : 1;
-      let res = getDatabase(name)
-        .find(Object.assign({}, omit(query, optFields), query._id ? {
+
+      const db = getDatabase(name);
+      const q = Object.assign({}, omit(query, optFields), query._id ? {
           _id: query._id - 0
-        } : {}))
+        } : {});
+
+      let res = db.find(q)
         .sort(sort)
         .limit(opts.limit)
         .skip(opts.skip || 0)
         .toArray((err, docs) => {
           if (err) return reject(err);
-
           let models = docs.map((el) => model({_id: el._id}));
 
           Promise.all(models.map(el => el.populate())).then(() => {
@@ -202,7 +205,7 @@ const publicProps = module.exports.publicProps = (state) => ({
   }
 });
 
-// This creates acomposite object that populates field `name` with
+// This creates a composite object that populates field `name` with
 // the child props. This is a hook.
 const manyToOne = module.exports.manyToOne = (state, name, getDB = getDatabase) => ({
   postGetProps: (props) => {
@@ -212,7 +215,7 @@ const manyToOne = module.exports.manyToOne = (state, name, getDB = getDatabase) 
       [name]: pop
     } : {});
   },
-  postPopulate: async () => {
+  postPopulate: () => {
     return new Promise((resolve, reject) => {
       if (!state.props[name]) return resolve();
       getDB(name).findOne({
@@ -324,7 +327,8 @@ const validator = module.exports.validator = (state, ...validators) => {
       try {
         Object.keys(val).forEach((key) => {
           let validators = [].concat(val[key]);
-          const value = validators.reduce((value, validate) => validate(value), state.props[key]);
+          const value = validators.reduce((value, validate) => validate(value),
+            state.props[key]);
           state.props[key] = value;
         });
         resolve();
@@ -339,7 +343,7 @@ const validator = module.exports.validator = (state, ...validators) => {
     preCreate: hook
   };
 }
-const validators = module.exports.validators = {
+const enforce = module.exports.enforce = {
   required: function () {
     return (value) => {
       if (['null', 'undefined', ''].includes(`${value}`)
@@ -382,7 +386,7 @@ const validators = module.exports.validators = {
   },
   oneOf: function (...array) {
     return (value) => {
-      if ([].concat(array).includes(value)) {
+      if ([].concat(...array).includes(value)) {
         return value;
       }
       return undefined;
