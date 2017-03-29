@@ -98,25 +98,25 @@ test('operationMapper - creates or finds a new artist', async t => {
   }]);
 });
 
-test('scan - works with directory', async t => {
-  let folder = path.join(__dirname, '../../../../data/library');
-  let library = Library({path: folder});
-  await library.create();
-  await scan(library.props._id);
-  let [props] = (await File.find({bitrate: 158110})).map(el => el.props);
-  t.deepEqual(props,{ duration: 297.900408,
-    bitrate: 158110,
-    path: path.join(folder, '/04 - Cleanin Out My Closet.mp3'),
-    _id: props._id,
-    album: { name: 'The Eminem Show', artist: props.artist._id, _id: props.album._id },
-    artist: { name: 'Eminem', _id: props.artist._id },
-    track: {
-      _id: props.track._id,
-      album: props.album._id,
-      artist: props.track._id,
-      duration: 297.900408,
-      name: 'Cleanin Out My Closet',
-      trackNumber: 4
-    }
-  });
-});
+// test('scan - works with directory', async t => {
+//   let folder = path.join(__dirname, '../../../../data/library');
+//   let library = Library({path: folder});
+//   await library.create();
+//   await scan(library.props._id);
+//   let [props] = (await File.find({bitrate: 158110})).map(el => el.props);
+//   t.deepEqual(props,{ duration: 297.900408,
+//     bitrate: 158110,
+//     path: path.join(folder, '/04 - Cleanin Out My Closet.mp3'),
+//     _id: props._id,
+//     album: { name: 'The Eminem Show', artist: props.artist._id, _id: props.album._id },
+//     artist: { name: 'Eminem', _id: props.artist._id },
+//     track: {
+//       _id: props.track._id,
+//       album: props.album._id,
+//       artist: props.track._id,
+//       duration: 297.900408,
+//       name: 'Cleanin Out My Closet',
+//       trackNumber: 4
+//     }
+//   });
+// });

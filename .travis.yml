@@ -25,3 +25,5 @@ install:
   - yarn
   - cp ./secure.json.template ./secure.json
   - sudo apt-get install ffmpeg
+  - ffmpeg
+  - ffprobe
