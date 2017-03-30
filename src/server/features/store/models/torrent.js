@@ -32,9 +32,9 @@ const Torrent = module.exports = function(props) {
   const state = {
     name: 'torrent',
     fields: [
-      'torrent_search',
+      'wanted_album',
       'tracker',
-      'rid',
+      'torrent_id',
       'seeders',
       'leechers',
       'size',
@@ -55,10 +55,10 @@ const Torrent = module.exports = function(props) {
     databaseLoader(state),
     publicProps(state),
     legacySupport(state),
-    manyToOne(state, 'torrent_search'),
+    manyToOne(state, 'wanted_album'),
     manyToOne(state, 'tracker'),
     validator(state, {
-      torrent_search: [enforce.number(), enforce.required()],
+      wanted_album: [enforce.number(), enforce.required()],
       tracker: [enforce.number(), enforce.required()],
       seeders: enforce.number(),
       leechers: enforce.number(),

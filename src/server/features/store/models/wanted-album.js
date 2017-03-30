@@ -19,7 +19,7 @@ const {
 const WantedAlbum = module.exports = function(props) {
   let state = {
     name: 'wanted_album',
-    fields: ['mbid', 'name', 'partial'],
+    fields: ['mbid', 'name', 'partial', 'download', 'artist'],
     functions: {},
     populated: {},
     props

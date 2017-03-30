@@ -326,9 +326,10 @@ const validator = module.exports.validator = (state, ...validators) => {
     return new Promise((resolve, reject) => {
       try {
         Object.keys(val).forEach((key) => {
-          let validators = [].concat(val[key]);
-          const value = validators.reduce((value, validate) => validate(value),
-            state.props[key]);
+          const validators = [].concat(val[key]);
+          const value = validators.reduce((value, validate) => {
+            return validate(value, key, state.props[key]);
+          }, state.props[key]);
           state.props[key] = value;
         });
         resolve();
@@ -345,10 +346,10 @@ const validator = module.exports.validator = (state, ...validators) => {
 }
 const enforce = module.exports.enforce = {
   required: function () {
-    return (value) => {
+    return (value, key, origValue) => {
       if (['null', 'undefined', ''].includes(`${value}`)
         && (typeof value !== 'string' || value === '')) {
-        throw new Error(`Missing required field`);
+        throw new Error(`Field '${key}' is required, but got '${origValue}'`);
       }
       return value;
     }

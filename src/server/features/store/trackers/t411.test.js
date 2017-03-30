@@ -1,10 +1,10 @@
-const test    = require('ava');
-const sinon   = require('sinon');
-const t411    = require('./t411');
-const request = require('request-promise-native');
-const torrent = require('../models/torrent');
-const tracker = require('../models/tracker');
-const search  = require('../models/search');
+const test        = require('ava');
+const sinon       = require('sinon');
+const t411        = require('./t411');
+const request     = require('request-promise-native');
+const torrent     = require('../models/torrent');
+const tracker     = require('../models/tracker');
+const WantedAlbum = require('../models/wanted-album');
 
 const trackerProps = {
   name: 'T411',
@@ -68,10 +68,8 @@ test('searchReleases - creates the releases a search results', async t => {
   t.is(typeof api.searchReleases, 'function');
 
   const res = await api.searchReleases({props: {
-    query: 'Toxicity',
-    type: 'release',
+    name: 'Toxicity',
     artist: 'System of A Down',
-    lossless: true,
     _id: 42
   }});
 
@@ -118,16 +116,16 @@ test('searchReleases - creates the releases', async t => {
 
   const api = await t411(req, instance);
 
-  const research = search({
-    query: 'Toxicity',
-    type: 'release',
+  const wantedAlbum = WantedAlbum({
+    name: 'Toxicity',
     artist: 'System of A Down',
-    lossless: true
+    mbid: 'f50fbcb4-bfcd-3784-b4c9-44f4793e66b2',
+    partial: false
   });
-  await research.create();
+  await wantedAlbum.create();
 
-  await api.searchReleases(research);
+  await api.searchReleases(wantedAlbum);
 
-  const releases = await torrent.find({torrent_search: research.props._id});
+  const releases = await torrent.find({wanted_album: wantedAlbum.props._id});
   t.is(releases.length, 2);
 });

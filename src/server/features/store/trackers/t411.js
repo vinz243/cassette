@@ -18,16 +18,15 @@ module.exports = async function (request, tracker) {
   }
 
   return {
-    searchReleases: async (search) => {
-      const {query, type, mrel_type, artist, lossless, _id} = search.props;
-
+    searchReleases: async (wanted) => {
+      const {partial, artist, name, _id} = wanted.props;
       assert(_id);
 
-      if (type === 'release') {
+      if (!partial) {
         const url = `https://api.${host}/torrents/search/${
           utils.formatToURL(artist)
         }+${
-          utils.formatToURL(query)
+          utils.formatToURL(name)
         }?cid=623`;
         const time = Date.now();
 
@@ -43,9 +42,9 @@ module.exports = async function (request, tracker) {
           throw new Error(`Remote: ${error}`);
         }
         const releases = torrents.map((el) => torrent({
-          torrent_search: _id,
+          wanted_album: _id,
           tracker: tracker.props._id,
-          rid: el._id,
+          torrent_id: el.id,
           seeders: el.seeders,
           leechers: el.leechers,
           size: el.size,
