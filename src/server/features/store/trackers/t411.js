@@ -2,7 +2,7 @@ const chalk       = require('chalk');
 const utils       = require('./utils');
 const assert      = require('assert');
 const {mainStory} = require('storyboard');
-const torrent     = require('../torrent');
+const torrent     = require('features/store/models/torrent');
 
 module.exports = async function (request, tracker) {
   const {username, password, host = 't411.ai'} = tracker.props;

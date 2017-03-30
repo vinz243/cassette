@@ -2,9 +2,9 @@ const test    = require('ava');
 const sinon   = require('sinon');
 const t411    = require('./t411');
 const request = require('request-promise-native');
-const torrent = require('../torrent');
-const tracker = require('../tracker');
-const search  = require('../search');
+const torrent = require('../models/torrent');
+const tracker = require('../models/tracker');
+const search  = require('../models/search');
 
 const trackerProps = {
   name: 'T411',
