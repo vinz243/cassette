@@ -2,7 +2,7 @@ const test    = require('ava');
 const sinon   = require('sinon');
 const t411    = require('./t411');
 const request = require('request-promise-native');
-const release = require('../release');
+const torrent = require('../torrent');
 const tracker = require('../tracker');
 const search  = require('../search');
 
@@ -85,7 +85,6 @@ test('searchReleases - creates the releases a search results', async t => {
 })
 
 test('searchReleases - creates the releases', async t => {
-  debugger;
   const req = Object.assign(sinon.spy(() => Promise.resolve({
     query: 'System+of+Down+Toxicity',
     offset: 0,
@@ -129,6 +128,6 @@ test('searchReleases - creates the releases', async t => {
 
   await api.searchReleases(research);
 
-  const releases = await release.find({release_search: research.props._id});
+  const releases = await torrent.find({torrent_search: research.props._id});
   t.is(releases.length, 2);
 });
