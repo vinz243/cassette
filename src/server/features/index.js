@@ -1,10 +1,9 @@
-// const search = require("./store");
-// const indexers = require("./indexers");
-// const downloaders = require("./downloaders");
+
 const artworks = require("./artworks");
 const jobs     = require("./jobs");
 const updater  = require("./updater");
+const store    = require("./store");
 
 module.exports = Object.assign({
 
-}, /*search, indexers, downloaders,*/ artworks, jobs, updater);
+}, store, artworks, jobs, updater);

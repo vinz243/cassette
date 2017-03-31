@@ -1,14 +1,11 @@
 #! /usr/bin/env node
 
-require('babel-polyfill');
 // console.log(require('config.js'));
 const path = require('path');
-const config = require('./lib/server/config');
+const config = require('./src/server/config');
 const express = require('express');
-const backend = require('./lib/server/server').default;
-// const serveStatic = require('serve-static');
-const processResult = require('./lib/server/models/Scan').processResult;
-// console.log(backend);
+const backend = require('./src/server/server').default;
+
 const assert = require('assert');
 const app = express();
 

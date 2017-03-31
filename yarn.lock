@@ -5297,6 +5297,14 @@ multimatch@^2.1.0:
     arrify "^1.0.0"
     minimatch "^3.0.0"
 
+musicbrainz@^0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/musicbrainz/-/musicbrainz-0.2.6.tgz#e9765ee3fcde78bb47978594d0ed73020ab392af"
+  dependencies:
+    request "1.9.x"
+    timetrickle "~0.1.1"
+    xml2js "0.1.x"
+
 mute-stream@0.0.5, mute-stream@~0.0.4:
   version "0.0.5"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.5.tgz#8fbfabb0a98a253d3184331f9e8deb7372fac6c0"
@@ -7361,6 +7369,10 @@ request-promise@^4.1.1:
     request-promise-core "1.1.1"
     stealthy-require "^1.0.0"
 
+request@1.9.x:
+  version "1.9.9"
+  resolved "https://registry.yarnpkg.com/request/-/request-1.9.9.tgz#af231fe87e3725a5db46ff74833f3aa0ebfd9151"
+
 request@2, request@^2.55.0, request@^2.61.0, request@^2.65.0, request@^2.75.0, request@^2.79.0:
   version "2.79.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.79.0.tgz#4dfe5bf6be8b8cdc37fcf93e04b65577722710de"
@@ -7555,7 +7567,7 @@ sass-loader@4.0.1:
     loader-utils "^0.2.15"
     object-assign "^4.1.0"
 
-sax@1.2.x, sax@>=0.6.0, sax@^1.1.4, sax@~1.2.1:
+sax@1.2.x, sax@>=0.1.1, sax@>=0.6.0, sax@^1.1.4, sax@~1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/sax/-/sax-1.2.1.tgz#7b8e656190b228e81a66aea748480d828cd2d37a"
 
@@ -8258,6 +8270,10 @@ timers-browserify@^2.0.2:
   dependencies:
     setimmediate "^1.0.4"
 
+timetrickle@~0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/timetrickle/-/timetrickle-0.1.1.tgz#f089e9619ce327f01e1ccac0d1a69bb31123cce8"
+
 timm@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/timm/-/timm-1.0.0.tgz#bef2179ecc129d4004bc546c5dcb2416b5295ef8"
@@ -8922,6 +8938,12 @@ xhr@^2.0.1:
 xml-parse-from-string@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/xml-parse-from-string/-/xml-parse-from-string-1.0.0.tgz#feba5809f3cd2d17d2e4239fa810cd0319fc5da5"
+
+xml2js@0.1.x:
+  version "0.1.14"
+  resolved "https://registry.yarnpkg.com/xml2js/-/xml2js-0.1.14.tgz#5274e67f5a64c5f92974cd85139e0332adc6b90c"
+  dependencies:
+    sax ">=0.1.1"
 
 xml2js@^0.4.5:
   version "0.4.17"
