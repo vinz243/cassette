@@ -20,7 +20,7 @@ script:
   # - yarn backend:coverage-travis -- -v
 
 install:
-  - npm install
+  - yarn
   - cp ./secure.json.template ./secure.json
   - sudo add-apt-repository ppa:mc3man/trusty-media -y
   - sudo apt-get update -q
