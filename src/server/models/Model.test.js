@@ -664,10 +664,10 @@ test('validator - does not mutate valid props', async t => {
   }
   const {preUpdate} = validator(state, enforce);
   await preUpdate();
-  t.deepEqual(enforce.string.args, [['a string']]);
-  t.deepEqual(enforce.boolean.args, [[true]]);
-  t.deepEqual(enforce.int[0].args, [[42]]);
-  t.deepEqual(enforce.int[1].args, [[43]]);
+  t.deepEqual(enforce.string.args, [['a string', 'string', 'a string']]);
+  t.deepEqual(enforce.boolean.args, [[true, 'boolean', true]]);
+  t.deepEqual(enforce.int[0].args, [[42, 'int', 42]]);
+  t.deepEqual(enforce.int[1].args, [[43, 'int', 42]]);
 });
 
 test('enforce.required - does not do anything if defined', t => {
