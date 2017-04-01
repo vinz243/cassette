@@ -33,7 +33,7 @@ module.exports = {
       ctx.body = (await musicbrainz.searchArtists(q.query, q.filter)).map(el => {
         const {id, type, name, country, lifeSpan} = el;
         return {id, type, name, country, lifeSpan};
-      });
+      }).slice(0, q.limit ? q.limit - 1 : undefined);
       ctx.status = 200;
     }
   },
@@ -58,7 +58,7 @@ module.exports = {
         .map(el => {
           const {id, type, title, firstReleaseDate} = el;
           return  {id, type, title, firstReleaseDate};
-        });
+        }).slice(0, q.limit ? q.limit - 1 : undefined);
       ctx.status = 200;
     }
   },
@@ -70,7 +70,7 @@ module.exports = {
       ctx.body = res.releaseGroups.map(el => {
         const {id, type, title, firstReleaseDate} = el;
         return {id, type, title, firstReleaseDate};
-      });
+      }).filter(r => r.type === 'Album');
       ctx.status = 200;
     }
   },

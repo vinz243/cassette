@@ -2,41 +2,56 @@ import { createStructuredSelector } from 'reselect';
 import assign  from 'lodash/assign';
 import axios from 'axios';
 
-const UPDATE_RESULTS = 'cassette/library/UPDATE_RESULTS';
-const UPDATE_RELEASES = 'cassette/library/UPDATE_RELEASES';
-const SET_LOSSLESS = 'cassette/library/SET_LOSSLESS';
-const HIDE_RELEASES = 'cassette/library/HIDE_RELEASES';
+const SEARCH_ARTISTS  = 'cassette/store/SEARCH_ARTISTS';
+const SEARCH_ALBUMS   = 'cassette/store/SEARCH_ALBUMS';
+const OPEN_ARTIST     = 'cassette/store/OPEN_ARTIST';
+const OPEN_ALBUM      = 'cassette/store/OPEN_ALBUM';
+const DOWNLOAD_ALBUM  = 'cassette/store/DOWNLOAD_ALBUM';
+const SELECT_ARTIST   = 'cassette/store/SELECT_ARTIST';
 
 
 const initialState = {
-  query: '',
-  results: {
-    albums: [],
-    tracks: []
+  artists: [],
+  albums: [],
+  selectedArtist: '',
+  artist: {
+    id: '',
+    name: '',
+    albums: []
   },
-  releases: [],
-  lossless: false,
-  showReleases: false
+  album: {
+    id: '',
+    name: '',
+    tracks: []
+  }
 }
+
 export const NAME = 'store';
+
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
-    case HIDE_RELEASES:
+    case SEARCH_ARTISTS:
       return Object.assign({}, state, {
-        showReleases: false
+        artists: action.data,
+        selectedArtist: ''
       });
-    case UPDATE_RESULTS:
+    case SEARCH_ALBUMS:
       return Object.assign({}, state, {
-        results: action.data
+        albums: action.data
       });
-    case UPDATE_RELEASES:
+    case OPEN_ARTIST:
       return Object.assign({}, state, {
-        showReleases: true,
-        releases: action.data
+        albums: action.data
       });
-    case SET_LOSSLESS:
+    case OPEN_ALBUM:
       return Object.assign({}, state, {
-        lossless: action.flag
+        artists: [],
+        albums: [],
+        album: action.data
+      });
+    case SELECT_ARTIST:
+      return Object.assign({}, state, {
+        selectedArtist: action.mbid
       });
   }
   return state;
@@ -48,36 +63,41 @@ export const selector = createStructuredSelector({
   store
 });
 
-function searchAndUpdateResults(query) {
-  return axios.post('/v1/store/searches', {
-    query: query,
-    limit: 25
-  }).then((response) => {
-    return Promise.resolve({
-      type: UPDATE_RESULTS,
-      data: response.data.data
-    });
-  });
-}
-function findReleases(id, lossless = false) {
-  return axios.get(`/v1/store/${id}/releases?lossless=${lossless - 0}`).then(response => {
-    return Promise.resolve({
-      type: UPDATE_RELEASES,
-      data: response.data.data.sort((a, b) => b.score.total - a.score.total)
-    });
-  });
-}
-function hideReleases() {
+function searchArtists (query) {
+  return axios.post('/api/v2/store/artists/searches', {
+    query, limit: 10
+  }).then(res => {
     return {
-      type: HIDE_RELEASES
+      data: res.data,
+      type: SEARCH_ARTISTS
     }
+  })
 }
-function setLossless(flag) {
+function searchAlbums (query) {
+  return axios.post('/api/v2/store/release-groups/searches', {
+    query, limit: 10
+  }).then(res => {
+    return {
+      data: res.data,
+      type: SEARCH_ALBUMS
+    }
+  })
+}
+function openArtist (id) {
+  return axios.get(`/api/v2/store/artists/${id}/release-groups`).then((res) => {
+    return {
+      data: res.data,
+      type: OPEN_ARTIST
+    }
+  })
+}
+function selectArtist (mbid) {
   return {
-    type: SET_LOSSLESS,
-    flag
+    type: SELECT_ARTIST,
+    mbid
   }
 }
+
 export const actionCreators = {
-  searchAndUpdateResults, findReleases, setLossless, hideReleases
+  searchArtists, selectArtist, searchAlbums, openArtist
 }

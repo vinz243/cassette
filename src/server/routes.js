@@ -6,6 +6,7 @@ const tracksController = require("./controllers/tracks");
 const scansController = require("./controllers/scans");
 // const filesController = require("./controllers/files");
 const features = require("./features");
+const assets = require("./assets");
 // const jobController = require("./controllers/job");
 
 let routes = {};
@@ -16,8 +17,8 @@ Object.assign(routes,
   tracksController,
   librariesController,
   scansController);
-  
-Object.assign(routes, features)
+
+Object.assign(routes, features, assets)
 
 module.exports = function (router) {
   for(let route in routes) {
