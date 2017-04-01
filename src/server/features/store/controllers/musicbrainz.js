@@ -21,9 +21,10 @@ module.exports = {
         type,
         name,
         country,
+        disambiguation,
         lifeSpan
       } = await musicbrainz.lookupArtist(ctx.params.mbid, []);
-      ctx.body = {id, type, name, country, lifeSpan};
+      ctx.body = {id, type, name, country, disambiguation, lifeSpan};
       ctx.status = 200;
     }
   },
@@ -32,21 +33,32 @@ module.exports = {
       let q = Object.assign({}, ctx.request.fields || {},
         ctx.request.body || {}, {filter: {}});
 
-      ctx.body = (await musicbrainz.searchArtists(q.query, q.filter)).map(el => {
-        const {id, type, name, country, lifeSpan} = el;
-        return {id, type, name, country, lifeSpan};
-      }).slice(0, q.limit ? q.limit - 1 : undefined);
+      const {artists} = await request.get({
+        url: `https://musicbrainz.org/ws/2/artist?query=${
+          q.query
+        }&fmt=json&limit=${q.limit}`,
+        headers: {
+          'User-Agent': musicbrainz.userAgent()
+        },
+        json: true
+      });
+      ctx.body = artists;
       ctx.status = 200;
     }
   },
   '/api/v2/store/release-groups/:mbid': {
     get: async function (ctx) {
-      const res = await musicbrainz.lookupReleaseGroup(ctx.params.mbid, []);
+      const res = await musicbrainz.lookupReleaseGroup(ctx.params.mbid,
+        ['artists']);
+
+      const artist  = group.artistCredits[0].artist;
+      console.log(group.artistCredits);
       ctx.body = {
         id: res.id,
         type: res.type,
         title: res.title,
-        firstReleaseDate: res.firstReleaseDate
+        firstReleaseDate: res.firstReleaseDate,
+        artist
       }
       ctx.status = 200;
     }
@@ -56,11 +68,16 @@ module.exports = {
       let q = Object.assign({}, ctx.request.fields || {},
         ctx.request.body || {}, {filter: {}});
 
-      ctx.body = (await musicbrainz.searchReleaseGroups(q.query, q.filter))
-        .map(el => {
-          const {id, type, title, firstReleaseDate} = el;
-          return  {id, type, title, firstReleaseDate};
-        }).slice(0, q.limit ? q.limit - 1 : undefined);
+      const res = await request.get({
+        url: `https://musicbrainz.org/ws/2/release-group?query=${
+          q.query
+        }&fmt=json&limit=${q.limit}`,
+        headers: {
+          'User-Agent': musicbrainz.userAgent()
+        },
+        json: true
+      });
+      ctx.body = res['release-groups'];
       ctx.status = 200;
     }
   },
@@ -120,7 +137,7 @@ module.exports = {
         },
         json: true
       });
-      
+
       res.media = media;
 
       ctx.body = res;

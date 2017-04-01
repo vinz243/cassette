@@ -33,7 +33,7 @@ export default class AppView extends Component {
                 zIndex: 998,
                 position: 'fixed',
                 boxShadow: '0px 0px 18px 0px rgba(0,0,0,0.75)',
-                backgroundColor: 'rgb(45, 45, 46)',
+                backgroundColor: 'rgb(45, 45, 52)',
                 top: '64px',
                 bottom: '0px'
               }} >

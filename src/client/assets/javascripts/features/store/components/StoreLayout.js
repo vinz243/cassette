@@ -55,6 +55,7 @@ export default class LibraryLayout extends Component {
             actions.fetchArtistAlbums(el.id);
           } }>
           <span>{el.name}</span>
+          <div className="dis">{el.disambiguation}</div>
         </div>
       )) : <div className="spinner">
       <Spinner spinnerName="three-bounce" noFadeIn />
@@ -75,6 +76,7 @@ export default class LibraryLayout extends Component {
             () => actions.openAlbum(el.id)
           }>
           <span>{el.title}</span>
+          <div className="dis">{el['primary-type']} by {el['artist-credit'][0].artist.name}</div>
         </div>
       )) : <div className="spinner">
       <Spinner spinnerName="three-bounce" noFadeIn />
@@ -129,26 +131,14 @@ export default class LibraryLayout extends Component {
         <div className="results">
           <Flex>
             <Box className="artistResults" col={3}>
-              <ReactCSSTransitionGroup
-                transitionName="group"
-                transitionEnterTimeout={400}
-                transitionLeaveTimeout={300}
-                component={this.firstChild}>
                 <div key={`${store.query.artists}::${!!results.artists}`}>
                   {artists}
                 </div>
-              </ReactCSSTransitionGroup>
             </Box>
             <Box className="albumResults" col={3}>
-              <ReactCSSTransitionGroup
-                transitionName="group"
-                transitionEnterTimeout={400}
-                transitionLeaveTimeout={300}
-                component={this.firstChild}>
                 <div key={`${store.query.albums}::${!!results.albums}`}>
                   {albums}
                 </div>
-              </ReactCSSTransitionGroup>
             </Box>
             <Box className="album" col={6}>
               {/*store.album.id ? album : <div></div>*/}
