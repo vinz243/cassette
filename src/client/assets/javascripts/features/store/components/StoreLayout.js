@@ -4,6 +4,7 @@ import './StoreApp.scss';
 import classnames from 'classnames';
 import {Flex, Box} from 'reflexbox';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
+import Spinner from 'react-spinkit';
 
 export default class LibraryLayout extends Component {
   static propTypes = {
@@ -15,6 +16,9 @@ export default class LibraryLayout extends Component {
       searchString: ''
     };
   }
+  componentDidMount () {
+    this.input.focus();
+  }
   searchStringChange (e) {
     this.setState({
       searchString: e.target.value
@@ -23,64 +27,88 @@ export default class LibraryLayout extends Component {
   search (evt) {
     const { store, actions } = this.props;
     if (evt.key === 'Enter') {
-      actions.loadArtists();
-      actions.loadAlbums();
-      actions.searchArtists(this.state.searchString);
-      actions.searchAlbums(this.state.searchString);
+      actions.fetchArtistsResult(this.state.searchString);
+      actions.fetchAlbumsResult(this.state.searchString);
     }
+  }
+  getResults () {
+    const state = this.props.store;
+    return {
+      artists: state.artistsByQuery[state.query.artists],
+      albums: state.albumsByQuery[state.query.albums]
+    }
+  }
+  firstChild (props) {
+    const childrenArray = React.Children.toArray(props.children);
+    return childrenArray[0] || null;
   }
   render () {
     const { store, actions } = this.props;
-    const artists = store.artistsLoading ?
-      <div></div> : store.artists.map((el) => (
-      <div className={classnames('artistItem', {
-          selected: el.id === store.selectedArtist,
-          anySelected: store.selectedArtist
-        })} key={el.id} onClick={() => {
-          actions.selectArtist(el.id);
-          actions.openArtist(el.id);
-        } }>
-        <span>{el.name}</span>
-      </div>
-    ));
+    const results = this.getResults();
 
-    const albums = !store.artistsLoading ? store.albums.map((el) => (
-      <div className={classnames('artistItem')}
-        key={el.id} onClick={
-          () => actions.openAlbum(el.id)
-        }>
-        <span>{el.title}</span>
+    const artists = store.query.artists ?
+      (results.artists ? results.artists.map((el) => (
+        <div className={classnames('artistItem', {
+            selected: el.id === store.query.albums,
+            anySelected: store.query.albums && store.query.albums !== store.query.artists
+          })} key={el.id} onClick={() => {
+            actions.fetchArtistAlbums(el.id);
+          } }>
+          <span>{el.name}</span>
+        </div>
+      )) : <div className="spinner">
+      <Spinner spinnerName="three-bounce" noFadeIn />
+    </div>) : <div className="pt-non-ideal-state">
+      <div className="pt-non-ideal-state-visual pt-non-ideal-state-icon">
+        <span className="pt-icon pt-icon-geosearch"></span>
       </div>
-    )) : <div></div>;
-    const tracks = store.album.media.map((medium) => {
-        const title = medium.title ? <div className="title"></div> : <div></div>;
-        const tracks = medium.tracks.map((track) => {
-          return <div className="track">
-            <span className="number">{track.number}</span>
-            <span className="title">{track.title}</span>
-          </div>
-        });
-        return <div>
-          {title}
-          {tracks}
-        </div>
-    });
-
-    const album = <div>
-        <Flex>
-          <Box>
-              <img src={`/api/v2/store/release-groups/${store.album.groupId}/artwork?size=150`} />
-          </Box>
-          <Box className="albumInfo">
-            <div className="artistName">{store.album.artist}</div>
-            <div className="albumName">{store.album.title}</div>
-            <div className="trackCount">13 tracks</div>
-          </Box>
-        </Flex>
-        <div className="tracks">
-          {tracks}
-        </div>
+      <h4 className="pt-non-ideal-state-title">No search query</h4>
+      <div className="pt-non-ideal-state-description">
+        Type something to see results
+      </div>
     </div>
+
+    const albums = store.query.albums ? (results.albums ?
+      results.albums.map((el) => (
+        <div className={classnames('artistItem')}
+          key={el.id} onClick={
+            () => actions.openAlbum(el.id)
+          }>
+          <span>{el.title}</span>
+        </div>
+      )) : <div className="spinner">
+      <Spinner spinnerName="three-bounce" noFadeIn />
+      </div>) : null;
+
+    // const tracks = store.album.media.map((medium) => {
+    //     const title = medium.title ? <div className="title"></div> : <div></div>;
+    //     const tracks = medium.tracks.map((track) => {
+    //       return <div className="track">
+    //         <span className="number">{track.number}</span>
+    //         <span className="title">{track.title}</span>
+    //       </div>
+    //     });
+    //     return <div>
+    //       {title}
+    //       {tracks}
+    //     </div>
+    // });
+
+    // const album = <div>
+    //     <Flex>
+    //       <Box>
+    //           <img src={`/api/v2/store/release-groups/${store.album.groupId}/artwork?size=150`} />
+    //       </Box>
+    //       <Box className="albumInfo">
+    //         <div className="artistName">{store.album.artist}</div>
+    //         <div className="albumName">{store.album.title}</div>
+    //         <div className="trackCount">13 tracks</div>
+    //       </Box>
+    //     </Flex>
+    //     <div className="tracks">
+    //       {tracks}
+    //     </div>
+    // </div>
     return (
     	<div className="storeContainer">
         <div className="storeNav">
@@ -89,6 +117,7 @@ export default class LibraryLayout extends Component {
           <div className="pt-input-group .modifier">
             <span className="pt-icon pt-icon-search"></span>
             <input className="pt-input"
+              ref={(el) => this.input = el}
               type="search" placeholder="Search input"
               onChange={this.searchStringChange.bind(this)}
               onKeyPress={this.search.bind(this)} dir="auto" />
@@ -99,24 +128,30 @@ export default class LibraryLayout extends Component {
         </div>
         <div className="results">
           <Flex>
-            <Box className="artistResults">
+            <Box className="artistResults" col={3}>
               <ReactCSSTransitionGroup
                 transitionName="group"
                 transitionEnterTimeout={400}
-                transitionLeaveTimeout={300}>
-                {artists}
+                transitionLeaveTimeout={300}
+                component={this.firstChild}>
+                <div key={`${store.query.artists}::${!!results.artists}`}>
+                  {artists}
+                </div>
               </ReactCSSTransitionGroup>
             </Box>
-            <Box className="albumResults">
+            <Box className="albumResults" col={3}>
               <ReactCSSTransitionGroup
                 transitionName="group"
                 transitionEnterTimeout={400}
-                transitionLeaveTimeout={300}>
-                {albums}
+                transitionLeaveTimeout={300}
+                component={this.firstChild}>
+                <div key={`${store.query.albums}::${!!results.albums}`}>
+                  {albums}
+                </div>
               </ReactCSSTransitionGroup>
             </Box>
-            <Box className="album">
-              {store.album.id ? album : <div></div>}
+            <Box className="album" col={6}>
+              {/*store.album.id ? album : <div></div>*/}
             </Box>
           </Flex>
         </div>

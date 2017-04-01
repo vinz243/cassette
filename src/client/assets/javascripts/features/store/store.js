@@ -2,70 +2,35 @@ import { createStructuredSelector } from 'reselect';
 import assign  from 'lodash/assign';
 import axios from 'axios';
 
-const SEARCH_ARTISTS  = 'cassette/store/SEARCH_ARTISTS';
-const SEARCH_ALBUMS   = 'cassette/store/SEARCH_ALBUMS';
-const OPEN_ARTIST     = 'cassette/store/OPEN_ARTIST';
-const OPEN_ALBUM      = 'cassette/store/OPEN_ALBUM';
-const DOWNLOAD_ALBUM  = 'cassette/store/DOWNLOAD_ALBUM';
-const SELECT_ARTIST   = 'cassette/store/SELECT_ARTIST';
-const LOAD_ARTISTS    = 'cassette/store/LOAD_ARTISTS';
-const LOAD_ALBUMS     = 'cassette/store/LOAD_ALBUMS';
+const SET_ARTIST_RESULTS  = 'cassette/store/SET_ARTIST_RESULTS';
+const SET_ALBUMS_RESULTS  = 'cassette/store/SET_ALBUMS_RESULTS';
+const SET_QUERY           = 'cassette/store/SET_QUERY';
 
 
 const initialState = {
-  artists: [],
-  albums: [],
-  artistsLoading: false,
-  albumsLoading: false,
-  selectedArtist: '',
-  artist: {
-    id: '',
-    name: '',
-    albums: []
-  },
-  album: {
-    id: '',
-    name: '',
-    media: []
-  }
+  currentAlbum: '',
+  albumsById: {},
+  albumsByArtist: {},
+  artistsByQuery: {},
+  albumsByQuery: {},
+  query: {}
 }
 
 export const NAME = 'store';
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
-    case SEARCH_ARTISTS:
+    case SET_QUERY:
       return Object.assign({}, state, {
-        artists: action.data,
-        selectedArtist: '',
-        artistsLoading: false
+        query: Object.assign({}, state.query, action.query)
       });
-    case SEARCH_ALBUMS:
+    case SET_ARTIST_RESULTS:
       return Object.assign({}, state, {
-        albums: action.data,
-        albumsLoading: false
+        artistsByQuery: Object.assign({}, state.artistsByQuery, action.results)
       });
-    case OPEN_ARTIST:
+    case SET_ALBUMS_RESULTS:
       return Object.assign({}, state, {
-        albums: action.data
-      });
-    case OPEN_ALBUM:
-      return Object.assign({}, state, {
-        album: action.data
-      });
-    case SELECT_ARTIST:
-      return Object.assign({}, state, {
-        selectedArtist: action.mbid
-      });
-    case LOAD_ARTISTS:
-      return Object.assign({}, state, {
-        artistsLoading: true,
-        artists: []
-      });
-    case LOAD_ALBUMS:
-      return Object.assign({}, state, {
-        albumsLoading: true,
-        albums: []
+        albumsByQuery: Object.assign({}, state.albumsByQuery, action.results)
       });
   }
   return state;
@@ -77,60 +42,101 @@ export const selector = createStructuredSelector({
   store
 });
 
-function searchArtists (query) {
-  return axios.post('/api/v2/store/artists/searches', {
-    query, limit: 10
-  }).then(res => {
-    return {
-      data: res.data,
-      type: SEARCH_ARTISTS
-    }
-  })
+function setQuery (query) {
+  return {
+    type: SET_QUERY,
+    query
+  }
 }
-function searchAlbums (query) {
-  return axios.post('/api/v2/store/release-groups/searches', {
-    query, limit: 10
-  }).then(res => {
-    return {
-      data: res.data,
-      type: SEARCH_ALBUMS
+
+function fetchArtistsResult (query) {
+  query = query.toLowerCase();
+  const blank = {
+    type: SET_ARTIST_RESULTS,
+    results: {}
+  };
+  return function (dispatch, getState) {
+    const state = getState().store;
+    if (state.query.artists === query) {
+      return dispatch(blank);
     }
-  })
-}
-function openArtist (id) {
-  return axios.get(`/api/v2/store/artists/${id}/release-groups`).then((res) => {
-    return {
-      data: res.data,
-      type: OPEN_ARTIST
+    dispatch(setQuery({artists: query}));
+    if (state.artistsByQuery[query]) {
+      return dispatch(blank);
     }
-  })
-}
-function openAlbum (id) {
-  return axios.get(`/api/v2/store/release-groups/${id}/release`)
-    .then(({data}) => {
-      return {
-        type: OPEN_ALBUM,
-        data
+    axios.post('/api/v2/store/artists/searches', {query}).then(({data}) => {
+      if (getState().store.artistsByQuery[query]) {
+        dispatch(blank);
+      } else {
+        dispatch({
+          type: SET_ARTIST_RESULTS,
+          results: {
+            [query]: data
+          }
+        });
       }
     });
-}
-function selectArtist (mbid) {
-  return {
-    type: SELECT_ARTIST,
-    mbid
   }
 }
-function loadArtists () {
-  return {
-    type: LOAD_ARTISTS
+function fetchAlbumsResult (query) {
+  query = query.toLowerCase();
+  const blank = {
+    type: SET_ALBUMS_RESULTS,
+    results: {}
+  };
+  return function (dispatch, getState) {
+    const state = getState().store;
+    if (state.query.albums === query) {
+      return dispatch(blank);
+    }
+    dispatch(setQuery({albums: query}));
+    if (state.albumsByQuery[query]) {
+      return dispatch(blank);
+    }
+    axios.post('/api/v2/store/release-groups/searches', {query}).then(({data}) => {
+      if (getState().store.albumsByQuery[query]) {
+        dispatch(blank);
+      } else {
+        dispatch({
+          type: SET_ALBUMS_RESULTS,
+          results: {
+            [query]: data
+          }
+        });
+      }
+    });
   }
 }
-function loadAlbums () {
-  return {
-    type: LOAD_ALBUMS
+function fetchArtistAlbums(artist) {
+  const blank = {
+    type: SET_ALBUMS_RESULTS,
+    results: {}
+  };
+  return function (dispatch, getState) {
+    const state = getState().store;
+    if (state.query.albums === artist) {
+      return dispatch(blank);
+    }
+    dispatch(setQuery({albums: artist}));
+    if (state.albumsByQuery[artist]) {
+      return dispatch(blank);
+    }
+    axios.get(`/api/v2/store/artists/${artist}/release-groups`)
+      .then(({data}) => {
+        if (getState().store.albumsByQuery[artist]) {
+          dispatch(blank);
+        } else {
+          dispatch({
+            type: SET_ALBUMS_RESULTS,
+            results: {
+              [artist]: data
+            }
+          });
+        }
+      });
   }
 }
 
 export const actionCreators = {
-  searchArtists, selectArtist, searchAlbums, openArtist, loadArtists, loadAlbums, openAlbum
+  fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums
 }

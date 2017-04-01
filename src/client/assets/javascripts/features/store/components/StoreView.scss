@@ -17,7 +17,10 @@
   }
   .results {
     margin: 2.4em;
-
+    .spinner {
+      text-align: center;
+      margin-top: 40px;
+    }
     .album {
       img {
         margin: 1em;

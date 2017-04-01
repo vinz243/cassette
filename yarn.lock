@@ -7024,6 +7024,13 @@ react-slick@~0.14.2:
     react-responsive-mixin "^0.4.0"
     slick-carousel "^1.6.0"
 
+react-spinkit@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/react-spinkit/-/react-spinkit-2.1.1.tgz#a666f02367147de8151c1f7671453d56cef4650f"
+  dependencies:
+    classnames "^2.2.3"
+    object-assign "^4.1.0"
+
 react@15.3.1:
   version "15.3.1"
   resolved "https://registry.yarnpkg.com/react/-/react-15.3.1.tgz#f78501ed8c2ec6e6e31c3223652e97f1369d2bd6"
@@ -7249,9 +7256,9 @@ redux-slider-monitor@1.0.7:
     css-element-queries "^0.3.2"
     redux-devtools-themes "^1.0.0"
 
-redux-thunk@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.1.0.tgz#c724bfee75dbe352da2e3ba9bc14302badd89a98"
+redux-thunk@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/redux-thunk/-/redux-thunk-2.2.0.tgz#e615a16e16b47a19a515766133d1e3e99b7852e5"
 
 redux@^3.5.2, redux@^3.6.0:
   version "3.6.0"
