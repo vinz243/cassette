@@ -46,11 +46,41 @@ export default class LibraryLayout extends Component {
 
     const albums = !store.artistsLoading ? store.albums.map((el) => (
       <div className={classnames('artistItem')}
-        key={el.id}>
+        key={el.id} onClick={
+          () => actions.openAlbum(el.id)
+        }>
         <span>{el.title}</span>
       </div>
     )) : <div></div>;
+    const tracks = store.album.media.map((medium) => {
+        const title = medium.title ? <div className="title"></div> : <div></div>;
+        const tracks = medium.tracks.map((track) => {
+          return <div className="track">
+            <span className="number">{track.number}</span>
+            <span className="title">{track.title}</span>
+          </div>
+        });
+        return <div>
+          {title}
+          {tracks}
+        </div>
+    });
 
+    const album = <div>
+        <Flex>
+          <Box>
+              <img src={`/api/v2/store/release-groups/${store.album.groupId}/artwork?size=150`} />
+          </Box>
+          <Box className="albumInfo">
+            <div className="artistName">{store.album.artist}</div>
+            <div className="albumName">{store.album.title}</div>
+            <div className="trackCount">13 tracks</div>
+          </Box>
+        </Flex>
+        <div className="tracks">
+          {tracks}
+        </div>
+    </div>
     return (
     	<div className="storeContainer">
         <div className="storeNav">
@@ -84,6 +114,9 @@ export default class LibraryLayout extends Component {
                 transitionLeaveTimeout={300}>
                 {albums}
               </ReactCSSTransitionGroup>
+            </Box>
+            <Box className="album">
+              {store.album.id ? album : <div></div>}
             </Box>
           </Flex>
         </div>

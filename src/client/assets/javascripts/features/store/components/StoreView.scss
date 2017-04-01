@@ -18,6 +18,39 @@
   .results {
     margin: 2.4em;
 
+    .album {
+      img {
+        margin: 1em;
+        background-image: url(/api/v2/assets/no-album.jpg?size=150);
+      }
+      .albumInfo {
+        .artistName {
+
+        }
+        .albumName {
+
+        }
+        .trackCount {
+
+        }
+      }
+      .tracks {
+        .title {
+
+        }
+        .track {
+          margin: 0.1em 1em;
+          .number {
+            width: 25px;
+            color: #5a5a63;
+          }
+          .title {
+            margin-left: 1em;
+          }
+        }
+      }
+    }
+
     .albumResults, .artistResults {
       height: 65vh;
       overflow-y: auto;

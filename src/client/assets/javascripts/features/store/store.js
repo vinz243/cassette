@@ -26,7 +26,7 @@ const initialState = {
   album: {
     id: '',
     name: '',
-    tracks: []
+    media: []
   }
 }
 
@@ -51,8 +51,6 @@ export default function reducer(state = initialState, action = {}) {
       });
     case OPEN_ALBUM:
       return Object.assign({}, state, {
-        artists: [],
-        albums: [],
         album: action.data
       });
     case SELECT_ARTIST:
@@ -107,6 +105,15 @@ function openArtist (id) {
     }
   })
 }
+function openAlbum (id) {
+  return axios.get(`/api/v2/store/release-groups/${id}/release`)
+    .then(({data}) => {
+      return {
+        type: OPEN_ALBUM,
+        data
+      }
+    });
+}
 function selectArtist (mbid) {
   return {
     type: SELECT_ARTIST,
@@ -125,5 +132,5 @@ function loadAlbums () {
 }
 
 export const actionCreators = {
-  searchArtists, selectArtist, searchAlbums, openArtist, loadArtists, loadAlbums
+  searchArtists, selectArtist, searchAlbums, openArtist, loadArtists, loadAlbums, openAlbum
 }

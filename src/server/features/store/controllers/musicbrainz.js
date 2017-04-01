@@ -7,6 +7,8 @@ const musicbrainz = thenifyAll(require('musicbrainz'));
 
 const {getClosestSize} = require('features/artworks/sizes');
 
+const {mainStory} = require('storyboard');
+
 const cache = {};
 const MAX_CACHE_SIZE = 20; // Allows caching of 20 artworks
 const keys = [];
@@ -71,6 +73,57 @@ module.exports = {
         const {id, type, title, firstReleaseDate} = el;
         return {id, type, title, firstReleaseDate};
       }).filter(r => r.type === 'Album');
+      ctx.status = 200;
+    }
+  },
+  '/api/v2/store/release-groups/:mbid/release': {
+    get: async function (ctx) {
+      const group = await musicbrainz.lookupReleaseGroup(ctx.params.mbid, [
+        'releases', 'artists'
+      ]);
+      const releases = group.releases.filter((rel) => {
+        return rel.date === group.firstReleaseDate;
+      });
+
+      if (!releases) {
+        mainStory.warn('store', `No release found for ${
+          group.title} with date ${group.firstReleaseDate}`, {
+            attach: group.releases
+          });
+        return;
+      }
+
+      if (releases.length > 1) {
+        mainStory.warn('store', `Several releases found for ${
+          group.title} with date ${group.firstReleaseDate
+          }, dropping last releases`, {
+            attach: releases
+          });
+      }
+      const [release] = releases;
+      const artist  = group.artistCredits[0].artist;
+      const res = {
+        title: group.title,
+        id: release.id,
+        artist: artist.name,
+        artistId: artist.id,
+        date: release.date,
+        groupId: group.id,
+        status: release.status['#'],
+      }
+      const {media} = await request.get({
+        url:`http://musicbrainz.org/ws/2/release/${
+          release.id
+        }?inc=recordings&fmt=json`,
+        headers: {
+          'User-Agent': musicbrainz.userAgent()
+        },
+        json: true
+      });
+      
+      res.media = media;
+
+      ctx.body = res;
       ctx.status = 200;
     }
   },
