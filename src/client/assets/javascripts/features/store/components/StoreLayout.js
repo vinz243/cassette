@@ -23,13 +23,16 @@ export default class LibraryLayout extends Component {
   search (evt) {
     const { store, actions } = this.props;
     if (evt.key === 'Enter') {
+      actions.loadArtists();
+      actions.loadAlbums();
       actions.searchArtists(this.state.searchString);
       actions.searchAlbums(this.state.searchString);
     }
   }
   render () {
     const { store, actions } = this.props;
-    const artists = store.artists.map((el) => (
+    const artists = store.artistsLoading ?
+      <div></div> : store.artists.map((el) => (
       <div className={classnames('artistItem', {
           selected: el.id === store.selectedArtist,
           anySelected: store.selectedArtist
@@ -41,12 +44,12 @@ export default class LibraryLayout extends Component {
       </div>
     ));
 
-    const albums = store.albums.map((el) => (
+    const albums = !store.artistsLoading ? store.albums.map((el) => (
       <div className={classnames('artistItem')}
         key={el.id}>
         <span>{el.title}</span>
       </div>
-    ));
+    )) : <div></div>;
 
     return (
     	<div className="storeContainer">
