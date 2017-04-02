@@ -18,6 +18,18 @@ export default class LibraryLayout extends Component {
   }
   componentDidMount () {
     this.input.focus();
+    window.addEventListener('resize', (evt) => {
+      window.requestAnimationFrame(() => {
+        this.updateHeight();
+      })
+    });
+    this.updateHeight();
+  }
+  updateHeight () {
+    this.artistsDiv.style.height =
+      (window.innerHeight - this.artistsDiv.getBoundingClientRect().top - 38.4) + "px";
+    this.albumsDiv.style.height =
+      (window.innerHeight - this.albumsDiv.getBoundingClientRect().top - 38.4) + "px";
   }
   searchStringChange (e) {
     this.setState({
@@ -132,12 +144,12 @@ export default class LibraryLayout extends Component {
         <div className="results">
           <Flex>
             <Box className="artistResults" col={3}>
-                <div key={`${store.query.artists}::${!!results.artists}`}>
+                <div ref={(ref) => this.artistsDiv = ref}>
                   {artists}
                 </div>
             </Box>
             <Box className="albumResults" col={3}>
-                <div key={`${store.query.albums}::${!!results.albums}`}>
+                <div ref={(ref) => this.albumsDiv = ref}>
                   {albums}
                 </div>
             </Box>

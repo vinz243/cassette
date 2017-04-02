@@ -16,7 +16,7 @@
     }
   }
   .results {
-    margin: 2.4em;
+    margin: 2.4em 2.4em 0 2.4em;
     .spinner {
       text-align: center;
       margin-top: 40px;
@@ -55,7 +55,6 @@
     }
 
     .albumResults, .artistResults {
-      height: 65vh;
       overflow-y: auto;
       margin-right: 3em;
       &::-webkit-scrollbar {
