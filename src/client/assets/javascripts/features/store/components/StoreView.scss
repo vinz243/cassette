@@ -15,6 +15,15 @@
       width: 15%;
     }
   }
+  ::-webkit-scrollbar {
+    -webkit-appearance: none;
+    width: 3px;
+  }
+  ::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, .1);
+    -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .1);
+  }
   .results {
     margin: 2.4em 2.4em 0 2.4em;
     .spinner {
@@ -90,15 +99,7 @@
     .albumResults, .artistResults {
       overflow-y: auto;
       margin-right: 3em;
-      &::-webkit-scrollbar {
-        -webkit-appearance: none;
-        width: 3px;
-      }
-      &::-webkit-scrollbar-thumb {
-        border-radius: 4px;
-        background-color: rgba(0, 0, 0, .1);
-        -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .1);
-      }
+
     }
     .group-enter {
       opacity: 0.01;

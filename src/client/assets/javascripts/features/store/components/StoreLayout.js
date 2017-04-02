@@ -29,9 +29,19 @@ export default class LibraryLayout extends Component {
   }
   updateHeight () {
     this.artistsDiv.style.height =
-      (window.innerHeight - this.artistsDiv.getBoundingClientRect().top - 38.4) + "px";
+      (window.innerHeight - this.artistsDiv.getBoundingClientRect().top - 38.4
+        - this.artistsDiv.parentElement.scrollTop) + "px";
     this.albumsDiv.style.height =
-      (window.innerHeight - this.albumsDiv.getBoundingClientRect().top - 38.4) + "px";
+      (window.innerHeight - this.albumsDiv.getBoundingClientRect().top - 38.4
+        - this.albumsDiv.parentElement.scrollTop) + "px";
+    if (this.tracksDiv) {
+      this.tracksDiv.style.height =
+      (window.innerHeight - this.tracksDiv.getBoundingClientRect().top - 38.4
+        ) + "px";
+    }
+  }
+  componentDidUpdate () {
+    this.updateHeight();
   }
   searchStringChange (e) {
     this.setState({
@@ -153,7 +163,12 @@ export default class LibraryLayout extends Component {
             </Box>
           </Flex>
           <div className="tracks">
-            {tracks}
+            <div ref={(ref) => this.tracksDiv = ref} style={{
+                overflowY: 'auto',
+                overflowX: 'hidden',
+              }} className="minimalScroll">
+              {tracks}
+            </div>
           </div>
         </div>
       }
@@ -179,14 +194,14 @@ export default class LibraryLayout extends Component {
         <div className="results">
           <Flex>
             <Box className="artistResults" col={3}>
-                <div ref={(ref) => this.artistsDiv = ref}>
-                  {artists}
-                </div>
+              <div ref={(ref) => this.artistsDiv = ref}>
+                {artists}
+              </div>
             </Box>
             <Box className="albumResults" col={3}>
-                <div ref={(ref) => this.albumsDiv = ref}>
-                  {albums}
-                </div>
+              <div ref={(ref) => this.albumsDiv = ref}>
+                {albums}
+              </div>
             </Box>
             <Box className="album" col={6}>
               {album}
