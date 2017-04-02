@@ -5,6 +5,8 @@ import classnames from 'classnames';
 import {Flex, Box} from 'reflexbox';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import Spinner from 'react-spinkit';
+import BetterImage from 'components/BetterImage';
+import {Tooltip, Position} from '@blueprintjs/core';
 
 export default class LibraryLayout extends Component {
   static propTypes = {
@@ -50,10 +52,6 @@ export default class LibraryLayout extends Component {
       albums: state.albumsByQuery[state.query.albums],
       album: state.albumsById[state.query.album]
     }
-  }
-  firstChild (props) {
-    const childrenArray = React.Children.toArray(props.children);
-    return childrenArray[0] || null;
   }
   msToTime(ms) {
     let millis = Math.abs(Math.round(ms));
@@ -142,10 +140,14 @@ export default class LibraryLayout extends Component {
         album = <div>
           <Flex>
             <Box>
-                <img src={`/api/v2/store/release-groups/${results.album.groupId}/artwork?size=96`} />
+              <BetterImage
+                 src={`/api/v2/store/release-groups/${
+                   results.album.groupId
+                 }/artwork?size=112`} size="112"/>
             </Box>
             <Box className="albumInfo">
-              <div className="albumName">{results.album.title}</div>
+              <div className="albumName">{results.album.title}
+              </div>
               <div className="artistName">{results.album.artist}</div>
               <div className="trackCount">{trackCount} tracks</div>
             </Box>

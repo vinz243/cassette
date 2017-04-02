@@ -2,6 +2,12 @@ const fs    = require("fs-promise");
 const path  = require('path');
 const sharp = require('sharp');
 
+const TYPES = {
+  '.jpg': 'image/jpg',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml'
+}
+
 module.exports = {
   '/api/v2/assets/:name': {
     get: async function (ctx) {
@@ -14,13 +20,20 @@ module.exports = {
 
         if (await fs.exists(file)) {
           const buffer = await fs.readFile(file);
+
+          if (TYPES[ext]) {
+            ctx.set('Content-Type', TYPES[ext]);
+          }
+
           if(['.jpg', '.png'].includes(ext)) {
             if (height * width > 1)  {
               ctx.body = await sharp(buffer).resize(+height, +width).toBuffer();
             } else {
               ctx.body = await fs.readFile(file);
             }
-            ctx.set('Content-Type', `image/${ext.substr(1)}`);
+            ctx.status = 200;
+          } else {
+            ctx.body = buffer;
             ctx.status = 200;
           }
         } else {
