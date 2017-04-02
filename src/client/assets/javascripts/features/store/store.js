@@ -4,13 +4,13 @@ import axios from 'axios';
 
 const SET_ARTIST_RESULTS  = 'cassette/store/SET_ARTIST_RESULTS';
 const SET_ALBUMS_RESULTS  = 'cassette/store/SET_ALBUMS_RESULTS';
+const SET_ALBUM_RESULT    = 'cassette/store/SET_ALBUM_RESULT';
 const SET_QUERY           = 'cassette/store/SET_QUERY';
 
 
 const initialState = {
   currentAlbum: '',
   albumsById: {},
-  albumsByArtist: {},
   artistsByQuery: {},
   albumsByQuery: {},
   query: {}
@@ -32,6 +32,10 @@ export default function reducer(state = initialState, action = {}) {
       return Object.assign({}, state, {
         albumsByQuery: Object.assign({}, state.albumsByQuery, action.results)
       });
+    case SET_ALBUM_RESULT:
+      return Object.assign({}, state, {
+        albumsById: Object.assign({}, state.albumsById, action.results)
+      })
   }
   return state;
 }
@@ -137,6 +141,36 @@ function fetchArtistAlbums(artist) {
   }
 }
 
+function fetchAlbum(album) {
+  const blank = {
+    type: SET_ALBUM_RESULT,
+    results: {}
+  };
+  return function (dispatch, getState) {
+    const state = getState().store;
+    if (state.query.album === album) {
+      return dispatch(blank);
+    }
+    dispatch(setQuery({album}));
+    if (state.albumsById[album]) {
+      return dispatch(blank);
+    }
+    axios.get(`/api/v2/store/release-groups/${album}/release`)
+      .then(({data}) => {
+        if (getState().store.albumsById[album]) {
+          dispatch(blank);
+        } else {
+          dispatch({
+            type: SET_ALBUM_RESULT,
+            results: {
+              [album]: data
+            }
+          });
+        }
+      });
+  }
+}
+
 export const actionCreators = {
-  fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums
+  fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums, fetchAlbum
 }

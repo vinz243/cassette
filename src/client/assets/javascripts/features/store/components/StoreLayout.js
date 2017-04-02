@@ -47,12 +47,26 @@ export default class LibraryLayout extends Component {
     const state = this.props.store;
     return {
       artists: state.artistsByQuery[state.query.artists],
-      albums: state.albumsByQuery[state.query.albums]
+      albums: state.albumsByQuery[state.query.albums],
+      album: state.albumsById[state.query.album]
     }
   }
   firstChild (props) {
     const childrenArray = React.Children.toArray(props.children);
     return childrenArray[0] || null;
+  }
+  msToTime(ms) {
+    let millis = Math.abs(Math.round(ms));
+    let secs = millis / 1000;
+
+    let minutes = Math.round((secs - secs % 60) / 60);
+    let seconds = Math.round((secs % 60));
+    let sign = ((ms < 0) ? '-' : '');
+
+    let minStr = minutes > 9 ? minutes + '' : '0' + minutes;
+    let secStr = seconds > 9 ? seconds + '' : '0' + seconds;
+
+    return sign + minStr + ':' + secStr;
   }
   render () {
     const { store, actions } = this.props;
@@ -85,7 +99,7 @@ export default class LibraryLayout extends Component {
       results.albums.map((el) => (
         <div className={classnames('artistItem')}
           key={el.id} onClick={
-            () => actions.openAlbum(el.id)
+            () => actions.fetchAlbum(el.id)
           }>
           <span>{el.title}</span>
           <div className="dis">{el['primary-type']} by {(el['artist-credit'] ||
@@ -95,35 +109,39 @@ export default class LibraryLayout extends Component {
       <Spinner spinnerName="three-bounce" noFadeIn />
       </div>) : null;
 
-    // const tracks = store.album.media.map((medium) => {
-    //     const title = medium.title ? <div className="title"></div> : <div></div>;
-    //     const tracks = medium.tracks.map((track) => {
-    //       return <div className="track">
-    //         <span className="number">{track.number}</span>
-    //         <span className="title">{track.title}</span>
-    //       </div>
-    //     });
-    //     return <div>
-    //       {title}
-    //       {tracks}
-    //     </div>
-    // });
+    const tracks = results.album ? results.album.media.map((medium, i, arr) => {
 
-    // const album = <div>
-    //     <Flex>
-    //       <Box>
-    //           <img src={`/api/v2/store/release-groups/${store.album.groupId}/artwork?size=150`} />
-    //       </Box>
-    //       <Box className="albumInfo">
-    //         <div className="artistName">{store.album.artist}</div>
-    //         <div className="albumName">{store.album.title}</div>
-    //         <div className="trackCount">13 tracks</div>
-    //       </Box>
-    //     </Flex>
-    //     <div className="tracks">
-    //       {tracks}
-    //     </div>
-    // </div>
+      const title = arr.length > 1 ? <div className="mediaTitle">
+        {medium.title || (medium.format + ' #' + medium.position)}
+      </div> : null;
+      const tracks = medium.tracks.map((track) => {
+        return <div className="track">
+          <span className="number">{track.number}.</span>
+          <span className="title">{track.title}</span>
+          <span className="duration">{this.msToTime(track.length)}</span>
+        </div>
+      });
+      return <div>
+        {title}
+        {tracks}
+      </div>
+    }) : null;
+    const album = results.album ? <div>
+      <Flex>
+        <Box>
+            <img src={`/api/v2/store/release-groups/${results.album.groupId}/artwork?size=96`} />
+        </Box>
+        <Box className="albumInfo">
+          <div className="albumName">{results.album.title}</div>
+          <div className="artistName">{results.album.artist}</div>
+          <div className="trackCount">13 tracks</div>
+        </Box>
+      </Flex>
+      <div className="tracks">
+        {tracks}
+      </div>
+    </div> : null;
+
     return (
     	<div className="storeContainer">
         <div className="storeNav">
@@ -154,7 +172,7 @@ export default class LibraryLayout extends Component {
                 </div>
             </Box>
             <Box className="album" col={6}>
-              {/*store.album.id ? album : <div></div>*/}
+              {album}
             </Box>
           </Flex>
         </div>

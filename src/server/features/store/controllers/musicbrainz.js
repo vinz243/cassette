@@ -99,16 +99,22 @@ module.exports = {
   },
   '/api/v2/store/release-groups/:mbid/release': {
     get: async function (ctx) {
-      const group = await musicbrainz.lookupReleaseGroup(ctx.params.mbid, [
-        'releases', 'artists'
-      ]);
+      const group = await request.get({
+        url: `https://musicbrainz.org/ws/2/release-group/${
+          ctx.params.mbid
+        }?inc=artist-credits%2Breleases&fmt=json`,
+        headers: {
+          'User-Agent': musicbrainz.userAgent()
+        },
+        json: true
+      });
       const releases = group.releases.filter((rel) => {
-        return rel.date === group.firstReleaseDate;
+        return rel.date === group['first-release-date'];
       });
 
-      if (!releases) {
+      if (!releases.length) {
         mainStory.warn('store', `No release found for ${
-          group.title} with date ${group.firstReleaseDate}`, {
+          group.title} with date ${group['first-release-date']}`, {
             attach: group.releases
           });
         return;
@@ -116,13 +122,13 @@ module.exports = {
 
       if (releases.length > 1) {
         mainStory.warn('store', `Several releases found for ${
-          group.title} with date ${group.firstReleaseDate
+          group.title} with date ${group['first-release-date']
           }, dropping last releases`, {
             attach: releases
           });
       }
       const [release] = releases;
-      const artist  = group.artistCredits[0].artist;
+      const artist  = group['artist-credit'][0].artist;
       const res = {
         title: group.title,
         id: release.id,
