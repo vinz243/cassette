@@ -94,7 +94,7 @@ export default class LibraryLayout extends Component {
         Type something to see results
       </div>
     </div>
-
+    
     const albums = store.query.albums ? (results.albums ?
       results.albums.map((el) => (
         <div className={classnames('artistItem')}
@@ -109,41 +109,47 @@ export default class LibraryLayout extends Component {
       <Spinner spinnerName="three-bounce" noFadeIn />
       </div>) : null;
 
-    const tracks = results.album ? (results.album.loading ?
-      <div className="spinner">
-        <Spinner spinnerName="three-bounce" noFadeIn />
-      </div> : results.album.media.map((medium, i, arr) => {
-
-      const title = arr.length > 1 ? <div className="mediaTitle">
-        {medium.title || (medium.format + ' #' + medium.position)}
-      </div> : null;
-      const tracks = medium.tracks.map((track) => {
-        return <div className="track">
-          <span className="number">{track.number}.</span>
-          <span className="title">{track.title}</span>
-          <span className="duration">{this.msToTime(track.length)}</span>
+    let album = null;
+    if (results.album) {
+      if (results.album.loading) {
+        album = <div className="spinner">
+          <Spinner spinnerName="three-bounce" noFadeIn />
         </div>
-      });
-      return <div>
-        {title}
-        {tracks}
-      </div>
-    })) : null;
-    const album = results.album ? <div>
-      <Flex>
-        <Box>
-            <img src={`/api/v2/store/release-groups/${results.album.groupId}/artwork?size=96`} />
-        </Box>
-        <Box className="albumInfo">
-          <div className="albumName">{results.album.title}</div>
-          <div className="artistName">{results.album.artist}</div>
-          <div className="trackCount">13 tracks</div>
-        </Box>
-      </Flex>
-      <div className="tracks">
-        {tracks}
-      </div>
-    </div> : null;
+
+      } else {
+        const tracks = results.album.media.map((medium, i, arr) => {
+         const title = arr.length > 1 ? <div className="mediaTitle">
+           {medium.title || (medium.format + ' #' + medium.position)}
+         </div> : null;
+         const tracks = medium.tracks.map((track) => {
+           return <div className="track">
+             <span className="number">{track.number}.</span>
+             <span className="title">{track.title}</span>
+             <span className="duration">{this.msToTime(track.length)}</span>
+           </div>
+         });
+         return <div>
+           {title}
+           {tracks}
+         </div>
+        });
+        album = <div>
+          <Flex>
+            <Box>
+                <img src={`/api/v2/store/release-groups/${results.album.groupId}/artwork?size=96`} />
+            </Box>
+            <Box className="albumInfo">
+              <div className="albumName">{results.album.title}</div>
+              <div className="artistName">{results.album.artist}</div>
+              <div className="trackCount">13 tracks</div>
+            </Box>
+          </Flex>
+          <div className="tracks">
+            {tracks}
+          </div>
+        </div>
+      }
+    }
 
     return (
     	<div className="storeContainer">
