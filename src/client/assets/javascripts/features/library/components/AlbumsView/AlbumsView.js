@@ -19,7 +19,16 @@ export default class AlbumsView extends Component {
     let artistName = (this.props.library.items.albums.find(
       ((el) => el.artist._id === artistId)
     )  || {artist: {}}).artist.name;
-    let albums = this.props.library.items.albums.map((album, index) => {
+
+    const albums = this.props.library.items.albums.reduce((acc, album) => {
+      return Object.assign({}, acc, {
+        [album.artist._id]: [].concat(acc[album.artist._id] || [], album)
+      });
+    }, {});
+
+    const content = Object.keys(albums).map((id) => {
+      const artistAlbums = albums[id];
+      const ctt = artistAlbums.map((album, index) => {
         return <div className="albumCard" onClick={
             browserHistory.push.bind(null,
               `/app/library/albums/${album._id}/tracks`)}
@@ -35,11 +44,16 @@ export default class AlbumsView extends Component {
             </span>
           </div>
         </div>
+      });
+      return <div className="albumRow">
+        <div className="albumArtist">{artistAlbums[0].artist.name}</div>
+        {ctt}
+      </div>
     });
 
     return <LoaderProxy {...this.props}>
       <div className="albumsView">
-        {albums}
+        {content}
       </div>
     </LoaderProxy>
   }
