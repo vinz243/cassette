@@ -25,7 +25,13 @@
     -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .1);
   }
   .results {
-    margin: 2.4em 2.4em 0 2.4em;
+    margin: 1.4em 2.4em 0 2.4em;
+    .resultsTitle {
+      text-transform: uppercase;
+      font-size: 14px;
+      color: #5c5b70;
+      margin: 0 0 1em 1em;
+    }
     .spinner {
       text-align: center;
       margin-top: 40px;
@@ -101,6 +107,7 @@
     }
 
     .albumResults, .artistResults {
+      border-top: solid 1px #dadde6;
       overflow-y: auto;
       margin-right: 3em;
 

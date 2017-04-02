@@ -219,6 +219,18 @@ export default class LibraryLayout extends Component {
         </div>
         <div className="results">
           <Flex>
+            <Box className="resultsTitle" col={3}>
+              <div className="title">Artists</div>
+            </Box>
+            <Box className="resultsTitle" col={3}>
+              <div className="title" style={{
+                  marginLeft: '1em'
+                }}>Albums</div>
+            </Box>
+            <Box className="album" col={6}>
+            </Box>
+          </Flex>
+          <Flex>
             <Box className="artistResults" col={3}>
               <div ref={(ref) => this.artistsDiv = ref}>
                 {artists}
