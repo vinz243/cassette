@@ -8277,7 +8277,7 @@ timers-browserify@^2.0.2:
   dependencies:
     setimmediate "^1.0.4"
 
-timetrickle@~0.1.1:
+timetrickle@^0.1.1, timetrickle@~0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/timetrickle/-/timetrickle-0.1.1.tgz#f089e9619ce327f01e1ccac0d1a69bb31123cce8"
 

@@ -3,8 +3,9 @@ const qs          = require('qs');
 const sharp       = require('sharp');
 const config       = require('config');
 const request     = require('request-promise-native');
-const musicbrainz = thenifyAll(require('musicbrainz'));
+const timetrickle = require('timetrickle');
 
+const musicbrainz = thenifyAll(require('musicbrainz'));
 const {getClosestSize} = require('features/artworks/sizes');
 
 const {mainStory} = require('storyboard');
@@ -12,6 +13,16 @@ const {mainStory} = require('storyboard');
 const cache = {};
 const MAX_CACHE_SIZE = 20; // Allows caching of 20 artworks
 const keys = [];
+
+const limiter = timetrickle(1, 1200);
+
+const limit = function () {
+  return new Promise((resolve, reject) => {
+    limiter(() => {
+      resolve();
+    })
+  });
+}
 
 module.exports = {
   '/api/v2/store/artists/:mbid': {
@@ -30,6 +41,8 @@ module.exports = {
   },
   '/api/v2/store/artists/searches': {
     post: async function (ctx) {
+      await limit();
+
       let q = Object.assign({}, ctx.request.fields || {},
         ctx.request.body || {}, {filter: {}});
 
@@ -64,6 +77,7 @@ module.exports = {
   },
   '/api/v2/store/release-groups/searches': {
     post: async function (ctx) {
+      await limit();
       let q = Object.assign({}, ctx.request.fields || {},
         ctx.request.body || {}, {filter: {}});
 
@@ -82,6 +96,7 @@ module.exports = {
   },
   '/api/v2/store/artists/:mbid/release-groups': {
     get: async function (ctx) {
+      await limit();
       let q = ctx.query;
 
       const res = await request.get({
@@ -99,6 +114,7 @@ module.exports = {
   },
   '/api/v2/store/release-groups/:mbid/release': {
     get: async function (ctx) {
+      await limit();
       const group = await request.get({
         url: `https://musicbrainz.org/ws/2/release-group/${
           ctx.params.mbid
@@ -138,6 +154,7 @@ module.exports = {
         groupId: group.id,
         status: release.status['#'],
       }
+      await limit();
       const {media} = await request.get({
         url:`http://musicbrainz.org/ws/2/release/${
           release.id
@@ -156,6 +173,7 @@ module.exports = {
   },
   '/api/v2/store/artists/:mbid/artwork': {
     get: async function (ctx) {
+
       const {size = 300} = ctx.query;
       const {name} = await musicbrainz.lookupArtist(ctx.params.mbid, []);
 

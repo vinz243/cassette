@@ -94,7 +94,7 @@ export default class LibraryLayout extends Component {
         Type something to see results
       </div>
     </div>
-    
+
     const albums = store.query.albums ? (results.albums ?
       results.albums.map((el) => (
         <div className={classnames('artistItem')}
@@ -110,6 +110,7 @@ export default class LibraryLayout extends Component {
       </div>) : null;
 
     let album = null;
+
     if (results.album) {
       if (results.album.loading) {
         album = <div className="spinner">
@@ -133,6 +134,11 @@ export default class LibraryLayout extends Component {
            {tracks}
          </div>
         });
+
+        const trackCount = results.album.media.reduce((acc, medium) => {
+          return acc + medium.tracks.length;
+        }, 0);
+
         album = <div>
           <Flex>
             <Box>
@@ -141,7 +147,7 @@ export default class LibraryLayout extends Component {
             <Box className="albumInfo">
               <div className="albumName">{results.album.title}</div>
               <div className="artistName">{results.album.artist}</div>
-              <div className="trackCount">13 tracks</div>
+              <div className="trackCount">{trackCount} tracks</div>
             </Box>
           </Flex>
           <div className="tracks">
