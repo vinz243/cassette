@@ -155,9 +155,15 @@ function fetchAlbum(album) {
     if (state.albumsById[album]) {
       return dispatch(blank);
     }
+    dispatch({
+      type: SET_ALBUM_RESULT,
+      results: {
+        [album]: {loading: true}
+      }
+    });
     axios.get(`/api/v2/store/release-groups/${album}/release`)
       .then(({data}) => {
-        if (getState().store.albumsById[album]) {
+        if (!getState().store.albumsById[album].loading) {
           dispatch(blank);
         } else {
           dispatch({

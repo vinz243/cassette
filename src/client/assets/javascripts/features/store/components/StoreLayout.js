@@ -109,7 +109,10 @@ export default class LibraryLayout extends Component {
       <Spinner spinnerName="three-bounce" noFadeIn />
       </div>) : null;
 
-    const tracks = results.album ? results.album.media.map((medium, i, arr) => {
+    const tracks = results.album ? (results.album.loading ?
+      <div className="spinner">
+        <Spinner spinnerName="three-bounce" noFadeIn />
+      </div> : results.album.media.map((medium, i, arr) => {
 
       const title = arr.length > 1 ? <div className="mediaTitle">
         {medium.title || (medium.format + ' #' + medium.position)}
@@ -125,7 +128,7 @@ export default class LibraryLayout extends Component {
         {title}
         {tracks}
       </div>
-    }) : null;
+    })) : null;
     const album = results.album ? <div>
       <Flex>
         <Box>
