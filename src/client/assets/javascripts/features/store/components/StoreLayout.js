@@ -105,7 +105,10 @@ export default class LibraryLayout extends Component {
 
     const albums = store.query.albums ? (results.albums ?
       results.albums.map((el) => (
-        <div className={classnames('artistItem')}
+        <div className={classnames('artistItem', {
+            selected: el.id === store.query.album,
+            anySelected: store.query.album
+          })}
           key={el.id} onClick={
             () => actions.fetchAlbum(el.id)
           }>
