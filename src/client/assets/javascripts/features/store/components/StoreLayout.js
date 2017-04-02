@@ -174,6 +174,18 @@ export default class LibraryLayout extends Component {
               </div>
               <div className="artistName">{results.album.artist}</div>
               <div className="trackCount">{trackCount} tracks</div>
+              <div className="pt-button-group pt-minimal">
+                <Tooltip position={Position.BOTTOM}
+                  content="Silently downloads best available torrent">
+                  <a className="pt-button pt-icon-cloud-download"
+                    tabindex="0" role="button">Download</a>
+                </Tooltip>
+                <Tooltip position={Position.BOTTOM}
+                  content="Shows you all available torrents and lets you choose one">
+                  <a className="pt-button pt-icon-geosearch"
+                    tabindex="0" role="button">Search</a>
+                </Tooltip>
+              </div>
             </Box>
           </Flex>
           <div className="tracks">
