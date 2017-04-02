@@ -76,7 +76,8 @@ export default class LibraryLayout extends Component {
             () => actions.openAlbum(el.id)
           }>
           <span>{el.title}</span>
-          <div className="dis">{el['primary-type']} by {el['artist-credit'][0].artist.name}</div>
+          <div className="dis">{el['primary-type']} by {(el['artist-credit'] ||
+           [{artist: {name: 'Unknown'}}])[0].artist.name}</div>
         </div>
       )) : <div className="spinner">
       <Spinner spinnerName="three-bounce" noFadeIn />

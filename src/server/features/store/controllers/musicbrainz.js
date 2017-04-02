@@ -52,7 +52,6 @@ module.exports = {
         ['artists']);
 
       const artist  = group.artistCredits[0].artist;
-      console.log(group.artistCredits);
       ctx.body = {
         id: res.id,
         type: res.type,
@@ -83,13 +82,18 @@ module.exports = {
   },
   '/api/v2/store/artists/:mbid/release-groups': {
     get: async function (ctx) {
-      const res = await musicbrainz.lookupArtist(ctx.params.mbid, [
-        'release-groups'
-      ]);
-      ctx.body = res.releaseGroups.map(el => {
-        const {id, type, title, firstReleaseDate} = el;
-        return {id, type, title, firstReleaseDate};
-      }).filter(r => r.type === 'Album');
+      let q = ctx.query;
+
+      const res = await request.get({
+        url: `https://musicbrainz.org/ws/2/release-group?query=arid:${
+          ctx.params.mbid
+        }&fmt=json&limit=${q.limit}`,
+        headers: {
+          'User-Agent': musicbrainz.userAgent()
+        },
+        json: true
+      });
+      ctx.body = res['release-groups'];
       ctx.status = 200;
     }
   },
