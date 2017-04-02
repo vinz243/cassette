@@ -128,6 +128,17 @@ export default class LibraryLayout extends Component {
           <Spinner spinnerName="three-bounce" noFadeIn />
         </div>
 
+      } else if (results.album.errored) {
+        album = <div className="pt-non-ideal-state">
+          <div className="pt-non-ideal-state-visual pt-non-ideal-state-icon">
+            <span className="pt-icon pt-icon-error"></span>
+          </div>
+          <h4 className="pt-non-ideal-state-title">Could not fetch the release</h4>
+          <div className="pt-non-ideal-state-description">
+            {results.album.error.message} <br />
+            The release is probably unofficial (such as a bootleg)
+          </div>
+        </div>
       } else {
         const tracks = results.album.media.map((medium, i, arr) => {
          const title = arr.length > 1 ? <div className="mediaTitle">

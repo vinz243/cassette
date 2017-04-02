@@ -137,7 +137,7 @@ function fetchArtistAlbums(artist) {
             }
           });
         }
-      });
+      })
   }
 }
 
@@ -173,6 +173,17 @@ function fetchAlbum(album) {
             }
           });
         }
+      }).catch((err) => {
+        dispatch({
+          type: SET_ALBUM_RESULT,
+          results: {
+            [album]: {
+              loading: false,
+              errored: true,
+              error: err
+            }
+          }
+        });
       });
   }
 }
