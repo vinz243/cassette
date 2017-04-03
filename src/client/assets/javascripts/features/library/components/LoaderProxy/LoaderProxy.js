@@ -19,11 +19,11 @@ export default class LoaderProxy extends Component {
     if (this.props.library.loading) {
       return (
         <div className="loadingPage">
-          <div className="sk-folding-cube">
-            <div className="sk-cube1 sk-cube"></div>
-            <div className="sk-cube2 sk-cube"></div>
-            <div className="sk-cube4 sk-cube"></div>
-            <div className="sk-cube3 sk-cube"></div>
+          <div className="lp-sk-folding-cube">
+            <div className="lp-sk-cube1 lp-sk-cube"></div>
+            <div className="lp-sk-cube2 lp-sk-cube"></div>
+            <div className="lp-sk-cube4 lp-sk-cube"></div>
+            <div className="lp-sk-cube3 lp-sk-cube"></div>
           </div>
           <div className="text">
             Loading content...
