@@ -6,14 +6,16 @@ const SET_ARTIST_RESULTS  = 'cassette/store/SET_ARTIST_RESULTS';
 const SET_ALBUMS_RESULTS  = 'cassette/store/SET_ALBUMS_RESULTS';
 const SET_ALBUM_RESULT    = 'cassette/store/SET_ALBUM_RESULT';
 const SET_QUERY           = 'cassette/store/SET_QUERY';
-
+const ADD_ALBUM_FILTER    = 'cassette/store/ADD_ALBUM_FILTER';
+const REMOVE_ALBUM_FILTER = 'cassette/store/REMOVE_ALBUM_FILTER';
 
 const initialState = {
   currentAlbum: '',
   albumsById: {},
   artistsByQuery: {},
   albumsByQuery: {},
-  query: {}
+  query: {},
+  albumsFilter: []
 }
 
 export const NAME = 'store';
@@ -36,6 +38,14 @@ export default function reducer(state = initialState, action = {}) {
       return Object.assign({}, state, {
         albumsById: Object.assign({}, state.albumsById, action.results)
       })
+    case ADD_ALBUM_FILTER:
+      return Object.assign({}, state, {
+        albumsFilter: [action.filter, ...state.albumsFilter]
+      });
+    case REMOVE_ALBUM_FILTER:
+      return Object.assign({}, state, {
+        albumsFilter: state.albumsFilter.filter(el => el !== action.filter)
+      });
   }
   return state;
 }
@@ -232,7 +242,21 @@ function fetchMoreAlbums () {
       });
   }
 }
+
+function addAlbumFilter (filter) {
+  return {
+    type: ADD_ALBUM_FILTER,
+    filter
+  }
+}
+
+function removeAlbumFilter (filter) {
+  return {
+    type: REMOVE_ALBUM_FILTER,
+    filter
+  }
+}
 export const actionCreators = {
   fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums, fetchAlbum,
-  fetchMoreAlbums
+  fetchMoreAlbums, addAlbumFilter, removeAlbumFilter
 }

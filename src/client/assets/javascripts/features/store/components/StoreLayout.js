@@ -6,7 +6,7 @@ import {Flex, Box} from 'reflexbox';
 import ReactCSSTransitionGroup from 'react-addons-css-transition-group'
 import Spinner from 'react-spinkit';
 import BetterImage from 'components/BetterImage';
-import {Tooltip, Position} from '@blueprintjs/core';
+import {Tooltip, Position, Popover, PopoverInteractionKind, Checkbox} from '@blueprintjs/core';
 
 export default class LibraryLayout extends Component {
   static propTypes = {
@@ -76,6 +76,14 @@ export default class LibraryLayout extends Component {
 
     return sign + minStr + ':' + secStr;
   }
+  toggleFilter (name) {
+    const { store, actions } = this.props;
+    if (!store.albumsFilter.includes(name)) {
+      actions.addAlbumFilter(name);
+    } else {
+      actions.removeAlbumFilter(name);
+    }
+  }
   render () {
     const { store, actions } = this.props;
     const results = this.getResults();
@@ -105,6 +113,9 @@ export default class LibraryLayout extends Component {
 
     const albums = store.query.albums ? (results.albums ?
       results.albums.map((el) => {
+        if (store.albumsFilter.includes(el['primary-type'])) {
+          return null;
+        }
         if (el.hasMore) {
           return <a className="more" onClick={() => actions.fetchMoreAlbums()}>
             {el.count} more results available, expand.
@@ -236,7 +247,38 @@ export default class LibraryLayout extends Component {
             <Box className="resultsTitle" col={3}>
               <div className="title" style={{
                   marginLeft: '1em'
-                }}>Albums</div>
+                }}>Albums
+              <Popover content={
+                  <div className="filterPopover">
+                    <Checkbox checked={
+                      !store.albumsFilter.includes('Album')
+                    } label="Albums" onChange={
+                        this.toggleFilter.bind(this, 'Album')
+                      }/>
+                    <Checkbox checked={
+                      !store.albumsFilter.includes('EP')
+                    } label="EPs" onChange={
+                        this.toggleFilter.bind(this, 'EP')
+                      }/>
+                    <Checkbox checked={
+                      !store.albumsFilter.includes('Single')
+                    } label="Singles" onChange={
+                        this.toggleFilter.bind(this, 'Single')
+                      }/>
+                    <Checkbox checked={
+                      !store.albumsFilter.includes('Other')
+                    } label="Other" onChange={
+                        this.toggleFilter.bind(this, 'Other')
+                      }/>
+                  </div>
+                } position={Position.BOTTOM} className="filter">
+                <span className={classnames('pt-icon-standard',
+                  'pt-icon-filter-list', {
+                    filterActive: store.albumsFilter.length
+                  })}></span>
+              </Popover>
+
+              </div>
             </Box>
             <Box className="album" col={6}>
             </Box>

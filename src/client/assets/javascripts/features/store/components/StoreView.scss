@@ -1,3 +1,7 @@
+
+.filterPopover {
+  padding: 1.2em 2em 0.6em 1.2em;
+}
 .storeContainer {
   .storeNav {
     &> span {
@@ -31,6 +35,14 @@
       font-size: 14px;
       color: #5c5b70;
       margin: 0 0 1em 1em;
+      span.filter {
+        float: right;
+        margin-right: 1.8em;
+        cursor: pointer;
+        .filterActive {
+          color: #af4d4d !important;
+        }
+      }
     }
     .spinner {
       text-align: center;
