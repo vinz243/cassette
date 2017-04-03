@@ -104,8 +104,19 @@ export default class LibraryLayout extends Component {
     </div>
 
     const albums = store.query.albums ? (results.albums ?
-      results.albums.map((el) => (
-        <div className={classnames('artistItem', {
+      results.albums.map((el) => {
+        if (el.hasMore) {
+          return <a className="more" onClick={() => actions.fetchMoreAlbums()}>
+            {el.count} more results available, expand.
+          </a>
+        } else if (el.loadingMore) {
+          return <div className="more">
+            <div className="spinner">
+            <Spinner spinnerName="three-bounce" noFadeIn />
+            </div>
+          </div>
+        }
+        return <div className={classnames('artistItem', {
             selected: el.id === store.query.album,
             anySelected: store.query.album
           })}
@@ -116,7 +127,7 @@ export default class LibraryLayout extends Component {
           <div className="dis">{el['primary-type']} by {(el['artist-credit'] ||
            [{artist: {name: 'Unknown'}}])[0].artist.name}</div>
         </div>
-      )) : <div className="spinner">
+      }) : <div className="spinner">
       <Spinner spinnerName="three-bounce" noFadeIn />
       </div>) : null;
 

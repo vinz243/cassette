@@ -102,13 +102,17 @@ module.exports = {
       const res = await request.get({
         url: `https://musicbrainz.org/ws/2/release-group?query=arid:${
           ctx.params.mbid
-        }&fmt=json&limit=${q.limit}`,
+        }&fmt=json&limit=${q.limit}&offset=${q.offset || 0}`,
         headers: {
           'User-Agent': musicbrainz.userAgent()
         },
         json: true
       });
-      ctx.body = res['release-groups'];
+      ctx.body = res.count <= ((+q.offset || 0) + 25) ? res['release-groups'] :
+        res['release-groups'].concat({
+          hasMore: true,
+          count: res.count - (+q.offset || 0) - 25
+        });
       ctx.status = 200;
     }
   },

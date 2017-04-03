@@ -137,7 +137,7 @@ function fetchArtistAlbums(artist) {
             }
           });
         }
-      })
+      });
   }
 }
 
@@ -188,6 +188,51 @@ function fetchAlbum(album) {
   }
 }
 
+function fetchMoreAlbums () {
+  const blank = {
+    type: SET_ALBUMS_RESULTS,
+    results: {}
+  };
+  return function (dispatch, getState) {
+    const state = getState().store;
+    const artist = state.query.albums;
+    const current = state.albumsByQuery[artist];
+
+    dispatch({
+      type: SET_ALBUMS_RESULTS,
+      results: {
+        [artist]: [
+          ...current.slice(0, -1),
+          {
+            loadingMore: true
+          }
+        ]
+      }
+    });
+    axios.get(`/api/v2/store/artists/${
+      state.query.albums
+    }/release-groups?offset=${
+      current.length - 1
+    }`)
+      .then(({data}) => {
+        if (getState().store.albumsByQuery[artist].length
+              !== current.length) {
+          dispatch(blank);
+        } else {
+          dispatch({
+            type: SET_ALBUMS_RESULTS,
+            results: {
+              [artist]: [
+                ...current.slice(0, -1),
+                ...data
+              ]
+            }
+          });
+        }
+      });
+  }
+}
 export const actionCreators = {
-  fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums, fetchAlbum
+  fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums, fetchAlbum,
+  fetchMoreAlbums
 }
