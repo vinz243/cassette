@@ -80,7 +80,9 @@ export default class SidebarLayout extends Component {
             Store
           </span>
         </div>
-        <div className="">
+        <div className={this.itemSelected(/^\/app\/settings$/)} onClick={
+            () => this.props.history.push('/app/settings')
+          }>
           <span className="pt-icon-standard pt-icon-settings">
           </span>
           <span className="itemName">

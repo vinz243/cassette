@@ -1,1 +1,4 @@
-module.exports = require('./controllers/musicbrainz');
+module.exports = Object.assign({},
+  require('./controllers/musicbrainz'),
+  require('./controllers/trackers')
+);

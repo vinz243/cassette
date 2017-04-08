@@ -7,6 +7,7 @@ import {default as LibraryView,
         ArtistsView,
         AlbumsView} from 'features/library/components/LibraryView';
 import StoreView from 'features/store/components/StoreView';
+import SettingsView from 'features/settings/components/SettingsView';
 import NotFoundView from 'components/NotFound';
 
 export default (
@@ -20,6 +21,7 @@ export default (
       <Route path="/app/library/albums/:albumId/tracks" component={LibraryView} />
       <Route path="/app/library/tracks" component={LibraryView} />
       <Route path="/app/store" component={StoreView}  />
+      <Route path="/app/settings" component={SettingsView}  />
     </Route>
     <Route path="404" component={NotFoundView} />
     <Redirect from="*" to="404" />

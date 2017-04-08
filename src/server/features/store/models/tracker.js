@@ -18,7 +18,7 @@ const {
 const Tracker = module.exports = function(props) {
   let state = {
     name: 'tracker',
-    fields: ['name', 'type', 'username', 'password', 'host', 'score'],
+    fields: ['name', 'type', 'username', 'password', 'host', 'score', 'status'],
     functions: {},
     populated: {},
     props
@@ -33,8 +33,9 @@ const Tracker = module.exports = function(props) {
     publicProps(state),
     legacySupport(state),
     validator(state, {
-      name: [enforce.string(), enforce.required()],
-      type: [enforce.oneOf('gazelle', 't411'), enforce.required()],
+      name: [enforce.string()],
+      type: [enforce.oneOf('gazelle', 't411')],
+      status: [enforce.oneOf('UNCONFIRMED', 'CONFIRMED', 'INVALID')],
       username: enforce.string(),
       password: enforce.string(),
       host: enforce.string(),
