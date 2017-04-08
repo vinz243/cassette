@@ -75,7 +75,7 @@ class TrackerCard extends React.Component {
       {this.props.tracker.message ? <Tooltip content={this.props.tracker.message}
         className="status">
         {indicator}
-      </Tooltip> : indicator}
+      </Tooltip> : <div className="status">{indicator}</div>}
       </h5>
       <div>
         <span className="pt-icon-standard pt-icon-user"></span>
