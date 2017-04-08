@@ -50,8 +50,8 @@ function editTracker (id, props) {
       type: EDIT_TRACKER,
       index: getState().settings.trackers.findIndex(el => el._id === id),
       props:  {
-        status: 'UPDATING',
-        ...props
+        ...props,
+        status: 'UPDATING'
       }
     });
     axios.put(`/api/v2/trackers/${id}`, props).then(() => {
@@ -62,12 +62,19 @@ function editTracker (id, props) {
           status: 'UNCONFIRMED'
         }
       });
+      return axios.get(`/api/v2/trackers/${id}/status`);
+    }).then(({data}) => {
+      dispatch({
+        type: EDIT_TRACKER,
+        index: getState().settings.trackers.findIndex(el => el._id === id),
+        props:  data
+      });
     })
   }
 }
 function addTracker () {
   return (dispatch) => {
-    axios.post('/api/v2/trackers', {name: 'New Tracker'}).then((res) => {
+    axios.post('/api/v2/trackers', {name: 'New Tracker', status: 'UNCONFIRMED'}).then((res) => {
       dispatch({
         type: ADD_TRACKER,
         tracker: res.data

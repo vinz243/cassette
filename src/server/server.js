@@ -21,6 +21,7 @@ let app = new Koa();
 let router = koaRouter();
 app.use(async (ctx, next) => {
   const start = Date.now();
+  ctx.status = 404;
   try {
     await next();
     let color = 'green';
@@ -30,6 +31,7 @@ app.use(async (ctx, next) => {
       +` ${Date.now() - start}ms ` + chalk[color](ctx.status));
   } catch (err) {
     let color = 'red';
+    ctx.status = (ctx.status === 404) ? 500 : ctx.status;
     mainStory.error(`${ctx.method} ${chalk.underline.dim(ctx.url)}`
       +` ${Date.now() - start}ms ` + chalk[color](ctx.status), {attach: err});
   }

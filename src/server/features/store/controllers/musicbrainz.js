@@ -64,7 +64,7 @@ module.exports = {
       const res = await musicbrainz.lookupReleaseGroup(ctx.params.mbid,
         ['artists']);
 
-      const artist  = group.artistCredits[0].artist;
+      const artist  = res.artistCredits[0].artist;
       ctx.body = {
         id: res.id,
         type: res.type,

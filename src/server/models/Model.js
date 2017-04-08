@@ -254,6 +254,7 @@ const updateable = module.exports.updateable = (state, db = getDatabase(state.na
     if (state.fields.includes(key)) {
       state.props = Object.assign({}, state.props, {[key]: value});
       state.dirty = true;
+      state.dirtyFields = [key, ...(state.dirtyFields || [])];
     }
   }
 });

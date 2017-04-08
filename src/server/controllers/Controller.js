@@ -72,7 +72,7 @@ const updateable = module.exports.updateable = (name, findById) => ({
   }
 });
 
-const oneToMany = module.exports.oneToMany = (name, childName, findChildren) => ({
+const oneToMany = module.exports.oneToMany = (name, childName, findChildren, path = name) => ({
   [`/api/v2/${pluralize(name)}/:id/${pluralize(childName)}`]: {
     get: async (ctx) => {
       let children = await findChildren(Object.assign({},

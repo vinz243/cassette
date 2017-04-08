@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import {EditableText} from '@blueprintjs/core';
+import {EditableText, Tooltip} from '@blueprintjs/core';
 import classnames from 'classnames';
 
 class TrackerCard extends React.Component {
@@ -50,17 +50,32 @@ class TrackerCard extends React.Component {
       }
     }
   }
+  componentWillReceiveProps (nextProps) {
+    const {tracker, actions} = this.props;
+    this.setState({
+      name: tracker.name,
+      username: tracker.username,
+      host: tracker.host,
+      status: tracker.status,
+      type: tracker.type
+    });
+  }
   render () {
+    const status = this.props.tracker.status;
+    const indicator = <span className={classnames(
+        "pt-icon-standard", {
+          'pt-icon-tick tick': status === 'CONFIRMED',
+          'pt-icon-cross cross': status === 'INVALID',
+          'pt-icon-radial updating': status === 'UPDATING',
+          'pt-icon-ring radial': status === 'UNCONFIRMED',
+        }
+      )}></span>;
     return <div className="pt-card pt-elevation-0">
       <h5><EditableText value={this.state.name} {...this.editableEvents('name')}/>
-        <span className={classnames(
-            "pt-icon-standard status", {
-              'pt-icon-tick tick': this.state.status === 'CONFIRMED',
-              'pt-icon-cross cross': this.state.status === 'INVALID',
-              'pt-icon-ring updating': this.state.status === 'UPDATING',
-              'pt-icon-ring radial': this.state.status === 'UNCONFIRMED',
-            }
-          )}></span>
+      {this.props.tracker.message ? <Tooltip content={this.props.tracker.message}
+        className="status">
+        {indicator}
+      </Tooltip> : indicator}
       </h5>
       <div>
         <span className="pt-icon-standard pt-icon-user"></span>

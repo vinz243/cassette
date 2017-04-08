@@ -14,12 +14,51 @@ const {
   enforce,
   validator,
   defaultValues
-} = require('models/Model');
+}                  = require('models/Model');
+const Tracker      = require('./tracker');
+const trackersList = require('features/store/trackers');
+const request      = require('request-promise-native');
+const {mainStory}  = require('storyboard');
+const thenifyAll   = require('thenify-all');
+const musicbrainz  = thenifyAll(require('musicbrainz'));
+
+const download = async function (id) {
+  const album = await findById(id);
+  const {set, update, props} = album;
+
+  if (!props.artist || !props.name) {
+    const res = await musicbrainz.lookupReleaseGroup(props.mbid,
+      ['artists']);
+
+    const artist = res.artistCredits[0].artist;
+    album.set('title', res.title);
+    album.set('artist', artist.name);
+    album.set('date', res.firstReleaseDate);
+    await album.update();
+  }
+  if (props.partial) {
+    throw 'Partial downloads not implemented yet :/';
+  }
+  if (props.status !== 'WANTED') {
+    throw 'Entry already being searched';
+  }
+  set('status', 'SEARCHING_TRACKERS');
+
+  await update();
+  const promises = (await Tracker.find({})).map(async (tracker) => {
+    const api = await trackersList[tracker.props.type](request, tracker);
+
+    await api.searchReleases(album);
+  });
+  await Promise.all(promises);
+  set('status', 'SEARCHED');
+  await update();
+}
 
 const WantedAlbum = module.exports = function(props) {
   let state = {
     name: 'wanted_album',
-    fields: ['mbid', 'name', 'partial', 'download', 'artist'],
+    fields: ['mbid', 'title', 'partial', 'download', 'artist', 'status', 'date'],
     functions: {},
     populated: {},
     props
@@ -35,17 +74,28 @@ const WantedAlbum = module.exports = function(props) {
     legacySupport(state),
     defaultValues(state, {
       partial: false,
-      status: 'wanted'
+      status: 'WANTED'
     }),
     validator(state, {
-      name: [enforce.string(), enforce.required()],
+      title: [enforce.string()],
       mbid: [enforce.string(), enforce.required()],
       status: enforce.string(),
       partial: enforce.boolean()
-    })
+    }), {
+      download: async function () {
+        try {
+          await download(state.props._id);
+        } catch (err) {
+          mainStory.error('store', 'Searching for torrents failed', {
+            attach: err
+          });
+          state.functions.set('status', 'FAILED');
+          state.functions.update();
+        }
+      }
+    }
   );
 }
-
 const findOne = module.exports.findOne = findOneFactory(WantedAlbum);
 
 const findOrCreate = module.exports.findOrCreate = findOrCreateFactory(WantedAlbum);

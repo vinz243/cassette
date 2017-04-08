@@ -13,16 +13,17 @@
       line-height: 1em !important;
       font-size: 12px;
       float: right;
-      &.updating {
+      cursor: pointer;
+      .updating {
         color: #939cac;
       }
-      &.radial {
+      .radial {
         color: #5c6971;
       }
-      &.tick {
+      .tick {
         color: #459f3d;
       }
-      &.cross {
+      .cross {
         color: #b33737;
       }
     }
