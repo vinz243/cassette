@@ -22,7 +22,7 @@ export default class ArtistsView extends Component {
           <Box col={Math.floor(12 / COLUMNS)} className="artistCard" key={artist.id}>
             <ImageCard link={`/app/library/artists/${artist._id}/albums`}
               title={artist.name} image={
-                  `/api/v2/artists/${artist._id}/artwork?size=300`
+                  `/api/v2/artists/${artist._id}/artwork?size=120`
                 } />
           </Box>
         ));
