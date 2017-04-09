@@ -76,7 +76,7 @@ const oneToMany = module.exports.oneToMany = (name, childName, findChildren, pat
   [`/api/v2/${pluralize(name)}/:id/${pluralize(childName)}`]: {
     get: async (ctx) => {
       let children = await findChildren(Object.assign({},
-        {[name]: ctx.params.id - 0}, ctx.query));
+        {[path]: ctx.params.id - 0}, ctx.query));
       ctx.status = 200;
       ctx.body = children.map(child => child.props);
       return;

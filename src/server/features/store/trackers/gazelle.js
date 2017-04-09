@@ -6,9 +6,14 @@ const torrent     = require('features/store/models/torrent');
 const querystring = require('querystring');
 
 module.exports = async function (req, tracker) {
-  const {username, password, host = 'passtheheadphones.me'} = tracker.props;
+  const {username, host = 'passtheheadphones.me'} = tracker.props;
+  const password = tracker.privateProps.password;
 
   assert.equal(tracker.props.type, 'gazelle');
+
+  if (!username || !password) {
+    throw new Error(`No username or password specified`);
+  }
 
   const jar     = req.jar();
   const request = req.defaults({jar});
@@ -27,7 +32,7 @@ module.exports = async function (req, tracker) {
 
   return {
     searchReleases: async (wanted) => {
-      const {partial, artist, name, _id} = wanted.props;
+      const {partial, artist, title, _id} = wanted.props;
       assert(_id);
 
       if (!partial) {
@@ -35,7 +40,7 @@ module.exports = async function (req, tracker) {
           action: 'browse',
           searchstr: '',
           artistname: artist,
-          groupname: name
+          groupname: title
         })}`;
         const time = Date.now();
 
@@ -46,7 +51,7 @@ module.exports = async function (req, tracker) {
         } - ${Date.now() - time}ms`);
 
         if (status !== 'success' || !response) {
-          throw new Error(`Remote: ${error}`);
+          throw new Error(`Remote: error`);
         }
         if (!response.results.length) {
           return;
@@ -58,7 +63,7 @@ module.exports = async function (req, tracker) {
           seeders: el.seeders,
           leechers: el.leechers,
           size: el.size,
-          name: `${artist} - ${name} (${el.format} ${el.encoding})`,
+          name: `${artist} - ${title} (${el.format} ${el.encoding})`,
           format: el.format.toLowerCase(),
           bitrate: el.encoding
         }));

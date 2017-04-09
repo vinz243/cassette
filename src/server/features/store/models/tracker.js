@@ -14,9 +14,11 @@ const {
   enforce,
   validator
 } = require('models/Model');
-const {mainStory} = require('storyboard')
+
+const {mainStory}  = require('storyboard')
 const trackersList = require('features/store/trackers');
-const request = require('request-promise-native');
+const request      = require('request-promise-native');
+const omit         = require('lodash/omit');
 
 const checkStatus = async function (id, fields) {
   const tracker = await findById(id);
@@ -28,6 +30,9 @@ const checkStatus = async function (id, fields) {
   await tracker.update();
   try {
     const api = await trackersList[tracker.props.type](request, tracker);
+    tracker.set('status', 'CONFIRMED');
+    tracker.set('message', '');
+    await tracker.update();
   } catch (err) {
     mainStory.error('trackers', `Tracker ${tracker.props.name} doesn't work`, {
       attach: err
@@ -54,8 +59,19 @@ const Tracker = module.exports = function(props) {
     updateable(state),
     createable(state),
     removeable(state),
-    databaseLoader(state),
-    publicProps(state),
+    databaseLoader(state), {
+      getProps() {
+        return Object.assign({}, state.props);
+      },
+      get props() {
+        return omit(state.functions.getProps(), [
+          'password'
+        ]);
+      },
+      get privateProps() {
+        return Object.assign({}, state.functions.getProps());
+      }
+    },
     legacySupport(state),
     validator(state, {
       name: [enforce.string()],

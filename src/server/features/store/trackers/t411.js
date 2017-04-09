@@ -5,7 +5,8 @@ const {mainStory} = require('storyboard');
 const torrent     = require('features/store/models/torrent');
 
 module.exports = async function (request, tracker) {
-  const {username, password, host = 't411.ai'} = tracker.props;
+  const {username, host = 't411.ai'} = tracker.props;
+  const password = tracker.privateProps.password;
 
   assert.equal(tracker.props.type, 't411');
 
@@ -19,14 +20,14 @@ module.exports = async function (request, tracker) {
 
   return {
     searchReleases: async (wanted) => {
-      const {partial, artist, name, _id} = wanted.props;
+      const {partial, artist, title, _id} = wanted.props;
       assert(_id);
 
       if (!partial) {
         const url = `https://api.${host}/torrents/search/${
           utils.formatToURL(artist)
         }+${
-          utils.formatToURL(name)
+          utils.formatToURL(title)
         }?cid=623`;
         const time = Date.now();
 

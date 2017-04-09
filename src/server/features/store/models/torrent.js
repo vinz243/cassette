@@ -56,7 +56,7 @@ const Torrent = module.exports = function(props) {
     publicProps(state),
     legacySupport(state),
     manyToOne(state, 'wanted_album'),
-    manyToOne(state, 'tracker'),
+    // manyToOne(state, 'tracker'),
     validator(state, {
       wanted_album: [enforce.number(), enforce.required()],
       tracker: [enforce.number(), enforce.required()],
