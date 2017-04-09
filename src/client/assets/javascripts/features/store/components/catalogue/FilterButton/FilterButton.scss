@@ -1,0 +1,13 @@
+
+.filterPopover {
+  padding: 1.2em 2em 0.6em 1.2em;
+}
+
+span.filter {
+  float: right;
+  margin-right: 1.8em;
+  cursor: pointer;
+  .filterActive {
+    color: #af4d4d !important;
+  }
+}

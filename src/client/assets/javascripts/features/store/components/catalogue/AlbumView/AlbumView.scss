@@ -1,0 +1,69 @@
+.album {
+  img {
+    margin: 1em;
+    background-image: url(/api/v2/assets/no-album.jpg?size=96);
+    width: 96px;
+    height: 96px;
+  }
+  .albumInfo {
+    margin: 1em 0;
+
+    .artistName {
+      color: #5a596b;
+
+    }
+    .albumName {
+      font-weight: bold;
+      width: 100%;
+    }
+    .trackCount {
+      font-size: 12px;
+      color: #837c96;
+    }
+    .pt-button-group {
+      margin-top: 0.8em;
+    }
+  }
+  .tracks {
+    margin-top: 1em;
+    .mediaTitle {
+      margin: 1em 2em;
+      color: #736d88;
+      &:after  {
+        content:"";
+        display: inline-block;
+        height: 0.7em;
+        vertical-align: bottom;
+        width: 100%;
+        margin-right: -100%;
+        margin-left: 10px;
+        border-top: 1px solid #e4e1ec;
+      }
+    }
+    .track {
+      margin: 0.1em 2em;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      .number {
+        width: 25px;
+        color: #76768a;
+        float: left;
+        text-align: right;
+      }
+      .title {
+        margin-left: 1em;
+        width: 60%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+
+      }
+      .duration {
+        float: right;
+        // font-size: 1
+        color: #76768a;
+      }
+    }
+  }
+}
