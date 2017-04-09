@@ -14,7 +14,7 @@ module.exports = async function (request, tracker) {
     json: true
   });
   if (!token) {
-    throw new Error(`Remote error: ${error} when trying to login`);
+    throw new Error(`Remote error: ${error}`);
   }
 
   return {
