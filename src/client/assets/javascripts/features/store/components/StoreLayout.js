@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import CatalogueView from './catalogue/CatalogueView';
 import { Tab2, Tabs2 } from "@blueprintjs/core";
+import './StoreApp.scss';
 
 class StoreLayout extends React.Component {
   searchStringChange (e) {
@@ -20,9 +21,11 @@ class StoreLayout extends React.Component {
       <div className="storeContainer">
         <div className="storeNav">
           <Tabs2 id="storeScope" onChange={this.handleTabChange}>
-            <span className="pt-icon pt-icon-chevron-left"></span>
-            <span className="pt-icon pt-icon-chevron-right"></span>
-            <div className="pt-input-group .modifier">
+            <div className="chevrons">
+              <span className="pt-icon pt-icon-chevron-left chevrons"></span>
+              <span className="pt-icon pt-icon-chevron-right chevrons"></span>
+            </div>
+            <div className="pt-input-group search-box">
               <span className="pt-icon pt-icon-search"></span>
               <input className="pt-input"
                 ref={(el) => this.input = el}

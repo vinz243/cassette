@@ -1,3 +1,15 @@
 .storeContainer {
   margin-top: 1.6em;
+  .storeNav {
+    div.chevrons {
+      position: absolute;
+      span {
+        margin-bottom: 0.5em; 
+        margin-right: 0.8em;
+      }
+    }
+    div.search-box {
+      margin-left: 4em;
+    }
+  }
 }
