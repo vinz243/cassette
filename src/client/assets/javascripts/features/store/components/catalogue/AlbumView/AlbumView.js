@@ -78,14 +78,35 @@ class AlbumView extends React.Component {
                   tabindex="0" role="button" onClick={
                     () => this.props.onDownload(album.groupId, {
                       title: album.title,
-                      artist: album.artist
+                      artist: album.artist,
+                      auto_dl: true,
+                      auto_search: true
                     })
                   }>Download</a>
               </Tooltip>
               <Tooltip position={Position.BOTTOM}
                 content="Shows you all available torrents and lets you choose one">
                 <a className="pt-button pt-icon-geosearch"
-                  tabindex="0" role="button">Search</a>
+                  tabindex="0" role="button" onClick={
+                    () => this.props.onDownload(album.groupId, {
+                      title: album.title,
+                      artist: album.artist,
+                      auto_dl: false,
+                      auto_search: true
+                    })
+                  }>Search</a>
+              </Tooltip>
+              <Tooltip position={Position.BOTTOM}
+                content="Just add release to wanted item">
+                <a className="pt-button pt-icon-add"
+                  tabindex="0" role="button" onClick={
+                    () => this.props.onDownload(album.groupId, {
+                      title: album.title,
+                      artist: album.artist,
+                      auto_dl: false,
+                      auto_search: false
+                    })
+                  }>Add</a>
               </Tooltip>
             </div>
           </Box>

@@ -4,6 +4,7 @@ import axios from 'axios';
 
 const ADD_TRACKER = 'cassette/settings/ADD_TRACKER';
 const EDIT_TRACKER = 'cassette/settings/EDIT_TRACKER';
+const SET_TRACKERS = 'cassette/settings/SET_TRACKERS';
 
 const initialState = {
   trackers: []
@@ -16,6 +17,10 @@ export default function reducer(state = initialState, action = {}) {
     case ADD_TRACKER:
       return Object.assign({}, state, {
         trackers: [...state.trackers, action.tracker]
+      });
+    case SET_TRACKERS:
+      return Object.assign({}, state, {
+        trackers: action.trackers
       });
     case EDIT_TRACKER:
       return Object.assign({}, state, {
@@ -37,10 +42,10 @@ export const selector = createStructuredSelector({
 function loadTrackers (id, props) {
   return (dispatch) => {
     axios.get('/api/v2/trackers').then((res) => {
-      res.data.forEach((tracker) => dispatch({
-        type: ADD_TRACKER,
-        tracker
-      }));
+      dispatch({
+        type: SET_TRACKERS,
+        trackers: res.data
+      });
     });
   }
 }

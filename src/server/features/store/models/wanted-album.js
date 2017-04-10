@@ -64,7 +64,17 @@ const download = async function (id) {
 const WantedAlbum = module.exports = function(props) {
   let state = {
     name: 'wanted_album',
-    fields: ['mbid', 'title', 'partial', 'download', 'artist', 'status', 'date'],
+    fields: [
+      'mbid',
+      'title',
+      'partial',
+      'download',
+      'artist',
+      'status',
+      'date',
+      'auto_search',
+      'auto_dl'
+    ],
     functions: {},
     populated: {},
     props
@@ -86,8 +96,24 @@ const WantedAlbum = module.exports = function(props) {
       title: [enforce.string()],
       mbid: [enforce.string(), enforce.required()],
       status: enforce.string(),
-      partial: enforce.boolean()
+      partial: enforce.boolean(),
+      auto_dl: enforce.boolean(),
+      auto_search: enforce.boolean(),
     }), {
+      postCreate: function () {
+        if (state.props.auto_search) {
+          process.nextTick(() => {
+            download(state.props._id).catch((err) => {
+              mainStory.error('store', 'Auto-searching for torrents failed', {
+                attach: err
+              });
+              state.functions.set('status', 'FAILED');
+              state.functions.update();
+            });
+          });
+        }
+        return Promise.resolve();
+      },
       download: async function () {
         try {
           await download(state.props._id);
