@@ -152,7 +152,7 @@ function fetchWanted (id, force = false) {
     }
     axios.get(`/api/v2/wanted-albums/${id}`).then((res1) => {
       return axios.get(
-        `/api/v2/wanted-albums/${id}/results?sort=seeders&direction=desc&limit=15`
+        `/api/v2/wanted-albums/${id}/results?sort=score&direction=desc&limit=15`
       ).then((res2) => {
         return Promise.resolve([res1.data, res2.data]);
       });

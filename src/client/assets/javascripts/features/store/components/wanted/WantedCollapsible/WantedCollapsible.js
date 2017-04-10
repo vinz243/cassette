@@ -45,6 +45,11 @@ class WantedCollapsible extends React.Component {
             })}>
             <span className="pt-icon pt-icon-symbol-triangle-up"></span>{el.seeders}
           </span>
+          <span className={classnames('pt-tag', {
+              'pt-intent-primary': true
+            })}>
+            {el.score}
+          </span>
         </div>
       </div>)
       items = <div className="wanted-results-list">{results}</div>;
