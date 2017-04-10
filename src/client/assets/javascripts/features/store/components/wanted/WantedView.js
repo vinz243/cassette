@@ -11,7 +11,7 @@ class WantedView extends React.Component {
   }
   render () {
     const items = this.props.store.wanted;
-    const itemsPerRows = 5;
+    const itemsPerRows = 7;
     const rows = items.reduce((acc, item) => {
       const last = acc[acc.length - 1];
       if (last.length >= itemsPerRows) {
@@ -23,12 +23,14 @@ class WantedView extends React.Component {
       <WantedRow items={rows} key={index} current={
           this.props.store.wantedById[this.props.store.currentWanted]
         } onSelect={
-          (id) => this.props.actions.fetchWanted(id)
+          (id) => {
+            // this.props.actions.invalidateWanted(id)
+            this.props.actions.fetchWanted(id)
+          }
         } onClose={
           () => this.props.actions.clearWanted()
         } onSearch={
           (id) => {
-            console.log('on search');
             this.props.actions.searchWanted(id)
           }
         }/>);

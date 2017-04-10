@@ -1,7 +1,7 @@
 div.wanted-item {
   display: inline-block;
 
-  margin: 3em;
+  margin: 2em;
   cursor: pointer;
 
   div.wanted-image {
@@ -12,8 +12,12 @@ div.wanted-item {
       color: #fff;
       bottom: 1em;
       right: 1em;
+      div.wanted-status {
+        text-shadow: 0 0 3px #373654;
+      }
     }
   }
+
   div.wanted-props {
     text-align: center;
     width: 150px;

@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react'
 import {Collapse, Button, Intent} from '@blueprintjs/core';
 import './WantedCollapsible.scss';
+import classnames from 'classnames';
 
 class WantedCollapsible extends React.Component {
   render () {
@@ -25,11 +26,38 @@ class WantedCollapsible extends React.Component {
         </div>
       </div>
     } else {
-      items = <div>There are a few results</div>
+      const results = item.results.map((el) => <div
+        className="wanted-result" key={el._id}>
+        {el.name}
+        <div className="wanted-badges">
+          <span className="pt-tag pt-minimal">
+            {el.format}
+          </span>
+          <span className={classnames('pt-tag', {
+              'pt-intent-warning': el.seeders < el.leechers,
+              'pt-minimal': el.seeders >= el.leechers
+            })}>
+            <span className="pt-icon pt-icon-symbol-triangle-down"></span>{el.leechers}
+          </span>
+          <span className={classnames('pt-tag', {
+              'pt-intent-success pt-minimal': el.seeders > 2,
+              'pt-intent-warning': el.seeders <= 2
+            })}>
+            <span className="pt-icon pt-icon-symbol-triangle-up"></span>{el.seeders}
+          </span>
+        </div>
+      </div>)
+      items = <div className="wanted-results-list">{results}</div>;
     }
-
+    const cover = document.getElementById(`wanted-item-${item._id}`);
     return <div className="wanted-collapse" key="collapsible">
       <Collapse isOpen={isOpen}>
+        <div className="wanted-arrow" style={{
+            marginLeft: cover ? cover.offsetLeft - 24 : '0' + 'px'
+          }}></div>
+        <div className="wanted-arrow-2" style={{
+            marginLeft: cover ? cover.offsetLeft - 24 : '0' + 'px'
+          }}></div>
         <div className="wanted-content">
           <div className="wanted-close" onClick={this.props.onClose}>
             <span className="pt-icon-standard pt-icon-cross"></span>

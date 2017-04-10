@@ -15,7 +15,7 @@ class WantedItem extends React.Component {
     const {item} = this.props;
     return <div className="wanted-item" onClick={
         () => this.props.onSelect(item._id)
-      }>
+      } id={`wanted-item-${item._id}`}>
       <div className="wanted-image">
         <div className="wanted-overlay">
           <div className="wanted-status">

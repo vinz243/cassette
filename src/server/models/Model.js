@@ -69,7 +69,7 @@ const findFactory = module.exports.findFactory = (model, name, getDB = getDataba
 
       let res = db.find(q)
         .sort(sort)
-        .limit(opts.limit)
+        .limit(+opts.limit)
         .skip(opts.skip || 0)
         .toArray((err, docs) => {
           if (err) return reject(err);

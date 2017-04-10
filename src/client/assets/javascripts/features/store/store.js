@@ -89,6 +89,12 @@ export const selector = createStructuredSelector({
   store
 });
 
+function invalidateWanted (id) {
+  return {
+    type: INVALIDATE_WANTED, id
+  }
+}
+
 function updateWanted () {
   return function (dispatch, getState) {
     axios.get('/api/v2/wanted-albums?sort=title').then((res) => {
@@ -96,7 +102,6 @@ function updateWanted () {
       Object.keys(wantedById).forEach((id) => {
         const wanted = wantedById[id] || {};
         const current = res.data.find(el => +el._id === +id) || {};
-        console.log(wanted, current);
         if (wanted.status !== current.status) {
           dispatch({type: INVALIDATE_WANTED, id});
           if (+currentWanted === +id) {
@@ -146,7 +151,9 @@ function fetchWanted (id, force = false) {
       return;
     }
     axios.get(`/api/v2/wanted-albums/${id}`).then((res1) => {
-      return axios.get(`/api/v2/wanted-albums/${id}/results`).then((res2) => {
+      return axios.get(
+        `/api/v2/wanted-albums/${id}/results?sort=seeders&direction=desc&limit=15`
+      ).then((res2) => {
         return Promise.resolve([res1.data, res2.data]);
       });
     }).then(([album, results]) => {
@@ -372,5 +379,6 @@ function downloadAlbum (mbid, props) {
 export const actionCreators = {
   fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums, fetchAlbum,
   fetchMoreAlbums, addAlbumFilter, removeAlbumFilter, fetchWanted,
-  fetchAllWanted, downloadAlbum, clearWanted, updateWanted, searchWanted
+  fetchAllWanted, downloadAlbum, clearWanted, updateWanted, searchWanted,
+  invalidateWanted
 }

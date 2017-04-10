@@ -1,4 +1,20 @@
 div.wanted-collapse {
+  div.wanted-arrow {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 5px 5px 5px;
+    border-color: transparent transparent #c3c9d6 transparent;
+  }
+  div.wanted-arrow-2 {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 5px 5px 5px;
+    margin-top: -4px;
+    border-color: transparent transparent #fff transparent;
+  }
   div.wanted-content {
     border-top: 1px solid #c3c9d6;
     border-bottom: 1px solid #c3c9d6;
@@ -19,6 +35,7 @@ div.wanted-collapse {
       }
       div.wanted-results {
         height: 250px;
+        padding-top: 1em;
 
         div.wanted-empty {
           padding-top: 70px;
@@ -30,6 +47,27 @@ div.wanted-collapse {
           div.wanted-button {
 
           }
+        }
+        div.wanted-result {
+          font-size: 13px;
+          color: #808790;
+          margin: 0.6em;
+          &:first-child {
+            margin-top: 0 !important;
+          }
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          div.wanted-badges {
+            // display: inline-block;
+            float: right;
+            span.pt-minimal {
+              color: #696e88 !important;
+            }
+          }
+        }
+        div.wanted-results-list {
+          column-count: 3;
         }
       }
     }
