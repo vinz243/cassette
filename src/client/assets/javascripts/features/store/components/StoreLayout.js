@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import CatalogueView from './catalogue/CatalogueView';
+import WantedView from './wanted/WantedView'
 import { Tab2, Tabs2 } from "@blueprintjs/core";
 import './StoreApp.scss';
 
@@ -36,7 +37,12 @@ class StoreLayout extends React.Component {
             <Tab2 id="ca" title="Catalogue" panel={
                 <CatalogueView {...this.props} />
             } />
-            <Tab2 id="wi" title="Wanted Items" panel={null} />
+          <Tab2 id="wi" title={<span>Wanted Items 
+              <span className="pt-tag pt-round">
+                {this.props.store.wanted.length}
+              </span></span>} panel={
+                <WantedView {...this.props} />
+              } />
         </Tabs2>
         </div>
       </div>

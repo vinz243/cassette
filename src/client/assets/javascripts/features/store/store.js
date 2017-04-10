@@ -8,6 +8,11 @@ const SET_ALBUM_RESULT    = 'cassette/store/SET_ALBUM_RESULT';
 const SET_QUERY           = 'cassette/store/SET_QUERY';
 const ADD_ALBUM_FILTER    = 'cassette/store/ADD_ALBUM_FILTER';
 const REMOVE_ALBUM_FILTER = 'cassette/store/REMOVE_ALBUM_FILTER';
+const FETCH_ALL_WANTED    = 'cassette/store/FETCH_ALL_WANTED';
+const FETCH_WANTED        = 'cassette/store/FETCH_WANTED';
+const SET_WANTED          = 'cassette/store/SET_WANTED';
+const DOWNLOAD_ALBUM      = 'cassette/store/DOWNLOAD_ALBUM';
+const INVALIDATE_WANTED   = 'cassette/store/INVALIDATE_WANTED';
 
 const initialState = {
   currentAlbum: '',
@@ -15,7 +20,10 @@ const initialState = {
   artistsByQuery: {},
   albumsByQuery: {},
   query: {},
-  albumsFilter: []
+  albumsFilter: [],
+  wanted: [],
+  wantedById: {},
+  currentWanted: ''
 }
 
 export const NAME = 'store';
@@ -46,6 +54,31 @@ export default function reducer(state = initialState, action = {}) {
       return Object.assign({}, state, {
         albumsFilter: state.albumsFilter.filter(el => el !== action.filter)
       });
+    case FETCH_ALL_WANTED:
+      return Object.assign({}, state, {
+        wanted: action.wanted
+      });
+    case SET_WANTED:
+      return {
+        ...state,
+        currentWanted: action.currentWanted
+      }
+    case FETCH_WANTED:
+      return Object.assign({}, state, {
+        wantedById: {
+          ...state.wantedById,
+          [action.wanted._id]: action.wanted
+        }
+      });
+  case INVALIDATE_WANTED:
+    return Object.assign({}, state, {
+      wantedById: {
+        ...state.wantedById,
+        [action.id]: {
+          ...state.wantedById[action.id], stale: true
+        }
+      }
+    });
   }
   return state;
 }
@@ -55,6 +88,77 @@ const store = (state) => state[NAME];
 export const selector = createStructuredSelector({
   store
 });
+
+function updateWanted () {
+  return function (dispatch, getState) {
+    axios.get('/api/v2/wanted-albums?sort=title').then((res) => {
+      const {wantedById, currentWanted} = getState().store;
+      Object.keys(wantedById).forEach((id) => {
+        const wanted = wantedById[id] || {};
+        const current = res.data.find(el => +el._id === +id) || {};
+        console.log(wanted, current);
+        if (wanted.status !== current.status) {
+          dispatch({type: INVALIDATE_WANTED, id});
+          if (+currentWanted === +id) {
+            fetchWanted(id, true)(dispatch, getState);
+          }
+        }
+      });
+      dispatch({
+        type: FETCH_ALL_WANTED,
+        wanted: res.data
+      });
+    });
+  };
+}
+
+function searchWanted (id) {
+  return function (dispatch, getState) {
+    dispatch({type: INVALIDATE_WANTED, id});
+    axios.post(`/api/v2/wanted-albums/${id}/searches`, {});
+  }
+}
+
+function fetchAllWanted () {
+  return function (dispatch) {
+    axios.get('/api/v2/wanted-albums?sort=title').then((res) => {
+      dispatch({
+        type: FETCH_ALL_WANTED,
+        wanted: res.data
+      });
+    })
+  };
+}
+function clearWanted () {
+  return {
+    type: SET_WANTED,
+    currentWanted: ''
+  }
+}
+function fetchWanted (id, force = false) {
+  return function (dispatch, getState) {
+    dispatch({
+      type: SET_WANTED,
+      currentWanted: id
+    });
+    if (getState().store.wantedById[id]
+      && !getState().store.wantedById[id].stale && !force) {
+      return;
+    }
+    axios.get(`/api/v2/wanted-albums/${id}`).then((res1) => {
+      return axios.get(`/api/v2/wanted-albums/${id}/results`).then((res2) => {
+        return Promise.resolve([res1.data, res2.data]);
+      });
+    }).then(([album, results]) => {
+      dispatch({
+        type: FETCH_WANTED,
+        wanted: {
+          ...album, results
+        }
+      });
+    });
+  };
+}
 
 function setQuery (query) {
   return {
@@ -256,7 +360,17 @@ function removeAlbumFilter (filter) {
     filter
   }
 }
+
+function downloadAlbum (mbid, props) {
+  return (dispatch, getState) => {
+    axios.post('/api/v2/wanted-albums', {mbid, ...props}).then((res) => {
+      fetchAllWanted()(dispatch, getState);
+    });
+  };
+}
+
 export const actionCreators = {
   fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums, fetchAlbum,
-  fetchMoreAlbums, addAlbumFilter, removeAlbumFilter
+  fetchMoreAlbums, addAlbumFilter, removeAlbumFilter, fetchWanted,
+  fetchAllWanted, downloadAlbum, clearWanted, updateWanted, searchWanted
 }

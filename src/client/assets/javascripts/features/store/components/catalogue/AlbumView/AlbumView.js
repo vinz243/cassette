@@ -75,7 +75,12 @@ class AlbumView extends React.Component {
               <Tooltip position={Position.BOTTOM}
                 content="Silently downloads best available torrent">
                 <a className="pt-button pt-icon-cloud-download"
-                  tabindex="0" role="button">Download</a>
+                  tabindex="0" role="button" onClick={
+                    () => this.props.onDownload(album.groupId, {
+                      title: album.title,
+                      artist: album.artist
+                    })
+                  }>Download</a>
               </Tooltip>
               <Tooltip position={Position.BOTTOM}
                 content="Shows you all available torrents and lets you choose one">

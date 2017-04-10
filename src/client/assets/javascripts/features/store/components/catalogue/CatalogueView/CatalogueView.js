@@ -65,7 +65,8 @@ export default class CatalogueView extends Component {
         <Spinner spinnerName="three-bounce" noFadeIn />
       </div>) : null;
 
-    const album = results.album ? <AlbumView album={results.album} /> : null;
+    const album = results.album ? <AlbumView album={results.album}
+                                    onDownload={actions.downloadAlbum}/> : null;
 
     return (
       <div className="results">

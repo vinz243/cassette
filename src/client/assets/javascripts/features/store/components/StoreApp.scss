@@ -4,12 +4,15 @@
     div.chevrons {
       position: absolute;
       span {
-        margin-bottom: 0.5em; 
+        margin-bottom: 0.5em;
         margin-right: 0.8em;
       }
     }
     div.search-box {
       margin-left: 4em;
+    }
+    .pt-tag {
+      margin-left: 4px;
     }
   }
 }

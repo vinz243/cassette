@@ -46,9 +46,15 @@ const download = async function (id) {
 
   await update();
   const promises = (await Tracker.find({})).map(async (tracker) => {
-    const api = await trackersList[tracker.props.type](request, tracker);
+    try {
+      const api = await trackersList[tracker.props.type](request, tracker);
 
-    await api.searchReleases(album);
+      await api.searchReleases(album);
+    } catch (err) {
+      mainStory.warn('store', `Couldn't search ${tracker.props.name}`, {
+        attach: err
+      })
+    }
   });
   await Promise.all(promises);
   set('status', 'SEARCHED');
