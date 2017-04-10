@@ -64,9 +64,11 @@ export default class CatalogueView extends Component {
       }) : <div className="spinner">
         <Spinner spinnerName="three-bounce" noFadeIn />
       </div>) : null;
-
-    const album = results.album ? <AlbumView album={results.album}
-                                    onDownload={actions.downloadAlbum}/> : null;
+    const album = results.album ?
+      <AlbumView album={results.album}
+        onDownload={actions.downloadAlbum}
+        toggleLossless={() => actions.toggleLossless()}
+        lossless={store.wantLossless} /> : null;
 
     return (
       <div className="results">

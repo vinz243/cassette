@@ -73,7 +73,8 @@ const WantedAlbum = module.exports = function(props) {
       'status',
       'date',
       'auto_search',
-      'auto_dl'
+      'auto_dl',
+      'want_lossless'
     ],
     functions: {},
     populated: {},

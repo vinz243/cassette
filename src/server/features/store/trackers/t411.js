@@ -20,7 +20,7 @@ module.exports = async function (request, tracker) {
 
   return {
     searchReleases: async (wanted) => {
-      const {partial, artist, title, _id} = wanted.props;
+      const {partial, artist, title, _id, want_lossless} = wanted.props;
       assert(_id);
 
       if (!partial) {
@@ -50,6 +50,7 @@ module.exports = async function (request, tracker) {
           leechers: el.leechers,
           size: el.size,
           name: el.name,
+          want_lossless,
           format: el.name.toLowerCase().includes('mp3') ? 'mp3' :
             (el.name.toLowerCase().includes('flac') ? 'flac' : undefined),
           bitrate: utils.extractBitrateFromName(el.name)

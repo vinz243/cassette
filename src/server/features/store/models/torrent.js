@@ -78,7 +78,7 @@ const opts = {
 const computeScore = function (props) {
   let score = -10;
   if (props.lossless || props.format === 'flac') {
-   score += opts.losslessBonus;
+   score += opts.losslessBonus * (props.want_lossless ? 1 : -1);
   } else {
    if (props.bitrate) {
      if (typeof props.bitrate === 'string'
@@ -133,7 +133,8 @@ const Torrent = module.exports = function(props) {
       'name',
       'format',
       'bitrate',
-      'score'
+      'score',
+      'want_lossless'
     ],
     functions: {},
     populated: {},

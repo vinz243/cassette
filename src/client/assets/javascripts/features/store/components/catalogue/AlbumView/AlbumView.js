@@ -6,7 +6,7 @@ import Spinner from 'react-spinkit';
 import NonIdealState from 'components/NonIdealState';
 import ScrollableDiv from 'components/ScrollableDiv';
 import {Flex, Box} from 'reflexbox';
-import {Tooltip, Position} from '@blueprintjs/core';
+import {Tooltip, Position, Switch} from '@blueprintjs/core';
 
 class AlbumView extends React.Component {
   msToTime(ms) {
@@ -23,7 +23,7 @@ class AlbumView extends React.Component {
     return sign + minStr + ':' + secStr;
   }
   render () {
-    const {album} = this.props;
+    const {album, lossless, toggleLossless} = this.props;
     if (album.loading) {
       return <div className="spinner">
         <Spinner spinnerName="three-bounce" noFadeIn />
@@ -68,6 +68,10 @@ class AlbumView extends React.Component {
           </Box>
           <Box className="albumInfo">
             <div className="albumName">{album.title}
+              <span className="albumSwitch">
+                <Switch checked={lossless}
+                  label="Lossless" onChange={toggleLossless} />
+              </span>
             </div>
             <div className="artistName">{album.artist}</div>
             <div className="trackCount">{trackCount} tracks</div>
@@ -75,36 +79,39 @@ class AlbumView extends React.Component {
               <Tooltip position={Position.BOTTOM}
                 content="Silently downloads best available torrent">
                 <a className="pt-button pt-icon-cloud-download"
-                  tabindex="0" role="button" onClick={
+                  tabIndex="0" role="button" onClick={
                     () => this.props.onDownload(album.groupId, {
                       title: album.title,
                       artist: album.artist,
                       auto_dl: true,
-                      auto_search: true
+                      auto_search: true,
+                      want_lossless: lossless
                     })
                   }>Download</a>
               </Tooltip>
               <Tooltip position={Position.BOTTOM}
                 content="Shows you all available torrents and lets you choose one">
                 <a className="pt-button pt-icon-geosearch"
-                  tabindex="0" role="button" onClick={
+                  tabIndex="1" role="button" onClick={
                     () => this.props.onDownload(album.groupId, {
                       title: album.title,
                       artist: album.artist,
                       auto_dl: false,
-                      auto_search: true
+                      auto_search: true,
+                      want_lossless: lossless
                     })
                   }>Search</a>
               </Tooltip>
               <Tooltip position={Position.BOTTOM}
                 content="Just add release to wanted item">
                 <a className="pt-button pt-icon-add"
-                  tabindex="0" role="button" onClick={
+                  tabIndex="2" role="button" onClick={
                     () => this.props.onDownload(album.groupId, {
                       title: album.title,
                       artist: album.artist,
                       auto_dl: false,
-                      auto_search: false
+                      auto_search: false,
+                      want_lossless: lossless
                     })
                   }>Add</a>
               </Tooltip>

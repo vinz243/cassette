@@ -7,7 +7,13 @@
   }
   .albumInfo {
     margin: 1em 0;
-
+    span.albumSwitch {
+      float: right;
+      color: #73728e;
+      font-weight: 100;
+      display: inline-block;
+      margin: 0.2em 0.4em;
+    }
     .artistName {
       color: #5a596b;
 

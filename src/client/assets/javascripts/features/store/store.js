@@ -13,6 +13,7 @@ const FETCH_WANTED        = 'cassette/store/FETCH_WANTED';
 const SET_WANTED          = 'cassette/store/SET_WANTED';
 const DOWNLOAD_ALBUM      = 'cassette/store/DOWNLOAD_ALBUM';
 const INVALIDATE_WANTED   = 'cassette/store/INVALIDATE_WANTED';
+const TOGGLE_LOSSLESS     = 'cassette/store/TOGGLE_LOSSLESS';
 
 const initialState = {
   currentAlbum: '',
@@ -23,13 +24,16 @@ const initialState = {
   albumsFilter: [],
   wanted: [],
   wantedById: {},
-  currentWanted: ''
+  currentWanted: '',
+  wantLossless: true
 }
 
 export const NAME = 'store';
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
+    case TOGGLE_LOSSLESS:
+      return {...state, wantLossless: !state.wantLossless};
     case SET_QUERY:
       return Object.assign({}, state, {
         query: Object.assign({}, state.query, action.query)
@@ -88,7 +92,9 @@ const store = (state) => state[NAME];
 export const selector = createStructuredSelector({
   store
 });
-
+function toggleLossless () {
+  return {type: TOGGLE_LOSSLESS};
+}
 function invalidateWanted (id) {
   return {
     type: INVALIDATE_WANTED, id
@@ -380,5 +386,5 @@ export const actionCreators = {
   fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums, fetchAlbum,
   fetchMoreAlbums, addAlbumFilter, removeAlbumFilter, fetchWanted,
   fetchAllWanted, downloadAlbum, clearWanted, updateWanted, searchWanted,
-  invalidateWanted
+  invalidateWanted, toggleLossless
 }
