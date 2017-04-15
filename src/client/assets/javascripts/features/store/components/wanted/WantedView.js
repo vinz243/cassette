@@ -5,9 +5,12 @@ import ScrollableDiv from 'components/ScrollableDiv';
 class WantedView extends React.Component {
   componentDidMount() {
     this.props.actions.fetchAllWanted();
-    setInterval(() => {
+    this.interval = setInterval(() => {
       this.props.actions.updateWanted()
     }, 1000);
+  }
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
   render () {
     const items = this.props.store.wanted;
