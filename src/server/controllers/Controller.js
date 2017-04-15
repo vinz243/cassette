@@ -23,7 +23,7 @@ const fetchable = module.exports.fetchable = (name, find, findById) => ({
   }
 });
 
-const createable = module.exports.createable = (name, model) => ({
+const createable = module.exports.createable = (name, model, cb) => ({
   [`/api/v2/${pluralize(name)}`]: {
     post: async (ctx) => {
       let object = model(Object.assign({}, ctx.request.fields || {},
@@ -34,6 +34,9 @@ const createable = module.exports.createable = (name, model) => ({
       await object.create();
       ctx.status = object.props._id ? 201 : 202;
       ctx.body = object.props;
+      process.nextTick(() => {
+        if (cb) cb(object);
+      });
     }
   }
 });
