@@ -9,7 +9,34 @@ const {mainStory}  = require('storyboard');
 const thenifyAll   = require('thenify-all');
 const musicbrainz  = thenifyAll(require('musicbrainz'));
 const fs = require('fs');
-module.exports.snatch = async function (id) {
+
+module.exports.automatedProcess = async function (id) {
+  const wanted  = await WantedAlbum.findById(id);
+
+  if (wanted.props.auto_search) {
+    await search(id);
+
+    if (wanted.props.auto_dl) {
+      const results = await Torrent.find({wanted_album: +id});
+      if (!results.length) {
+        wanted.set('status', 'NO_RESULTS');
+        await wanted.update();
+        return;
+      }
+      const best = results.reduce((current, candidate) => {
+        if (!current) {
+          return candidate;
+        } else if (+current.props.score < +candidate.props.score) {
+          return candidate;
+        }
+        return current;
+      }, null);
+      await snatch(best.props._id);
+    }
+  }
+}
+
+const snatch = module.exports.snatch = async function (id) {
   const torrent = await Torrent.findById(id)
   const tracker = await Tracker.findById(torrent.props.tracker);
   const wanted  = await WantedAlbum.findById(torrent.props.wanted_album._id);
@@ -21,7 +48,7 @@ module.exports.snatch = async function (id) {
   const api = await trackersList[tracker.props.type](request, tracker);
 
   const buffer = await api.download(torrent.props.torrent_id);
-  fs.writeFile('/home/vincent/filetest', buffer, console.log);
+
   const item = await RTorrent.addTorrent(buffer);
 
   torrent.set('info_hash', item.infoHash);
@@ -52,7 +79,7 @@ module.exports.snatch = async function (id) {
   }, 1.5 * 60 * 60 * 1000);
 }
 
-module.exports.search = async function (id) {
+const search = module.exports.search = async function (id) {
   const album = await WantedAlbum.findById(id);
   const {set, update, props} = album;
 

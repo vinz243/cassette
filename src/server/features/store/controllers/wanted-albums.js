@@ -10,7 +10,9 @@ const {mainStory}  = require('storyboard');
 
 module.exports = merge({},
   fetchable('wanted-album', WantedAlbum.find, WantedAlbum.findById),
-  createable('wanted-album', WantedAlbum),
+  createable('wanted-album', WantedAlbum, (album) => {
+    torrents.automatedProcess(album.props._id);
+  }),
   oneToMany('wanted-album', 'results', Torrent.find, 'wanted_album'), {
     '/api/v2/wanted-albums/:id/searches':  {
       post: async (ctx, next) => {

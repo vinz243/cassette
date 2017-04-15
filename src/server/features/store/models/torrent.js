@@ -177,9 +177,10 @@ const Torrent = module.exports = function(props) {
       },
       preUpdate: function () {
         state.props.score = computeScore(Object.assign({}, state.props));
-      },
+      }
   });
 }
+
 module.exports.Torrent = Torrent;
 const findOne = module.exports.findOne = findOneFactory(Torrent);
 const findOrCreate = module.exports.findOrCreate = findOrCreateFactory(Torrent);
