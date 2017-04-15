@@ -74,6 +74,8 @@ const titleCase = module.exports.titleCase = (str = 'Unknown') => {
   }
   if (/^(([A-Za-z0-9][a-z0-9]|-|:)*\b\s*)+$/.test(str)) {
     return titlecase(str);
+  } else if (/^((\w{2,}|a|A)\s)+((\w{2,}|a|A))$/i.test(str)) {
+    return titlecase(str);
   }
   return str;
 }
@@ -90,7 +92,7 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
         return operationMapper(models, mediastic, ['create', fileName, entry]);
       });
     case 'create':
-      if (/.+\.(mp3|flac|alac|wav)$/i.test(filePath)) {
+      if (/.+\.(mp3|flac|alac|wav|m4a)$/i.test(filePath)) {
         return mediastic(filePath).then((metadata) => {
 
           if (!metadata.duration)

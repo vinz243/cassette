@@ -2,12 +2,17 @@ import { createStructuredSelector } from 'reselect';
 import assign  from 'lodash/assign';
 import axios from 'axios';
 
-const ADD_TRACKER = 'cassette/settings/ADD_TRACKER';
-const EDIT_TRACKER = 'cassette/settings/EDIT_TRACKER';
-const SET_TRACKERS = 'cassette/settings/SET_TRACKERS';
+const ADD_TRACKER         = 'cassette/settings/ADD_TRACKER';
+const ADD_LIBRARY         = 'cassette/settings/ADD_LIBRARY';
+const PREPARE_ADD_LIBRARY = 'cassette/settings/PREPARE_ADD_LIBRARY';
+const EDIT_TRACKER        = 'cassette/settings/EDIT_TRACKER';
+const SET_TRACKERS        = 'cassette/settings/SET_TRACKERS';
+const SET_LIBRARIES       = 'cassette/settings/SET_LIBRARIES';
 
 const initialState = {
-  trackers: []
+  trackers: [],
+  addingLib: false,
+  libraries: []
 }
 
 export const NAME = 'settings';
@@ -30,6 +35,18 @@ export default function reducer(state = initialState, action = {}) {
           ...state.trackers.slice(action.index + 1)
         ]
       });
+    case PREPARE_ADD_LIBRARY:
+      return {...state, addingLib: true};
+    case ADD_LIBRARY:
+      return Object.assign({}, state, {
+        addingLib: false,
+        libraries: [...state.libraries, action.library]
+      })
+    case SET_LIBRARIES:
+      return Object.assign({}, state, {
+        addingLib: false,
+        libraries: action.libraries
+      })
   }
   return state;
 }
@@ -49,6 +66,24 @@ function loadTrackers (id, props) {
     });
   }
 }
+
+function addLibrary (name, path) {
+  return (dispatch, getState) => {
+    dispatch({type: PREPARE_ADD_LIBRARY});
+    axios.post('/api/v2/libraries', {name, path}).then(({data}) => {
+      dispatch({type: ADD_LIBRARY, library: data});
+    });
+  }
+}
+function loadLibraries () {
+  return (dispatch, getState) => {
+    dispatch({type: PREPARE_ADD_LIBRARY});
+    axios.get('/api/v2/libraries').then(({data}) => {
+      dispatch({type: SET_LIBRARIES, libraries: data});
+    });
+  }
+}
+
 function editTracker (id, props) {
   return (dispatch, getState) => {
     dispatch({
@@ -88,5 +123,5 @@ function addTracker () {
   }
 }
 export const actionCreators = {
-  addTracker, editTracker, loadTrackers
+  addTracker, editTracker, loadTrackers, addLibrary, loadLibraries
 }

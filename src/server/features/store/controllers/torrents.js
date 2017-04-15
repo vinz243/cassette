@@ -21,7 +21,7 @@ module.exports.snatch = async function (id) {
   const api = await trackersList[tracker.props.type](request, tracker);
 
   const buffer = await api.download(torrent.props.torrent_id);
-  fs.writeFile('/home/vincent/filetest', buffer);
+  fs.writeFile('/home/vincent/filetest', buffer, console.log);
   const item = await RTorrent.addTorrent(buffer);
 
   torrent.set('info_hash', item.infoHash);
@@ -56,16 +56,15 @@ module.exports.search = async function (id) {
   const album = await WantedAlbum.findById(id);
   const {set, update, props} = album;
 
-  if (!props.artist || !props.name) {
-    const res = await musicbrainz.lookupReleaseGroup(props.mbid,
-      ['artists']);
+  const res = await musicbrainz.lookupReleaseGroup(props.mbid,
+    ['artists']);
 
-    const artist = res.artistCredits[0].artist;
-    album.set('title', res.title);
-    album.set('artist', artist.name);
-    album.set('date', res.firstReleaseDate);
-    await album.update();
-  }
+  const artist = res.artistCredits[0].artist;
+  album.set('title', res.title.replace(/\(.+\)/, ''));
+  album.set('artist', artist.name);
+  album.set('date', res.firstReleaseDate);
+  await album.update();
+
   if (props.partial) {
     throw 'Partial downloads not implemented yet :/';
   }

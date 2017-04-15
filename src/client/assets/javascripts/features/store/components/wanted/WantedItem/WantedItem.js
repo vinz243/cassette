@@ -8,7 +8,10 @@ class WantedItem extends React.Component {
       wanted: 'bookmark',
       searching_trackers: 'geosearch',
       searched: 'confirm',
-      failed: 'error'
+      failed: 'error',
+      downloading: 'cloud-download',
+      snatching: 'cloud-download',
+      done: 'tick',
     })[status.toLowerCase()]
   }
   render () {

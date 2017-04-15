@@ -12,7 +12,7 @@ class TrackersView extends React.Component {
     const trackers = settings.trackers.map((tracker) => {
       return <TrackerCard tracker={tracker} onChange={
           (props) => actions.editTracker(tracker._id, props)
-        } />
+        } key={tracker._id}/>
     })
     trackers.push(<div className="pt-card pt-elevation-0 pt-interactive ph"
     onClick={

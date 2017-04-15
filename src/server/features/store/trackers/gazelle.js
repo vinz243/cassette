@@ -47,7 +47,8 @@ module.exports = async function (req, tracker) {
       assert(torrentId);
 
       const url = `https://${host}/torrents.php?${querystring.stringify({
-        id: torrentId
+        id: torrentId,
+        action: 'download'
       })}`;
       await limit();
       const time = Date.now();

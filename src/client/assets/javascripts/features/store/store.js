@@ -113,6 +113,12 @@ function updateWanted () {
           if (+currentWanted === +id) {
             fetchWanted(id, true)(dispatch, getState);
           }
+        } else if (+current.dl_progress !== +wanted.dl_progress) {
+          dispatch({
+            type: FETCH_WANTED,
+            id: id,
+            wanted: {...wanted, dl_progress: current.dl_progress}
+          });
         }
       });
       dispatch({
