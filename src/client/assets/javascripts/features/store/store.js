@@ -382,9 +382,23 @@ function downloadAlbum (mbid, props) {
   };
 }
 
+function selectResult (id, wantedId) {
+  console.log('hey', id, wantedId);
+  return (dispatch, getState) => {
+    dispatch({
+      type: FETCH_WANTED,
+      wanted: {
+        ...wantedId,
+        status: 'SNATCHING'
+      }
+    });
+    axios.post('/api/v2/results/' + id + '/download');
+  }
+}
+
 export const actionCreators = {
   fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums, fetchAlbum,
   fetchMoreAlbums, addAlbumFilter, removeAlbumFilter, fetchWanted,
   fetchAllWanted, downloadAlbum, clearWanted, updateWanted, searchWanted,
-  invalidateWanted, toggleLossless
+  invalidateWanted, toggleLossless, selectResult
 }

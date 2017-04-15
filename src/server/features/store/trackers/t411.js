@@ -19,6 +19,22 @@ module.exports = async function (request, tracker) {
   }
 
   return {
+    download: async (id) => {
+
+      const url = `https://api.${host}/torrents/download/${id}`;
+
+      const time = Date.now();
+      const buffer = await request({
+        url, encoding: null, simple: false, headers: {
+          Authorization: token
+      }});
+
+      mainStory.debug('store', `GET ${
+        chalk.dim(url)
+      } - ${Date.now() - time}ms`);
+
+      return buffer;
+    },
     searchReleases: async (wanted) => {
       const {partial, artist, title, _id, want_lossless} = wanted.props;
       assert(_id);

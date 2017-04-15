@@ -43,6 +43,23 @@ module.exports = async function (req, tracker) {
   }
 
   return {
+    download: async (torrentId) => {
+      assert(torrentId);
+
+      const url = `https://${host}/torrents.php?${querystring.stringify({
+        id: torrentId
+      })}`;
+      await limit();
+      const time = Date.now();
+      const buffer = await request({url, encoding: null});
+
+      mainStory.debug('store', `GET ${
+        chalk.dim(url)
+      } - ${Date.now() - time}ms`);
+
+      return buffer;
+
+    },
     searchReleases: async (wanted) => {
       const {partial, artist, title, _id, want_lossless} = wanted.props;
       assert(_id);
@@ -63,6 +80,7 @@ module.exports = async function (req, tracker) {
         } - ${Date.now() - time}ms`);
 
         if (status !== 'success' || !response) {
+          console.log(response, status);
           throw new Error(`Remote: error`);
         }
         if (!response.results.length) {

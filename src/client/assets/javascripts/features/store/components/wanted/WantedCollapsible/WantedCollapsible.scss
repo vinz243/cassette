@@ -48,16 +48,38 @@ div.wanted-collapse {
 
           }
         }
+        div.wanted-downloading {
+          padding-top: 70px;
+          margin: 0 auto;
+          width: 250px;
+          div.wanted-text {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #6a6985;
+          }
+          div.wanted-progress {
+            width: 250px;
+          }
+        }
         div.wanted-result {
           font-size: 13px;
           color: #808790;
+
           margin: 0.6em;
-          &:first-child {
-            margin-top: 0 !important;
-          }
+
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          cursor: pointer;
+
+          &:hover {
+            color: #574d66;
+          }
+
+          &:first-child {
+            margin-top: 0 !important;
+          }
+
           div.wanted-badges {
             // display: inline-block;
             float: right;

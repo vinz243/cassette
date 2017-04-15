@@ -17,7 +17,9 @@ class WantedRow extends React.Component {
       <WantedCollapsible item={this.props.current} isOpen={
           this.props.current &&
             !!this.props.items.find(el => el._id === this.props.current._id)
-        } onClose={this.props.onClose} onSearch={this.props.onSearch}/>
+        } onClose={this.props.onClose}
+        onSearch={this.props.onSearch}
+        onPick={this.props.onPick} />
     </div>
   }
 }

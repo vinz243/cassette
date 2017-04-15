@@ -54,7 +54,7 @@ const Scan = module.exports.Scan = function(props) {
             let time = 0;
             let hasErrors = false;
 
-            return findLibraries({}).then((libs) => {
+            return Library.find({}).then((libs) => {
               time = Date.now();
               return Promise.all(libs.map(lib => scan(lib.props._id)));
             }).then(() => {

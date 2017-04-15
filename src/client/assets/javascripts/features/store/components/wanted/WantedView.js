@@ -7,7 +7,7 @@ class WantedView extends React.Component {
     this.props.actions.fetchAllWanted();
     setInterval(() => {
       this.props.actions.updateWanted()
-    }, 3000);
+    }, 1000);
   }
   render () {
     const items = this.props.store.wanted;
@@ -32,6 +32,10 @@ class WantedView extends React.Component {
         } onSearch={
           (id) => {
             this.props.actions.searchWanted(id)
+          }
+        } onPick={
+          (id, wid) => {
+            this.props.actions.selectResult(id, wid)
           }
         }/>);
 

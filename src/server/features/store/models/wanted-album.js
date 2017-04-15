@@ -17,49 +17,12 @@ const {
 }                  = require('models/Model');
 const Tracker      = require('./tracker');
 const trackersList = require('features/store/trackers');
+const Rtorrent     = require('features/store/rtorrent');
+const assert       = require('assert');
 const request      = require('request-promise-native');
 const {mainStory}  = require('storyboard');
 const thenifyAll   = require('thenify-all');
 const musicbrainz  = thenifyAll(require('musicbrainz'));
-
-const download = async function (id) {
-  const album = await findById(id);
-  const {set, update, props} = album;
-
-  if (!props.artist || !props.name) {
-    const res = await musicbrainz.lookupReleaseGroup(props.mbid,
-      ['artists']);
-
-    const artist = res.artistCredits[0].artist;
-    album.set('title', res.title);
-    album.set('artist', artist.name);
-    album.set('date', res.firstReleaseDate);
-    await album.update();
-  }
-  if (props.partial) {
-    throw 'Partial downloads not implemented yet :/';
-  }
-  if (props.status !== 'WANTED') {
-    throw 'Entry already being searched';
-  }
-  set('status', 'SEARCHING_TRACKERS');
-
-  await update();
-  const promises = (await Tracker.find({})).map(async (tracker) => {
-    try {
-      const api = await trackersList[tracker.props.type](request, tracker);
-
-      await api.searchReleases(album);
-    } catch (err) {
-      mainStory.warn('store', `Couldn't search ${tracker.props.name}`, {
-        attach: err
-      })
-    }
-  });
-  await Promise.all(promises);
-  set('status', 'SEARCHED');
-  await update();
-}
 
 const WantedAlbum = module.exports = function(props) {
   let state = {
@@ -74,7 +37,8 @@ const WantedAlbum = module.exports = function(props) {
       'date',
       'auto_search',
       'auto_dl',
-      'want_lossless'
+      'want_lossless',
+      'dl_progress'
     ],
     functions: {},
     populated: {},
@@ -102,29 +66,18 @@ const WantedAlbum = module.exports = function(props) {
       auto_search: enforce.boolean(),
     }), {
       postCreate: function () {
-        if (state.props.auto_search) {
-          process.nextTick(() => {
-            download(state.props._id).catch((err) => {
-              mainStory.error('store', 'Auto-searching for torrents failed', {
-                attach: err
-              });
-              state.functions.set('status', 'FAILED');
-              state.functions.update();
-            });
-          });
-        }
+        // if (state.props.auto_search) {
+        //   process.nextTick(() => {
+        //     download(state.props._id).catch((err) => {
+        //       mainStory.error('store', 'Auto-searching for torrents failed', {
+        //         attach: err
+        //       });
+        //       state.functions.set('status', 'FAILED');
+        //       state.functions.update();
+        //     });
+        //   });
+        // }
         return Promise.resolve();
-      },
-      download: async function () {
-        try {
-          await download(state.props._id);
-        } catch (err) {
-          mainStory.error('store', 'Searching for torrents failed', {
-            attach: err
-          });
-          state.functions.set('status', 'FAILED');
-          state.functions.update();
-        }
       }
     }
   );

@@ -5,5 +5,5 @@ const Scan = require('../models/Scan');
 
 
 module.exports = merge({},
-  fetchable('scan', Scan.find, Scan.findById), createable('scan', Scan)
+  fetchable('scan', Scan.find, Scan.findById), createable('scan', Scan.Scan)
 );

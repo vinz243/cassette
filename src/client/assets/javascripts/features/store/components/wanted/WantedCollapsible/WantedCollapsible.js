@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react'
-import {Collapse, Button, Intent} from '@blueprintjs/core';
+import {Collapse, Button, Intent, ProgressBar} from '@blueprintjs/core';
 import './WantedCollapsible.scss';
 import classnames from 'classnames';
 
@@ -8,7 +8,17 @@ class WantedCollapsible extends React.Component {
     const {item = {}, isOpen} = this.props;
     let items = null;
 
-    if (!['searched_trackers', 'searching_trackers', 'searched']
+    if (['snatching', 'downloading'].includes((item.status || '').toLowerCase())) {
+
+      items = <div className="wanted-downloading">
+        <div className="wanted-text">
+          Downloading
+        </div>
+        <div className="wanted-progress">
+            <ProgressBar value={item.dl_progress || 0.1} />
+        </div>
+      </div>
+    } else if (!['searched_trackers', 'searching_trackers', 'searched']
       .includes((item.status || '').toLowerCase()) && item) {
 
       items = <div className="wanted-empty">
@@ -26,12 +36,16 @@ class WantedCollapsible extends React.Component {
         </div>
       </div>
     } else {
+
       const results = item.results.map((el) => <div
-        className="wanted-result" key={el._id}>
+        className="wanted-result" key={el._id}
+        onDoubleClick={
+          this.props.onPick.bind(null, el._id, item)
+        }>
         {el.name}
         <div className="wanted-badges">
           <span className="pt-tag pt-minimal">
-            {el.format}
+            {el.format || '??'}
           </span>
           <span className={classnames('pt-tag', {
               'pt-intent-warning': el.seeders < el.leechers,

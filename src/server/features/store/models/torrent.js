@@ -15,6 +15,9 @@ const {
   validator,
   enforce
 } = require('models/Model');
+const Tracker      = require('./tracker');
+const WantedAlbum  = require('./wanted-album');
+const trackersList = require('features/store/trackers');
 
 const opts = {
     // Format impact score. If release has said format,
@@ -134,7 +137,9 @@ const Torrent = module.exports = function(props) {
       'format',
       'bitrate',
       'score',
-      'want_lossless'
+      'want_lossless',
+      'info_hash',
+      'dl_progress'
     ],
     functions: {},
     populated: {},
@@ -172,7 +177,7 @@ const Torrent = module.exports = function(props) {
       },
       preUpdate: function () {
         state.props.score = computeScore(Object.assign({}, state.props));
-      }
+      },
   });
 }
 module.exports.Torrent = Torrent;
