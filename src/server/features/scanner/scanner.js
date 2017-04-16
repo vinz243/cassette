@@ -21,6 +21,7 @@ const touch     = require("touch");
 const qs        = require("qs");
 const md5       = require("md5");
 const titlecase = require("titlecase");
+const emitter   = require('emitter');
 
 const fetchArtwork = fetchEntityArtworkFactory(
   fs, path, touch, request, qs, md5
@@ -154,19 +155,19 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
       return Promise.resolve();
   }
 }
-
 const operationMapperFactory = module.exports.operationMapperFactory = (models, mediastic) => {
   return operationMapper.bind(null, models, mediastic);
 }
 
 const scan = module.exports.scan = async (libraryId, mediastic = getMediastic()) => {
+  emitter.emit(['scanner', 'scanstart', libraryId], {libraryId});
+
   let library = await Library.findById(libraryId);
   let cachedEntries = await getCachedEntries(libraryId);
 
   let cached = new FSTree({
     entries: cachedEntries.map((entry) => {
       return Object.assign({}, entry, {
-
         isDirectory: () => {
           return entry.dir || false;
         }
@@ -195,7 +196,9 @@ const scan = module.exports.scan = async (libraryId, mediastic = getMediastic())
 
   await diff.reduce((stack, entry) => stack.then(mapper.bind(null, entry)),
     Promise.resolve());
-  return writeCachedEntries(libraryId, currentEntries.map((entry) => {
+  await writeCachedEntries(libraryId, currentEntries.map((entry) => {
     return Object.assign({}, entry, {dir: entry.isDirectory()});
   }));
+
+  emitter.emit(['scanner', 'scanfinished', libraryId], {libraryId});
 }

@@ -11,8 +11,23 @@ import JobsView from 'features/jobs/components/JobsView';
 
 import axios from 'axios';
 import { Flex, Box } from 'reflexbox';
+import socket from 'app/socket';
 
 export default class AppView extends Component {
+  componentDidMount() {
+    setTimeout(function () {
+      let start = 0;
+      let working = false;
+      let time = 0;
+      socket.listen('client::pong', () => {
+        time = Date.now() - start;
+        working = true;
+        console.log(`Socket.io connected. Ping is ${time}ms`);
+      });
+      start = Date.now();
+      socket.emit('server::ping');
+    }, 500);
+  }
   render() {
     return (
       <div className="rootContainer" style={{

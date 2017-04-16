@@ -2,13 +2,13 @@ import socketIO from 'socket.io-client';
 
 const io = socketIO(window.location.origin);
 
-export const listen = function (event, listener) {
+const listen = function (event, listener) {
   io.on(event, listener);
   io.emit('emitter.on', {event});
 }
 
-export const emit = function (event, ...args) {
-  io.emit(event, {args});
+const emit = function (event, ...args) {
+  io.emit('emitter.emit', {args, event});
 }
 
-window.emit = emit;
+export default {listen, emit};

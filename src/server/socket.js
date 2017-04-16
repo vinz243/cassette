@@ -9,9 +9,9 @@ module.exports = function(app) {
       id: socket.id
     });
     const listeners = [];
-    socket.on('emitter.emit', ({args}) => {
-      emitter.emit(['socket', 'emit'], data);
-      emitter.emit(data.event, ...args);
+    socket.on('emitter.emit', ({args, event}) => {
+      emitter.emit(['socket', 'emit'], {args});
+      emitter.emit(event, ...args);
     })
     socket.on('emitter.on', (data) => {
       emitter.emit(['socket', 'addlistener'], data);
@@ -29,7 +29,13 @@ module.exports = function(app) {
 
       listeners.forEach(([event, listener]) => {
         emitter.off(event, listener);
-      })
-    })
+      });
+    });
   })
 }
+emitter.on(['server', 'ping'], () => {
+  process.nextTick(() => {
+    return emitter.emit(['client', 'pong']);
+  })
+});
+console.log(emitter.eventNames());
