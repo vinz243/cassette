@@ -16,7 +16,7 @@ class WantedCollapsible extends React.Component {
           Downloading
         </div>
         <div className="wanted-progress">
-            <ProgressBar value={item.dl_progress || 0.1} />
+            <ProgressBar value={Math.max(item.dl_progress, 0.1) || 0.1} />
         </div>
       </div>
     } else if (item.status === 'NO_RESULTS' || (

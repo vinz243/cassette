@@ -16,6 +16,7 @@ const changeCase = require('change-case');
 
 const dataDir = path.join(conf.get('configPath'), '/database/');
 const emitter = require('emitter');
+const diff    = require('object-diff');
 
 mkdirp.sync(dataDir);
 
@@ -189,6 +190,7 @@ const databaseLoader = module.exports.databaseLoader =  (state, db = getDatabase
       db.findOne(query, {}, (err, doc) => {
         if (err) return reject(err);
         state.props = Object.assign({}, doc || {});
+        state.originalProps = Object.assign({}, doc || {});
         resolve();
       });
     });
@@ -246,17 +248,26 @@ const updateable = module.exports.updateable = (state, db = getDatabase(state.na
       return;
     }
     return new Promise((resolve, reject) => {
-      emitter.emit(['model', 'willupdate', state.props._id]);
+      emitter.emit(
+        ['model', 'willupdate', state.name, state.props._id],
+        Object.assign({}, diff(state.originalProps, state.props)),
+        Object.assign({}, state.props)
+      );
       db.update({_id: state.props._id}, state.props, (err) => {
         if (err) return reject(err);
-        emitter.emit(['model', 'didupdate', state.props._id]);
+        emitter.emit(
+          ['model', 'didupdate', state.name, state.props._id],
+          Object.assign({}, diff(state.originalProps, state.props)),
+          Object.assign({}, state.props)
+        );
+        state.originalProps = Object.assign({}, state.props);
         resolve();
       });
     });
   },
   set: (key, value) => {
     if (state.fields.includes(key)) {
-      emitter.emit(['model', 'setprop', state.props._id], {
+      emitter.emit(['model', 'setprop', state.name, state.props._id], {
         [key]: value
       }, Object.assign({}, state.props));
       state.props = Object.assign({}, state.props, {[key]: value});
@@ -273,14 +284,14 @@ const createable = module.exports.createable = (state, db = getDatabase(state.na
       throw Boom.create('Cannot create a document that already exists');
     }
     return new Promise((resolve, reject) => {
-      emitter.emit(['model', 'willcreate', state.props._id],
+      emitter.emit(['model', 'willcreate', state.name, state.props._id],
         Object.assign({}, state.props));
 
       db.insert(state.props, (err, [props]) => {
         if (err)
           return reject(Boom.wrap(err));
         state.props = Object.assign({}, props);
-        emitter.emit(['model', 'didcreate', state.props._id],
+        emitter.emit(['model', 'didcreate', state.name, state.props._id],
           Object.assign({}, state.props));
         resolve();
       });
@@ -291,13 +302,13 @@ const createable = module.exports.createable = (state, db = getDatabase(state.na
 const removeable = module.exports.removeable = (state, db = getDatabase(state.name)) => ({
   remove: async () => {
     if (state.props._id) {
-      emitter.emit(['model', 'willremove', state.props._id],
+      emitter.emit(['model', 'willremove', state.name, state.props._id],
         Object.assign({}, state.props));
       return new Promise((resolve, reject) => {
         db.remove({_id: state.props._id}, {}, (err) => {
           if (err) return reject(err);
           delete state.props._id;
-          emitter.emit(['model', 'didremove', state.props._id],
+          emitter.emit(['model', 'didremove', state.name, state.props._id],
             Object.assign({}, state.props));
           resolve();
         });

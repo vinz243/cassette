@@ -1,13 +1,18 @@
 import React, { PropTypes } from 'react'
 import WantedRow from './WantedRow';
 import ScrollableDiv from 'components/ScrollableDiv';
+import socket from 'app/socket';
 
 class WantedView extends React.Component {
   componentDidMount() {
     this.props.actions.fetchAllWanted();
-    this.interval = setInterval(() => {
-      this.props.actions.updateWanted()
-    }, 3000);
+    // this.interval = setInterval(() => {
+    //   this.props.actions.updateWanted()
+    // }, 3000);
+
+    socket.listen('model::willupdate::wanted_album::*', (...args) => {
+      this.props.actions.onUpdate(...args);
+    });
   }
   componentWillUnmount() {
     clearInterval(this.interval);

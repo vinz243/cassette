@@ -12,7 +12,7 @@ const listen = function (event, listener) {
   }
   io.on('connect', function () {
     process.nextTick(() => {
-      io.on(event, listener);
+      io.on(event, ({args}) => listener(...args));
       io.emit('emitter.on', {event});
     });
   });

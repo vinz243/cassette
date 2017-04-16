@@ -36,6 +36,32 @@ module.exports.automatedProcess = async function (id) {
   }
 }
 
+// updateProgress is a function that will calls itself
+// with an increasing delay until it finishes downloading
+
+const updateProgress = (nextDelay, item, wanted, torrent) => {
+  let stop = false;
+  item.getProgress().then((progress) => {
+    if (progress >= 1) {
+      wanted.set('status', 'DONE');
+    }
+    wanted.set('dl_progress', progress);
+    torrent.set('dl_progress', progress);
+    if (progress >= 1) {
+      wanted.set('status', 'DONE');
+      stop = true;
+      return Promise.all([wanted.update(), torrent.update()]);
+    }
+    return Promise.all([wanted.update(), torrent.update()]);
+  }).then(() => {
+    if (!stop) {
+      setTimeout(() => {
+        updateProgress(nextDelay + 50, item, wanted, torrent);
+      }, nextDelay);
+    }
+  });
+}
+
 const snatch = module.exports.snatch = async function (id) {
   const torrent = await Torrent.findById(id)
   const tracker = await Tracker.findById(torrent.props.tracker);
@@ -57,27 +83,10 @@ const snatch = module.exports.snatch = async function (id) {
   wanted.set('status', 'DOWNLOADING');
   await wanted.update();
 
-  const poller = setInterval(() => {
-    item.getProgress().then((progress) => {
-      if (progress >= 1) {
-        clearInterval(poller);
-        wanted.set('status', 'DONE');
-      }
-      wanted.set('dl_progress', progress);
-      torrent.set('dl_progress', progress);
-      return Promise.all([wanted.update(), torrent.update()]);
-    });
-  }, 600);
-  setTimeout(() => {
-    item.getProgress().then((progress) => {
-      if (progress === 0) {
-        clearInterval(poller);
-        wanted.set('status', 'FAILED');
-        wanted.update();
-      }
-    });
-  }, 1.5 * 60 * 60 * 1000);
+  updateProgress(300, item, wanted, torrent);
 }
+
+
 
 const search = module.exports.search = async function (id) {
   const album = await WantedAlbum.findById(id);

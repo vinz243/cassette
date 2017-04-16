@@ -14,6 +14,8 @@ import StoreLayout from './StoreLayout';
   return res;
 })
 export default class LibraryView extends Component {
+  componentDidMount() {
+  }
   render() {
     return (
       <div>

@@ -62,6 +62,7 @@
     "mkdirp": "^0.5.1",
     "musicbrainz": "^0.2.6",
     "node-vibrant": "^3.0.0-alpha.2",
+    "object-diff": "^0.0.4",
     "parse-torrent": "^5.8.1",
     "pascal-case": "^2.0.0",
     "pluralize": "^3.0.0",

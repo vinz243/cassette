@@ -68,11 +68,25 @@ export default function reducer(state = initialState, action = {}) {
         currentWanted: action.currentWanted
       }
     case FETCH_WANTED:
+      const index = state.wanted.findIndex(el => el._id === action.wanted._id);
+      const wantedById = {
+        ...state.wantedById,
+        [action.wanted._id]: action.wanted
+      };
+      if (index) {
+        console.log('INDEX FOUND');
+
+        return Object.assign({}, state, {
+          wantedById,
+          wanted: [
+            ...state.wanted.slice(0, index),
+            Object.assign({}, action.wanted, {results: undefined}),
+            ...state.wanted.slice(index + 1)
+          ]
+        });
+      }
       return Object.assign({}, state, {
-        wantedById: {
-          ...state.wantedById,
-          [action.wanted._id]: action.wanted
-        }
+        wantedById
       });
   case INVALIDATE_WANTED:
     return Object.assign({}, state, {
@@ -98,6 +112,24 @@ function toggleLossless () {
 function invalidateWanted (id) {
   return {
     type: INVALIDATE_WANTED, id
+  }
+}
+
+function onUpdate (newProps, props) {
+  return (dispatch, getState) => {
+    const {wantedById, currentWanted} = getState().store;
+    dispatch({
+      type: FETCH_WANTED,
+      id: props._id,
+      wanted: {...props, results: wantedById[props._id].results}
+    });
+    if (newProps.status) {
+      dispatch({type: INVALIDATE_WANTED, id: props._id});
+      if (+currentWanted === +props._id) {
+        fetchWanted(props._id, true)(dispatch, getState);
+      }
+    }
+
   }
 }
 
@@ -406,5 +438,5 @@ export const actionCreators = {
   fetchArtistsResult, fetchAlbumsResult, fetchArtistAlbums, fetchAlbum,
   fetchMoreAlbums, addAlbumFilter, removeAlbumFilter, fetchWanted,
   fetchAllWanted, downloadAlbum, clearWanted, updateWanted, searchWanted,
-  invalidateWanted, toggleLossless, selectResult
+  invalidateWanted, toggleLossless, selectResult, onUpdate
 }
