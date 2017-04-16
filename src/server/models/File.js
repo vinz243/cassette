@@ -9,7 +9,8 @@ const {
   databaseLoader,
   publicProps,
   findOneFactory,
-  findFactory
+  findFactory,
+  findOrCreateFactory
 } = require('./Model');
 
 const File = module.exports = function(props) {
@@ -51,6 +52,7 @@ const File = module.exports = function(props) {
 module.exports.File = File;
 
 const findOne = module.exports.findOne = findOneFactory(File);
+const findOrCreate = module.exports.findOrCreate = findOrCreateFactory(File);
 
 const findById = module.exports.findById = (_id) => findOne({
   _id

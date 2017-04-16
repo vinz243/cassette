@@ -44,20 +44,10 @@ function scanLibraries () {
 }
 function waitScan(scanId) {
   return new Promise((resolve, reject) => {
-    function wait (res) {
-      if (res.data.statusCode && res.data.statusCode !== 'PENDING')
-        return resolve({
-          type: WAIT_SCAN,
-          res
-        });
-      setTimeout(() => {
-        axios.get(`/api/v2/scans/${scanId}`).then(wait);
-      }, 700);
-    }
-    wait({
-      data: {
-        statusCode: 'PENDING'
-      }
+    socket.listen(`scanner::scanfinished::${scanId}`, function () {
+      resolve({
+        type: WAIT_SCAN
+      })
     });
   });
 }

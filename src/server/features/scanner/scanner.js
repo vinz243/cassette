@@ -121,16 +121,15 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
             duration: metadata.duration
           }).then(track => Promise.resolve([metadata, artist, album, track]));
         }).then(([metadata, artist, album, track]) => {
-
-          let file = models.File({
-            duration: metadata.duration,
-            bitrate: metadata.bitrate,
-            path: filePath,
+          return File.findOrCreate({
+            path: filePath
+          }, {
             artist: artist.props._id,
             album: album.props._id,
-            track: track.props._id
-          });
-          return file.create().then(() => {
+            track: track.props._id,
+            duration: metadata.duration,
+            bitrate: metadata.bitrate
+          }).then(() => {
             return Promise.resolve([metadata, artist, album, track, file])
           });
         }).then(([metadata, artist, album, track, file]) => {
@@ -147,6 +146,9 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
       return Promise.resolve();
     case 'unlink':
       return File.findOne({path: filePath}).then((file) => {
+        if (!file) {
+          return Promise.resolve();
+        }
         return file.remove();
       });
     case 'mkdir':
@@ -160,7 +162,6 @@ const operationMapperFactory = module.exports.operationMapperFactory = (models, 
 }
 
 const scan = module.exports.scan = async (libraryId, mediastic = getMediastic()) => {
-  emitter.emit(['scanner', 'scanstart', libraryId], {libraryId});
 
   let library = await Library.findById(libraryId);
   let cachedEntries = await getCachedEntries(libraryId);
@@ -199,6 +200,4 @@ const scan = module.exports.scan = async (libraryId, mediastic = getMediastic())
   await writeCachedEntries(libraryId, currentEntries.map((entry) => {
     return Object.assign({}, entry, {dir: entry.isDirectory()});
   }));
-
-  emitter.emit(['scanner', 'scanfinished', libraryId], {libraryId});
 }

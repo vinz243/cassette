@@ -18,6 +18,7 @@ const {
   findFactory,
   findOrCreateFactory
 } = require('./Model');
+const emitter = require('emitter');
 
 const Scan = module.exports.Scan = function(props) {
   if (typeof props === 'string') {
@@ -49,8 +50,12 @@ const Scan = module.exports.Scan = function(props) {
     publicProps(state),
     legacySupport(state), {
       postCreate: () => {
-        process.nextTick(() => {
+        setTimeout(() => {
           if ((state.props.mode || '').toLowerCase() === 'all') {
+            emitter.emit(['scanner', 'scanstarted', state.props._id], {
+              scanId: state.props._id
+            });
+
             let time = 0;
             let hasErrors = false;
 
@@ -73,9 +78,18 @@ const Scan = module.exports.Scan = function(props) {
               state.functions.set('statusMessage', 'Scan finished without error.');
               state.functions.set('duration', Date.now() - time);
 
+              emitter.emit(['scanner', 'scanfinished', state.props._id], {
+                scanId: state.props._id
+              });
               return state.functions.update();
             }).catch((e) => {
               hasErrors = true;
+
+              emitter.emit(['scanner', 'scanfinished', state.props._id], {
+                scanId: state.props._id,
+                hasErrors
+              });
+
               mainStory.error('scanner', 'One scan failed with errors', {attach: e});
             });
           }
@@ -84,10 +98,17 @@ const Scan = module.exports.Scan = function(props) {
             return;
           }
           try {
+            emitter.emit(['scanner', 'scanstarted', state.props._id], {
+              scanId: state.props._id
+            });
             scan(state.props.library).then(() => {
               mainStory.info('scanner', 'Scan finished without raising errors');
               state.functions.set('statusCode', 'DONE');
               state.functions.set('statusMessage', 'Scan finished without errors.');
+
+              emitter.emit(['scanner', 'scanfinished', state.props._id], {
+                scanId: state.props._id
+              });
 
               return;
             }).catch((err) => {
@@ -96,13 +117,18 @@ const Scan = module.exports.Scan = function(props) {
               state.functions.set('statusMessage', 'Scan failed with errors. Please check the logs for more details...');
               state.functions.update().catch(err => {
                 mainStory.fatal('scanner', 'Could not update scan', {attach: err});
-              })
+              });
+
+              emitter.emit(['scanner', 'scanfinished', state.props._id], {
+                scanId: state.props._id,
+                hasErrors: true
+              });
             });
           } catch (err) {
             mainStory.fatal('scanner', 'Scanner crashed unexpectedly.', {attach: err});
 
           }
-        });
+        }, 2500);
 
       }
     }

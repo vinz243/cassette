@@ -14,25 +14,11 @@ import { Flex, Box } from 'reflexbox';
 import {Intent} from '@blueprintjs/core';
 import socket from 'app/socket';
 import toaster from 'app/toaster';
+import notifications from './notifications';
 
 export default class AppView extends Component {
   componentDidMount() {
-    setTimeout(function () {
-      let start = 0;
-      let working = false;
-      let time = 0;
-      socket.listen('client::pong', () => {
-        time = Date.now() - start;
-        working = true;
-        toaster.show({
-          message: `Socket.io connected. Ping is ${time}ms`,
-          timeout: 2500,
-          intent: Intent.SUCCESS
-        });
-      });
-      start = Date.now();
-      socket.emit('server::ping');
-    }, 1500);
+    notifications();
   }
   render() {
     return (
