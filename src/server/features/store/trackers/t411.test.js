@@ -7,12 +7,14 @@ const tracker     = require('../models/tracker');
 const WantedAlbum = require('../models/wanted-album');
 
 const trackerProps = {
-  name: 'T411',
-  type: 't411',
-  host: 't411.ch',
-  username: 'foo',
-  password: 'bar',
-  _id: 1337
+  props: {
+    name: 'T411',
+    type: 't411',
+    host: 't411.ch',
+    _id: 1337
+  }, privateProps: {
+    password: 'bar'
+  }
 };
 
 test('t411 - authentificate user', async t => {
@@ -22,7 +24,7 @@ test('t411 - authentificate user', async t => {
       'token':'1337:42:133742'
     }))
   };
-  const api = await t411(req, {props: trackerProps});
+  const api = await t411(req, trackerProps);
   t.is(typeof api.searchReleases, 'function');
 
   t.deepEqual(req.post.args, [
@@ -40,7 +42,7 @@ test('t411 - throws a remote error if couldn\'t login', async t => {
       code: 107
     }))
   };
-  const err = await t.throws(t411(req, {props: trackerProps}));
+  const err = await t.throws(t411(req, trackerProps));
 
   t.is(err.message, 'Remote error: Wrong password');
   t.deepEqual(req.post.args, [
@@ -64,7 +66,7 @@ test('searchReleases - creates the releases a search results', async t => {
       'token':'1337:42:133742'
     }))
   });
-  const api = await t411(req, {props: trackerProps});
+  const api = await t411(req, trackerProps);
   t.is(typeof api.searchReleases, 'function');
 
   const res = await api.searchReleases({props: {
@@ -111,7 +113,9 @@ test('searchReleases - creates the releases', async t => {
       'token':'1337:42:133742'
     }))
   });
-  const instance = tracker(Object.assign({}, trackerProps, {_id: undefined}));
+  const instance = tracker(Object.assign({}, trackerProps.props,
+    trackerProps.privateProps,
+    {_id: undefined}));
   await instance.create();
 
   const api = await t411(req, instance);

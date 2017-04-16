@@ -5,13 +5,16 @@
 require('babel-polyfill');
 // console.log(require('config.js'));
 const path = require('path');
-const express = require('express');
-const webpack = require('webpack');
+
+const express              = require('express');
+const webpack              = require('webpack');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
-const DashboardPlugin = require('webpack-dashboard/plugin');
-const config = require('./config/webpack.config.development');
-const backend = require('./src/server/server');
+const DashboardPlugin      = require('webpack-dashboard/plugin');
+const config                = require('./config/webpack.config.development');
+const backend              = require('./src/server/server');
+const socket               = require('./src/server/socket');
+const http                 = require('http');
 
 const api = process.argv.includes('--api');
 
@@ -23,6 +26,9 @@ if (api) {
 // console.log(backend);
 
 const app = express();
+
+const server = http.createServer(app);
+socket(server);
 
 const host = process.env.HOST || 'localhost';
 const port = process.env.PORT || 3000;
@@ -64,7 +70,8 @@ if (!api) {
     res.sendFile(path.join(__dirname, './src/client/assets/index.html'));
   });
 }
-app.listen(port, host, (err) => {
+
+server.listen(port, host, (err) => {
   if (err) {
     log(err);
     return;
