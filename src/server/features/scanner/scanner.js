@@ -26,7 +26,7 @@ const fetchArtwork = fetchEntityArtworkFactory(
   fs, path, touch, request, qs, md5
 );
 
-const trackCase = (title) => {
+const trackCase = (title = '') => {
   if (title.length > 5) {
     return titlecase(title.toLowerCase());
   }
