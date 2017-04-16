@@ -7,7 +7,7 @@ class WantedView extends React.Component {
     this.props.actions.fetchAllWanted();
     this.interval = setInterval(() => {
       this.props.actions.updateWanted()
-    }, 1000);
+    }, 3000);
   }
   componentWillUnmount() {
     clearInterval(this.interval);

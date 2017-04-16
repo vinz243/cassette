@@ -11,6 +11,7 @@ class WantedItem extends React.Component {
       failed: 'error',
       downloading: 'cloud-download',
       snatching: 'cloud-download',
+      no_results: 'cross',
       done: 'tick',
     })[status.toLowerCase()]
   }

@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 import {Collapse, Button, Intent, ProgressBar} from '@blueprintjs/core';
 import './WantedCollapsible.scss';
 import classnames from 'classnames';
+import NonIdealState from 'components/NonIdealState';
 
 class WantedCollapsible extends React.Component {
   render () {
@@ -17,6 +18,20 @@ class WantedCollapsible extends React.Component {
         <div className="wanted-progress">
             <ProgressBar value={item.dl_progress || 0.1} />
         </div>
+      </div>
+    } else if (item.status === 'NO_RESULTS' || (
+      item.results &&
+      !item.results.length &&
+      item.status === 'SEARCHED'
+    )) {
+
+      items = <div className="wanted-no-results">
+        <NonIdealState icon="cross" title="No results" description="Searching for releases has yielded no results" />
+      </div>
+    } else if (item.status === 'DONE') {
+
+      items = <div className="wanted-no-results">
+        <NonIdealState icon="tick" title="Album downloaded" description="Best release has been downloaded. Refresh library to add it." />
       </div>
     } else if (!['searched_trackers', 'searching_trackers', 'searched']
       .includes((item.status || '').toLowerCase()) && item) {
