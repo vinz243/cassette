@@ -1,10 +1,16 @@
-// Creates a hot reloading development environment
-// process.env.NODE_PATH = __dirname;
-// require('module').Module._initPaths();
+let backend = null;
+let socket  = null;
 
-require('babel-polyfill');
-// console.log(require('config.js'));
+function loadAPI() {
+  backend = require('./src/server/server');
+  socket = require('./src/server/socket');
+}
+loadAPI();
+
+const dependencies = Object.keys(require.cache);
+
 const path = require('path');
+const watch = require('node-watch');
 
 const express              = require('express');
 const webpack              = require('webpack');
@@ -12,15 +18,46 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const DashboardPlugin      = require('webpack-dashboard/plugin');
 const config                = require('./config/webpack.config.development');
-const backend              = require('./src/server/server');
-const socket               = require('./src/server/socket');
 const http                 = require('http');
+
+// const nodeRequire = require;
+// require = Object.assign(function (module) {
+//   if (!dependencies.includes(module)) {
+//     dependencies.push(module);
+//   }
+//   return nodeRequire(module);
+// }, nodeRequire);
+
 
 const api = process.argv.includes('--api');
 
 if (api) {
   console.log('Warning: running server as API only');
 }
+console.log(`Watching folder ${path.join(__dirname, 'src/server')}`);
+
+watch(path.join(__dirname, 'src/server'), {recursive: true},
+  function(event, filename) {
+  console.warn(` `);
+  console.warn(`   ${filename} was ${event}d, reloading API server`);
+  console.warn(`  `);
+  const node_modules = path.join(__dirname, 'node_modules');
+  const excludes = [
+    'src/server/config.js'
+  ].map((file) => path.join(__dirname, file));
+
+  dependencies.forEach((module) => {
+    if (module.startsWith(path.join(node_modules, 'sharp'))) {
+      return;
+    }
+    if (excludes.includes(module)) {
+      return
+    }
+    delete require.cache[module];
+  });
+
+  loadAPI();
+})
 
 // const processResult = require('./src/server/models/Scan').processResult;
 // console.log(backend);
