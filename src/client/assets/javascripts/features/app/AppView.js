@@ -11,7 +11,9 @@ import JobsView from 'features/jobs/components/JobsView';
 
 import axios from 'axios';
 import { Flex, Box } from 'reflexbox';
+import {Intent} from '@blueprintjs/core';
 import socket from 'app/socket';
+import toaster from 'app/toaster';
 
 export default class AppView extends Component {
   componentDidMount() {
@@ -22,11 +24,15 @@ export default class AppView extends Component {
       socket.listen('client::pong', () => {
         time = Date.now() - start;
         working = true;
-        console.log(`Socket.io connected. Ping is ${time}ms`);
+        toaster.show({
+          message: `Socket.io connected. Ping is ${time}ms`,
+          timeout: 2500,
+          intent: Intent.SUCCESS
+        });
       });
       start = Date.now();
       socket.emit('server::ping');
-    }, 500);
+    }, 1500);
   }
   render() {
     return (
@@ -35,7 +41,7 @@ export default class AppView extends Component {
         <div className="toolbarContainer" style={{
           boxShadow: '0px 0px 12px 0px rgba(0,0,0,0.75)',
           width: '100%',
-          zIndex: 999,
+          zIndex: 39,
           position: 'fixed',
         }}>
           <ToolbarView {...this.props} />
@@ -45,7 +51,7 @@ export default class AppView extends Component {
           }}>
           <Flex align="center" justify="space-between">
             <Box style={{
-                zIndex: 998,
+                zIndex: 38,
                 position: 'fixed',
                 boxShadow: '0px 0px 18px 0px rgba(0,0,0,0.75)',
                 backgroundColor: 'rgb(45, 45, 52)',
