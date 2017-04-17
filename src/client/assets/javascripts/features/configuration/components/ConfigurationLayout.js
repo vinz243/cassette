@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 import './ConfigurationApp.scss';
 import classnames from 'classnames';
 import ChecksView from './checks';
+import LoginView from './login';
 import {Button, Intent} from '@blueprintjs/core';
 
 class ConfigurationLayout extends React.Component {
@@ -13,7 +14,7 @@ class ConfigurationLayout extends React.Component {
         desc: 'Cassette will make sure system requirements are met'
       },
       'login': {
-        render: () => (<ChecksView {...this.props} />),
+        render: () => (<LoginView {...this.props} />),
         name: 'Login configuration',
         desc: 'You can now secure your cassette instance by setting a login'
       },
@@ -44,6 +45,8 @@ class ConfigurationLayout extends React.Component {
         <div className="configuration-content">
           {step.render()}
           <div className="configuration-next">
+            <Button iconName="arrow-left" className="pt-large pt-minimal"
+              text="Previous" onClick={actions.prevStep}/>
             <Button rightIconName="arrow-right" className="pt-large"
               text="Next" onClick={actions.nextStep}/>
           </div>

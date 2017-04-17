@@ -4,6 +4,7 @@ import axios from 'axios';
 export const NAME = 'configuration';
 
 const NEXT_STEP = 'cassette/configuration/NEXT_STEP';
+const PREV_STEP = 'cassette/configuration/PREV_STEP';
 
 const initialState = {
   checksById: {
@@ -44,6 +45,13 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         currentStep: state.steps[state.steps.indexOf(state.currentStep) + 1]
       }
+    case PREV_STEP:
+      const index = state.steps.indexOf(state.currentStep);
+      if (!index) return state;
+      return {
+        ...state,
+        currentStep: state.steps[index - 1]
+      }
     default:
       return state;
   }
@@ -60,7 +68,12 @@ function nextStep () {
     type: NEXT_STEP
   }
 }
+function prevStep () {
+  return {
+    type: PREV_STEP
+  }
+}
 
 export const actionCreators = {
-  nextStep
+  nextStep, prevStep
 }

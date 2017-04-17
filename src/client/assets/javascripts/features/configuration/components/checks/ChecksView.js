@@ -16,7 +16,7 @@ class ChecksView extends React.Component {
         <span className={classnames("pt-icon-standard", {
             'pt-icon-small-tick': check.status === 'ok',
             'pt-icon-cross': check.status === 'ko',
-            'pt-icon-symbol-circle': check.status === 'uk',
+            'pt-icon-dot': check.status === 'uk',
           })}></span> <span className="check-text">{check.message}</span>
       </div>
     });

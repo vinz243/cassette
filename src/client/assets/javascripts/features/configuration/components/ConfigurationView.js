@@ -13,7 +13,7 @@ import ConfigurationLayout from './ConfigurationLayout';
 
 class ConfigurationView extends React.Component {
   render () {
-    return <div className="configuration-view">
+    return <div className="configuration-view pt-dark">
       <ConfigurationLayout {...this.props} />
     </div>
   }
