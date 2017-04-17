@@ -30,7 +30,7 @@ class WantedItem extends React.Component {
         </div>
         <BetterImage
           src={`/api/v2/store/release-groups/${item.mbid}/artwork?size=150`}
-          size={150} />
+          size={140} />
       </div>
       <div className="wanted-props">
         <div className="wanted-title">
