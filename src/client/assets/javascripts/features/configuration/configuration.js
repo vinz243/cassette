@@ -1,39 +1,15 @@
 import { createStructuredSelector } from 'reselect';
 
 import axios from 'axios';
+import shortid from 'shortid';
 export const NAME = 'configuration';
 
 const NEXT_STEP = 'cassette/configuration/NEXT_STEP';
 const PREV_STEP = 'cassette/configuration/PREV_STEP';
+const UPDATE_CHECKS = 'cassette/configuration/UPDATE_CHECKS';
 
 const initialState = {
-  checksById: {
-    'ssl': {
-      name: 'SSL Check',
-      message: 'Server isn\'t using a secure connection (https)',
-      status: 'ko'
-    },
-    'node_version': {
-      name: 'Node version check',
-      message: 'You are using node v7.7.4 (>= 7.7.0)',
-      status: 'ok'
-    },
-    'rtorrent': {
-      name: 'rTorrent status',
-      message: 'rTorrent is available through port 36810',
-      status: 'ok'
-    },
-    'disk_writable': {
-      name: 'Cassette folder writable',
-      message: '.cassette folder is writable in /home/vincent/.cassette',
-      status: 'ok'
-    },
-    'socketio_connected': {
-      name: 'WebSocket connected',
-      message: 'Trying to connect through websocket',
-      status: 'uk'
-    }
-  },
+  checksById: {},
   libraries: [{
     name: 'Downloads',
     path: '/home/vincent/.cassette/downloads',
@@ -46,7 +22,8 @@ const initialState = {
     synced: false
   }],
   steps: ['checks', 'login', 'libraries', 'trackers'],
-  currentStep: 'checks'
+  currentStep: 'checks',
+  checksProcessing: true
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -63,8 +40,35 @@ export default function reducer(state = initialState, action = {}) {
         ...state,
         currentStep: state.steps[index - 1]
       }
+    case UPDATE_CHECKS:
+      const {data} = action;
+      return {
+        ...state,
+        checksProcessing: Object.values(data).find(el => el.status === 'uk'),
+        checksPassed: Object.values(data).every(el => el.status === 'ok'),
+        checksById: data
+      }
     default:
       return state;
+  }
+}
+
+function updateChecks () {
+  return function (dispatch) {
+    const id = shortid.generate();
+    function update () {
+      axios.get(`/api/v2/checks/${id}`).then(({data}) => {
+        dispatch({
+          type: UPDATE_CHECKS, data
+        });
+        if (Object.values(data).find(el => el.status === 'uk')) {
+          setTimeout(() => {
+            update();
+          }, 500)
+        }
+      });
+    }
+    update();
   }
 }
 
@@ -86,5 +90,5 @@ function prevStep () {
 }
 
 export const actionCreators = {
-  nextStep, prevStep
+  nextStep, prevStep, updateChecks
 }

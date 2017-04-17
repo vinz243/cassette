@@ -55,27 +55,32 @@ module.exports.checks = {
   },
   socketio_connected: function () {
     return new Promise((resolve, reject) => {
-      const key = shortid.generate();
-      const time = Date.now();
-      let resolved = false;
-      emitter.on(['checks', 'socketiotest', 'pong'], function (id) {
-        if (key === id) {
-          resolved = true;
-          resolve({
-            status: 'ok',
-            message: `SocketIO connected in ${Date.now() - time}ms`
-          });
-        }
-      });
-      emitter.emit(['checks', 'socketiotest', 'ping']);
       setTimeout(() => {
-        if (!resolved) {
-          resolve({
-            status: 'ko',
-            message: `Can't connect socket.io instance`
-          });
-        }
-      }, 6500);
+        const key = shortid.generate();
+        const time = Date.now();
+        let resolved = false;
+        emitter.on(['checks', 'socketiotest', 'pong'], function (id) {
+          if (key === id) {
+            resolved = true;
+            resolve({
+              status: 'ok',
+              message: `SocketIO connected in ${Date.now() - time}ms`
+            });
+          }
+        });
+        emitter.emit(['checks', 'socketiotest', 'ping'], key);
+        emitter.on(['socket', 'connect'], function () {
+          emitter.emit(['checks', 'socketiotest', 'ping'], key);
+        })
+        setTimeout(() => {
+          if (!resolved) {
+            resolve({
+              status: 'ko',
+              message: `Can't connect socket.io instance`
+            });
+          }
+        }, 6500);
+      }, 1500);
     })
   },
   write_access: async function () {

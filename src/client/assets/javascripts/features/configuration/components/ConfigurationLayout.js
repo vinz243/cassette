@@ -8,11 +8,14 @@ import {Button, Intent} from '@blueprintjs/core';
 
 class ConfigurationLayout extends React.Component {
   configurationStep () {
+    const {configuration, actions} = this.props;
     return {
       'checks': {
         render: () => (<ChecksView {...this.props} />),
-        name: 'System requirements check',
-        desc: 'Cassette will make sure system requirements are met'
+        name: 'System requirements checklist',
+        desc: 'Cassette will make sure system requirements are met',
+        loading: configuration.checksProcessing,
+        valid: configuration.checksPassed
       },
       'login': {
         render: () => (<LoginView {...this.props} />),
@@ -51,7 +54,11 @@ class ConfigurationLayout extends React.Component {
             <Button iconName="arrow-left" className="pt-large pt-minimal"
               text="Previous" onClick={actions.prevStep}/>
             <Button rightIconName="arrow-right" className="pt-large"
-              text="Next" onClick={actions.nextStep}/>
+              text="Next" onClick={actions.nextStep} disabled={
+                !step.valid
+              } loading={
+                step.loading
+              }/>
           </div>
         </div>
       </div>
