@@ -8,10 +8,12 @@ import {default as LibraryView,
         AlbumsView} from 'features/library/components/LibraryView';
 import StoreView from 'features/store/components/StoreView';
 import SettingsView from 'features/settings/components/SettingsView';
+import ConfigurationView from 'features/configuration/components/ConfigurationView';
 import NotFoundView from 'components/NotFound';
 
 export default (
   <Route path="/">
+    <Route path="/configure" component={ConfigurationView} />
     <Route path="/app" component={AppView}>
       <Route path="/app/library" component={ArtistsView} />
       <Route path="/app/library/artists" component={ArtistsView} />

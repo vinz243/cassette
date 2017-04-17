@@ -9,6 +9,7 @@ import jobs, {NAME as jobsName} from 'features/jobs';
 import updater, {NAME as updaterName} from 'features/updater';
 import playlist, {NAME as playlistName} from 'features/playlist';
 import settings, {NAME as settingsName} from 'features/settings';
+import configuration, {NAME as configurationName} from 'features/configuration';
 
 export default combineReducers({
   routing,
@@ -20,4 +21,5 @@ export default combineReducers({
   [updaterName]: updater,
   [playlistName]: playlist,
   [settingsName]: settings,
+  [configurationName]: configuration,
 });
