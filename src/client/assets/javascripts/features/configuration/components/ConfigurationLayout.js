@@ -25,7 +25,9 @@ class ConfigurationLayout extends React.Component {
         desc: 'You can choose where cassette will look for your music'
       },
       'trackers': {
-        render: () => (<ChecksView {...this.props} />),
+        render: () => (<div className="trackers">
+          Please checkout the settings once you're done.
+        </div>),
         name: 'Trackers configuration',
         desc: 'Choose which trackers you want to download your music from (optionnal)'
       },

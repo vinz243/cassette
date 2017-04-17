@@ -38,4 +38,3 @@ emitter.on(['server', 'ping'], () => {
     return emitter.emit(['client', 'pong']);
   })
 });
-console.log(emitter.eventNames());
