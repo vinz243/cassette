@@ -14,25 +14,29 @@ div.configuration-layout {
   div.configuration-container {
     margin: 0 0 0 0;
 
-    background-color: #333340;
+    background-color: #262830;
     padding: 15vh 0;
     height: 100vh;
-    box-shadow: -1px 0px 16px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: -1px 0px 36px 0px rgba(0, 0, 0, 0.2);
     position: absolute;
     z-index: 1;
-    opacity: 0;
-    transition: all 250ms ease-in-out;
+    // opacity: 0;
+    transition: all 375ms ease;
     width: 75%;
-
+    filter: blur(12px);
     &.active {
+      filter: blur(0px);
       margin: 0 0 0 25%;
-      transition: all 250ms ease-in-out;
+      transition: all 375ms ease;
       opacity: 1;
+      background-color: #333340;
     }
     &.next {
+      filter: blur(0px);
       margin: 0 0 0 100%;
-      transition: all 250ms ease-in-out;
+      transition: all 375ms ease;
       opacity: 1;
+      background-color: #333340;
     }
   }
   div.configuration-content {
