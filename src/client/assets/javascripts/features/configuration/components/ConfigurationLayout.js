@@ -3,6 +3,7 @@ import './ConfigurationApp.scss';
 import classnames from 'classnames';
 import ChecksView from './checks';
 import LoginView from './login';
+import LibrariesView from './libraries';
 import {Button, Intent} from '@blueprintjs/core';
 
 class ConfigurationLayout extends React.Component {
@@ -19,7 +20,7 @@ class ConfigurationLayout extends React.Component {
         desc: 'You can now secure your cassette instance by setting a login'
       },
       'libraries': {
-        render: () => (<ChecksView {...this.props} />),
+        render: () => (<LibrariesView {...this.props} />),
         name: 'Libraries configuration',
         desc: 'You can choose where cassette will look for your music'
       },

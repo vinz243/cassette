@@ -1,0 +1,31 @@
+div.configuration-libraries-view {
+  div.library-item {
+    span {
+      margin: 0.3em;
+      display: inline-block;
+    }
+    span.library-name {
+      width: 75px;
+      min-width: 75px;
+    	text-overflow: ellipsis;
+    	white-space: nowrap;
+    	overflow: hidden;
+    }
+    span.library-path {
+      width: 225px;
+
+    	text-overflow: ellipsis;
+    	white-space: nowrap;
+    	overflow: hidden;
+    }
+  }
+  div.add-library {
+    margin: 1em 0.4em;
+    .input-name {
+      width: 75px;
+    }
+    .input-path {
+      width: 225px;
+    }
+  }
+}

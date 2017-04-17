@@ -34,6 +34,17 @@ const initialState = {
       status: 'uk'
     }
   },
+  libraries: [{
+    name: 'Downloads',
+    path: '/home/vincent/.cassette/downloads',
+    _id: 2,
+    synced: true
+  }, {
+    name: 'Torrents',
+    path: '/home/vincent/torrents/music',
+    _id: 3,
+    synced: false
+  }],
   steps: ['checks', 'login', 'libraries', 'trackers'],
   currentStep: 'checks'
 };
