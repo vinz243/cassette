@@ -25,7 +25,8 @@ const initialState = {
   }],
   steps: ['checks', 'login', 'libraries', 'trackers'],
   currentStep: 'checks',
-  checksProcessing: true
+  checksProcessing: true,
+  userConfigured: false
 };
 
 export default function reducer(state = initialState, action = {}) {
@@ -62,10 +63,10 @@ export default function reducer(state = initialState, action = {}) {
 
 function configureApp(username, password) {
   return function (dispatch, getState) {
-    dispatch({type: START_CONFIGURE});
     if (getState().configuration.userConfigured) {
       return dispatch(nextStep());
     }
+    dispatch({type: START_CONFIGURE});
     axios.post('/api/v2/configure', {username, password}).then(() => {
       return axios.login({username, password});
     }).then(() => {

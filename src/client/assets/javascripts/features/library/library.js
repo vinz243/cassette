@@ -2,7 +2,7 @@
 import { createStructuredSelector } from 'reselect';
 import assign from 'lodash/assign';
 import uniq from 'lodash/uniq';
-import axios from 'axios';
+import axios from 'app/axios';
 import deepAssign from 'deep-assign';
 
 import {State} from 'models/library';

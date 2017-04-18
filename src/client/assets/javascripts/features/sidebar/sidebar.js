@@ -1,5 +1,5 @@
 import {createStructuredSelector} from 'reselect';
-import axios from 'axios';
+import axios from 'app/axios';
 import socket from 'app/socket';
 
 const SCAN_LIBRARIES = 'cassette/sidebar/SCAN_LIBRARIES';

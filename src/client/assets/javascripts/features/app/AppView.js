@@ -9,7 +9,7 @@ import UpdaterView from 'features/updater/components/UpdaterView';
 import PlaylistView from 'features/playlist/components/PlaylistView';
 import JobsView from 'features/jobs/components/JobsView';
 
-import axios from 'axios';
+import axios from 'app/axios';
 import { Flex, Box } from 'reflexbox';
 import {Intent} from '@blueprintjs/core';
 import socket from 'app/socket';

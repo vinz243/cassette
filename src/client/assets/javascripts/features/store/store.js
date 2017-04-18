@@ -1,6 +1,6 @@
 import { createStructuredSelector } from 'reselect';
 import assign  from 'lodash/assign';
-import axios from 'axios';
+import axios from 'app/axios';
 
 const SET_ARTIST_RESULTS  = 'cassette/store/SET_ARTIST_RESULTS';
 const SET_ALBUMS_RESULTS  = 'cassette/store/SET_ALBUMS_RESULTS';

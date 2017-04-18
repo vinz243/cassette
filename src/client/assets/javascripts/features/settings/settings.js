@@ -1,6 +1,6 @@
 import { createStructuredSelector } from 'reselect';
 import assign  from 'lodash/assign';
-import axios from 'axios';
+import axios from 'app/axios';
 
 const ADD_TRACKER         = 'cassette/settings/ADD_TRACKER';
 const ADD_LIBRARY         = 'cassette/settings/ADD_LIBRARY';

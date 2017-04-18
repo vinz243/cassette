@@ -3,7 +3,7 @@
 
 import { createStructuredSelector } from 'reselect';
 
-import axios from 'axios';
+import axios from 'app/axios';
 import deepAssign from 'deep-assign';
 
 const UPDATE = 'cassette/updater/UPDATE';
