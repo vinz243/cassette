@@ -45,12 +45,13 @@ class LoginView extends React.Component {
           <input
             value={this.state.username}
             onChange={this.handleUsernameChange.bind(this)}
+            disabled={configuration.userConfigured}
             id="input-username"
             className={classnames("pt-input", {
               'pt-intent-danger': (this.state.usernameChanged || this.state.passwordChanged )
                 && this.state.username.length < 4
             })}
-            placeholder="username"
+            placeholder="admin"
             type="text"
             dir="auto" />
           <div className="pt-form-helper-text">4 characters at least required</div>
@@ -68,6 +69,7 @@ class LoginView extends React.Component {
           <input
             value={this.state.password}
             onChange={this.handlePasswordChange.bind(this)}
+            disabled={configuration.userConfigured}
             id="input-password"
             className={classnames("pt-input", {
              'pt-intent-danger': this.state.passwordChanged
@@ -90,6 +92,7 @@ class LoginView extends React.Component {
           <input
             id="input-password-confirmation"
             value={this.state.confpass}
+            disabled={configuration.userConfigured}
             onChange={this.handleConfPassChange.bind(this)}
             className={classnames("pt-input", {
                'pt-intent-danger': this.state.password !== this.state.confpass
@@ -108,8 +111,9 @@ class LoginView extends React.Component {
             this.state.password.length < 8 ||
             this.state.username.length < 4
           } loading={
-            false
-          }/>
+            configuration.configuringUser
+          } onClick={() => actions.configureApp(this.state.username,
+            this.state.password)}/>
       </div>
     </div>
   }

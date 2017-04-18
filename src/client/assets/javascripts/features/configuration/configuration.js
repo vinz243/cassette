@@ -1,15 +1,17 @@
 import { createStructuredSelector } from 'reselect';
 
-import axios from 'axios';
+import axios from 'app/axios';
 import shortid from 'shortid';
 export const NAME = 'configuration';
 
 const NEXT_STEP = 'cassette/configuration/NEXT_STEP';
 const PREV_STEP = 'cassette/configuration/PREV_STEP';
 const UPDATE_CHECKS = 'cassette/configuration/UPDATE_CHECKS';
+const START_CONFIGURE = 'cassette/configuration/START_CONFIGURE';
 
 const initialState = {
   checksById: {},
+  configuringUser: false,
   libraries: [{
     name: 'Downloads',
     path: '/home/vincent/.cassette/downloads',
@@ -28,10 +30,15 @@ const initialState = {
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
+    case START_CONFIGURE:
+      return {
+        ...state, configuringUser: true, userConfigured: true
+      }
     case NEXT_STEP:
       return {
         ...state,
-        currentStep: state.steps[state.steps.indexOf(state.currentStep) + 1]
+        currentStep: state.steps[state.steps.indexOf(state.currentStep) + 1],
+        configuringUser: false
       }
     case PREV_STEP:
       const index = state.steps.indexOf(state.currentStep);
@@ -50,6 +57,22 @@ export default function reducer(state = initialState, action = {}) {
       }
     default:
       return state;
+  }
+}
+
+function configureApp(username, password) {
+  return function (dispatch, getState) {
+    dispatch({type: START_CONFIGURE});
+    if (getState().configuration.userConfigured) {
+      return dispatch(nextStep());
+    }
+    axios.post('/api/v2/configure', {username, password}).then(() => {
+      return axios.login({username, password});
+    }).then(() => {
+      return axios.get('/api/v2/versions');
+    }).then(({data}) => {
+      dispatch(nextStep());
+    });
   }
 }
 
@@ -90,5 +113,5 @@ function prevStep () {
 }
 
 export const actionCreators = {
-  nextStep, prevStep, updateChecks
+  nextStep, prevStep, updateChecks, configureApp
 }

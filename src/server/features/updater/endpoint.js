@@ -3,7 +3,7 @@ const semver = require("semver")
 const pkg = require("../../../../package.json");
 
 module.exports = {
-  '/v1/versions': {
+  '/api/v2/versions': {
     get: async (ctx) => {
       let url = 'https://registry.npmjs.org/node-cassette';
       let json = await request.get(url);
@@ -26,14 +26,14 @@ module.exports = {
       return;
     }
   },
-  '/v1/restart': {
+  '/api/v2/restart': {
     post: async (ctx) => {
       let url = process.argv[process.argv.length - 1];
       let res = await request.post(url + '/restart');
       ctx.body = res;
     }
   },
-  '/v1/update': {
+  '/api/v2/update': {
     post: async (ctx) => {
       let url = process.argv[process.argv.length - 1];
       let res = await request.post(url + '/update');

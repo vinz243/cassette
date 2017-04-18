@@ -54,7 +54,6 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(async (ctx, next) => {
-
   if (ctx.url === '/api/v2/configure'
     && ctx.method === 'POST'
     && !config.isConfigured()) {
@@ -105,6 +104,14 @@ app.use(async (ctx, next) => {
 });
 
 app.use(async function (ctx, next) {
+  if (ctx.url === '/api/v2/status' && ctx.method === 'GET') {
+    ctx.body = {
+      loggedIn: ctx.isAuthenticated(),
+      configured: config.isConfigured()
+    }
+    ctx.status = 200;
+    return;
+  }
   if (ctx.isAuthenticated()) {
     await next();
   } else {
