@@ -72,6 +72,12 @@ const conf = convict({
     format: '*',
     default: '85d5b036c6aa02af4d7216af592e1eea',
     env: 'LAST_FM_API_KEY'
+  },
+  jwtSecret: {
+    doc: 'jsonwebtoken secret',
+    format: '*',
+    default: 'pleaseChangeThisValue',
+    env: 'JWT_SECRET'
   }
 });
 // Load environment dependent configuration
@@ -117,3 +123,15 @@ if (!username || username === '') {
 
 story.close();
 module.exports = conf;
+
+const file = path.join(conf.get('configRoot'), 'configured');
+let configured = fs.existsSync(file);
+
+module.exports.isConfigured = function () {
+  return configured;
+}
+
+module.exports.markConfigured = function () {
+  configured = true;
+  return;
+}

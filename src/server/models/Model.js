@@ -27,7 +27,7 @@ const db = new (tingodb({
 
 // This function returns the nedb datastore corresponding to a name
 // Useful for manyToOne. if it wasn't found it will create it
-const getDatabase = (name, database = db) => {
+const getDatabase = module.exports.getDatabase = (name, database = db) => {
   if (databases[name]) {
     return databases[name];
   }

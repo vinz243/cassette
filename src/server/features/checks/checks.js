@@ -5,18 +5,44 @@ const emitter    = require('emitter');
 const shortid    = require('shortid');
 const fs         = require('fs-promise');
 const path       = require('path');
+const entropy    = require('string-entropy');
 
 const REQUIRED_NODE = '^7.7.0';
+const MIN_ENTROPY = 256;
 
 module.exports.checklist = [
   'node_version',
   'ssl',
   'rtorrent',
   'socketio_connected',
-  'write_access'
+  'write_access',
+  'secret_entropy'
 ]
 
 module.exports.checks = {
+  secret_entropy: async function () {
+    const secret = config.get('jwtSecret');
+    if (secret === 'pleaseChangeThisValue') {
+      return {
+        status: 'ko',
+        message: `You haven't set a jwtSecret in your config.`
+      };
+    }
+    const ent = entropy(secret);
+
+    if (ent < MIN_ENTROPY) {
+      return {
+        status: 'ko',
+        message: `Your JWT Secret doesn't have a high entropy (current: ${
+          ent
+        } < ${MIN_ENTROPY})`
+      };
+    }
+    return {
+      status: 'ok',
+      message: 'Your JWT secret has a high entropy (${ent})'
+    }
+  },
   node_version: async function () {
     const works = semver.satisfies(process.version, REQUIRED_NODE);
     return {

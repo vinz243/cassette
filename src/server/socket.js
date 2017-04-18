@@ -7,33 +7,37 @@ module.exports = function(app) {
   mainStory.info('socket', 'Injecting socket.io into app...');
   io.on('connection', function (socket) {
     mainStory.debug('socket', `Socket #${socket.id} connected`);
+    
     emitter.emit(['socket', 'connect'], {
       id: socket.id
     });
     const listeners = [];
-    socket.on('emitter.emit', ({args, event}) => {
-      mainStory.trace('socket', `emitter.emit ${event}`, {attach: args});
-      emitter.emit(['socket', 'emit'], {args});
-      emitter.emit(event, ...args);
-    })
-    socket.on('emitter.on', (data) => {
-      mainStory.debug('socket', `emitter.on ${data.event}`, {attach: data});
-      emitter.emit(['socket', 'addlistener'], data);
-      const listener = function (...args) {
-        socket.emit(data.event, {args});
-      }
-      emitter.on(data.event, listener);
-      listeners.push([data.event, listener]);
-    });
-    socket.on('disconnect', function (data) {
-      mainStory.debug('socket', `Socket #${socket.id} disconnected`, {attach: data});
-      emitter.emit(['socket', 'connect'], {
-        id: socket.id,
-        reason: data.reason
-      });
 
-      listeners.forEach(([event, listener]) => {
-        emitter.off(event, listener);
+    socket.on('authenticate', ({token}) => {
+      socket.on('emitter.emit', ({args, event}) => {
+        mainStory.trace('socket', `emitter.emit ${event}`, {attach: args});
+        emitter.emit(['socket', 'emit'], {args});
+        emitter.emit(event, ...args);
+      })
+      socket.on('emitter.on', (data) => {
+        mainStory.debug('socket', `emitter.on ${data.event}`, {attach: data});
+        emitter.emit(['socket', 'addlistener'], data);
+        const listener = function (...args) {
+          socket.emit(data.event, {args});
+        }
+        emitter.on(data.event, listener);
+        listeners.push([data.event, listener]);
+      });
+      socket.on('disconnect', function (data) {
+        mainStory.debug('socket', `Socket #${socket.id} disconnected`, {attach: data});
+        emitter.emit(['socket', 'connect'], {
+          id: socket.id,
+          reason: data.reason
+        });
+
+        listeners.forEach(([event, listener]) => {
+          emitter.off(event, listener);
+        });
       });
     });
   })

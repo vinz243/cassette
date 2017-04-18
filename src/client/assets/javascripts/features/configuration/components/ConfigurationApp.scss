@@ -20,10 +20,11 @@ div.configuration-layout {
     box-shadow: -1px 0px 36px 0px rgba(0, 0, 0, 0.2);
     position: absolute;
     z-index: 1;
-    // opacity: 0;
+    opacity: 0.5;
     transition: all 375ms ease;
     width: 75%;
     filter: blur(12px);
+    transform: translate3d(0, 0, 1);
     &.active {
       filter: blur(0px);
       margin: 0 0 0 25%;
