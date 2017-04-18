@@ -1,7 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import './JobsApp.scss';
-import {Row, Col, Card, Progress} from 'antd';
-import 'antd/dist/antd.css';
 
 export default class JobsLayout extends Component {
   static propTypes = {

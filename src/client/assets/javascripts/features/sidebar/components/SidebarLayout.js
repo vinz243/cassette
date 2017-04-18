@@ -1,7 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import './SidebarApp.scss';
-import {Row, Col, Tooltip, Input, Menu, Icon} from 'antd';
-import 'antd/dist/antd.css';
 import SidebarLibraryItem from './SidebarLibraryItem';
 import classnames from 'classnames';
 import {Link} from 'react-router';

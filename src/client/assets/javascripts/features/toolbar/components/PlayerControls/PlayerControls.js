@@ -1,7 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
 // import './ToolbarApp.scss';
-import {Button, Row, Col} from 'antd';
 import { Slider } from "@blueprintjs/core";
 
 import './PlayerControls.scss';

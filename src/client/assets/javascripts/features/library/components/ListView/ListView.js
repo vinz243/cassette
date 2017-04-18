@@ -1,8 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import './ListView.scss';
 import ListItem from '../ListItem';
-import {Row, Col} from 'antd';
-import 'antd/dist/antd.css';
 
 
 export default class ListView extends Component {

@@ -1,7 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import './ListItem.scss';
-import {Row, Col} from 'antd';
-import 'antd/dist/antd.css';
 import deepAssign from 'deep-assign';
 
 export default class ListItem extends Component {

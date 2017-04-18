@@ -1,8 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
 // import './ToolbarApp.scss';
-import {Button, Row, Col, Slider} from 'antd';
-import 'antd/dist/antd.css';
 import './CurrentTrackStatus.scss';
 import GoPlaybackRewind from 'react-icons/lib/go/playback-rewind';
 import GoPlaybackPause from 'react-icons/lib/go/playback-pause';
@@ -57,16 +55,14 @@ export default class CurrentTrackStatus extends Component {
     return (
     	<div className="currentTrackStatus">
 	    	<div>
-	    		<Row gutter={24} className="currentTrackStatusRow">
-            <div className="currentTrackTitle">{(current || {}).name}
-               &#8212; {((current || {}).artist || {}).name}</div>
-            <div className="currentTrackTime">
-            <AudioPlayer source={
-                current ?
-                `/api/v2/tracks/${current._id}/stream?${current.uid}` : ''
-              } playing={toolbar.playing} onEnded={this.onEnded.bind(this)}/>
-            </div>
-	    		</Row>
+          <div className="currentTrackTitle">{(current || {}).name}
+             &#8212; {((current || {}).artist || {}).name}</div>
+          <div className="currentTrackTime">
+          <AudioPlayer source={
+              current ?
+              `/api/v2/tracks/${current._id}/stream?${current.uid}` : ''
+            } playing={toolbar.playing} onEnded={this.onEnded.bind(this)}/>
+          </div>
 	    	</div>
 	    </div>
     );

@@ -65,7 +65,6 @@ export default class AppView extends Component {
               <PlaylistView {...this.props} />
             </Box>
           </Flex>
-          <UpdaterView {...this.props} />
         </div>
       </div>
     );

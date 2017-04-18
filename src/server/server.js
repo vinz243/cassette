@@ -72,7 +72,6 @@ app.use(async (ctx, next) => {
   if (ctx.url.startsWith('/api/v2/checks/')
     && ctx.method === 'GET'
     && !config.isConfigured()) {
-      console.log('HEJEHJJEJEJEJ');
     const route = koaRouter();
     route.get('/api/v2/checks/:id', checks['/api/v2/checks/:id'].get);
     const mw = route.routes();

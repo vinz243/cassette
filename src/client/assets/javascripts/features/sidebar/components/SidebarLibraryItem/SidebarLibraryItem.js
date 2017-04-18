@@ -1,7 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import './SidebarLibraryItem.scss';
-import {Row, Col, notification} from 'antd';
-import 'antd/dist/antd.css';
 import IonRefresh from 'react-icons/lib/io/refresh';
 import IonMinusRound from 'react-icons/lib/io/minus-round';
 
