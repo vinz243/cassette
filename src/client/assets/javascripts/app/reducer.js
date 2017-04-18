@@ -10,6 +10,7 @@ import updater, {NAME as updaterName} from 'features/updater';
 import playlist, {NAME as playlistName} from 'features/playlist';
 import settings, {NAME as settingsName} from 'features/settings';
 import configuration, {NAME as configurationName} from 'features/configuration';
+import land, {NAME as landName} from 'features/land';
 
 export default combineReducers({
   routing,
@@ -22,4 +23,5 @@ export default combineReducers({
   [playlistName]: playlist,
   [settingsName]: settings,
   [configurationName]: configuration,
+  [landName]: land
 });

@@ -9,10 +9,12 @@ import {default as LibraryView,
 import StoreView from 'features/store/components/StoreView';
 import SettingsView from 'features/settings/components/SettingsView';
 import ConfigurationView from 'features/configuration/components/ConfigurationView';
+import LandingPage from 'features/land/components/LandingPage';
 import NotFoundView from 'components/NotFound';
 
 export default (
   <Route path="/">
+    <IndexRoute component={LandingPage} />
     <Route path="/configure" component={ConfigurationView} />
     <Route path="/app" component={AppView}>
       <Route path="/app/library" component={ArtistsView} />

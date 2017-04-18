@@ -8,7 +8,7 @@ const path       = require('path');
 const entropy    = require('string-entropy');
 
 const REQUIRED_NODE = '^7.7.0';
-const MIN_ENTROPY = 256;
+const MIN_ENTROPY = 1024;
 
 module.exports.checklist = [
   'node_version',
@@ -40,7 +40,7 @@ module.exports.checks = {
     }
     return {
       status: 'ok',
-      message: 'Your JWT secret has a high entropy (${ent})'
+      message: `Your JWT secret has a high entropy (${ent})`
     }
   },
   node_version: async function () {
