@@ -7,6 +7,9 @@ import LibrariesView from './libraries';
 import {Button, Intent} from '@blueprintjs/core';
 
 class ConfigurationLayout extends React.Component {
+  static contextTypes = {
+    router: React.PropTypes.object.isRequired
+  }
   configurationStep () {
     const {configuration, actions} = this.props;
     return {
@@ -25,14 +28,26 @@ class ConfigurationLayout extends React.Component {
           <div>This is mandatory and <b>not</b> related to tracker credentials.</div></span>)
       },
       'libraries': {
-        render: () => (<LibrariesView {...this.props} />),
+        render: (props) => (<LibrariesView {...this.props} {...props}/>),
+        valid: true,
         name: 'Libraries configuration',
         desc: 'You can choose where cassette will look for your music'
       },
       'trackers': {
-        render: () => (<div className="trackers">
-          Please checkout the settings once you're done.
+        render: () => (<div className="trackers" style={{
+          width: '400px'
+        }}>
+          <p>You will be able to add your favorite tracker in order to add music
+          by going in the settings, the Trackers section. Feel free to use cassette now!</p>
+        <div style={{textAlign: 'right'}}>
+          <Button
+            className="pt-large"
+            rightIconName="arrow-right"
+            text="Go to cassette" onClick={() => {window.location.href = '/app/library'}}  />
+        </div>
         </div>),
+        valid: true,
+        customButtons: true,
         name: 'Trackers configuration',
         desc: 'Choose which trackers you want to download your music from (optionnal)'
       },
@@ -52,13 +67,13 @@ class ConfigurationLayout extends React.Component {
           <div className="configuration-description">{step.desc}</div>
         </div>
         <div className="configuration-content">
-          {step.render()}
+          {step.render({active: stepName === configuration.currentStep})}
           {step.customButtons ? null : <div className="configuration-next">
             <Button iconName="arrow-left" className="pt-large pt-minimal"
               text="Previous" onClick={actions.prevStep}/>
             <Button rightIconName="arrow-right" className="pt-large"
               text="Next" onClick={actions.nextStep} disabled={
-                !step.valid 
+                !step.valid
               } loading={
                 step.loading
               }/>

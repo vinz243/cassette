@@ -107,9 +107,9 @@ class LoginView extends React.Component {
           text="Previous" onClick={actions.prevStep}/>
         <Button rightIconName="arrow-right" className="pt-large"
           text="Next" onClick={actions.nextStep} disabled={
-            this.state.password !== this.state.confpass ||
+            (this.state.password !== this.state.confpass ||
             this.state.password.length < 8 ||
-            this.state.username.length < 4
+            this.state.username.length < 4)
           } loading={
             configuration.configuringUser
           } onClick={() => actions.configureApp(this.state.username,

@@ -1,6 +1,7 @@
 import { createStructuredSelector } from 'reselect';
 
 import axios from 'app/axios';
+import socket from 'app/socket';
 import shortid from 'shortid';
 import path from 'path';
 
@@ -12,23 +13,15 @@ const UPDATE_CHECKS = 'cassette/configuration/UPDATE_CHECKS';
 const START_CONFIGURE = 'cassette/configuration/START_CONFIGURE';
 const LOAD_DIR = 'cassette/configuration/LOAD_DIR';
 const SET_CURRENT_PATH = 'cassette/configuration/SET_CURRENT_PATH';
+const SET_LIBRARY = 'cassette/configuration/SET_LIBRARY';
+const ADD_LIBRARY = 'cassette/configuration/ADD_LIBRARY';
 
 const initialState = {
   checksById: {},
   configuringUser: false,
-  libraries: [{
-    name: 'Downloads',
-    path: '/home/vincent/.cassette/downloads',
-    _id: 2,
-    synced: true
-  }, {
-    name: 'Torrents',
-    path: '/home/vincent/torrents/music',
-    _id: 3,
-    synced: false
-  }],
+  libraries: [],
   steps: ['checks', 'login', 'libraries', 'trackers'],
-  currentPath: ['home','vincent'],
+  currentPath: [],
   fs: {},
   currentStep: 'checks',
   checksProcessing: true,
@@ -37,6 +30,22 @@ const initialState = {
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
+    case ADD_LIBRARY:
+      return {...state, libraries: [
+        ...state.libraries, action.library
+      ]};
+    case SET_LIBRARY:
+      const id = action.library._id;
+      const foundIndex = state.libraries.findIndex((lib) => lib._id === id);
+      const i = foundIndex !== -1 ? foundIndex :
+        state.libraries.length - 1;
+      return {
+        ...state, libraries: [
+          ...state.libraries.slice(0, i),
+          {...state.libraries[i], ...action.props},
+          ...state.libraries.slice(i + 1)
+        ]
+      };
     case SET_CURRENT_PATH:
       return  {
         ...state,
@@ -79,6 +88,44 @@ export default function reducer(state = initialState, action = {}) {
       return state;
   }
 }
+function loadLibs() {
+  return (dispatch) => {
+    axios.get('/api/v2/vars').then(({data: {homedir, configRoot}}) => {
+      dispatch(setCurrentPath(homedir + '/.'));
+      addLibrary('Downloads', path.join(configRoot, 'downloads'))(dispatch);
+    });
+  }
+}
+
+function addLibrary(name, path) {
+  return (dispatch) => {
+    dispatch({
+      type: ADD_LIBRARY,
+      library: {name, path}
+    });
+    axios.post('/api/v2/libraries', {name, path}).then(({data}) => {
+      dispatch({
+        type: SET_LIBRARY,
+        library: data
+      });
+      return axios.post('/api/v2/scans', {library: data._id}).then((res) => {
+        return Promise.resolve([data, res.data]);
+      });
+    }).then(([library, scan]) => {
+      dispatch({
+        type: SET_LIBRARY,
+        library: {_id: library._id, scan: 'pending'}
+      });
+      socket.listen(`scanner::scanfinished::${scan._id}`, function () {
+        dispatch({
+          type: SET_LIBRARY,
+          library: {_id: library._id, scan: 'done'}
+        });
+      });
+    })
+  }
+}
+
 function setCurrentPath(folder = '') {
   if (typeof folder === 'string') {
     return {
@@ -149,5 +196,6 @@ function prevStep () {
 }
 
 export const actionCreators = {
-  nextStep, prevStep, updateChecks, configureApp, loadPath, setCurrentPath
+  nextStep, prevStep, updateChecks, configureApp, loadPath, setCurrentPath,
+  loadLibs, addLibrary
 }

@@ -1,8 +1,8 @@
 Arguments: 
-  /home/vincent/.nvm/versions/node/v7.7.4/bin/node /usr/bin/yarn add lodash/omit
+  /home/vincent/.nvm/versions/node/v7.7.4/bin/node /usr/bin/yarn add lodash/once
 
 PATH: 
-  /home/vincent/.nvm/versions/node/v7.7.4/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/vincent/.config/yarn/global/node_modules/.bin:/home/vincent/.config/yarn/global/node_modules/.bin:/home/vincent/.config/yarn/global/node_modules/.bin
+  /home/vincent/.nvm/versions/node/v7.7.4/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:/home/vincent/.config/yarn/global/node_modules/.bin:/home/vincent/.config/yarn/global/node_modules/.bin
 
 Yarn version: 
   0.20.0

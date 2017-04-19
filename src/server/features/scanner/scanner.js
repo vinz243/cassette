@@ -129,7 +129,7 @@ const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
             track: track.props._id,
             duration: metadata.duration,
             bitrate: metadata.bitrate
-          }).then(() => {
+          }).then((file) => {
             return Promise.resolve([metadata, artist, album, track, file])
           });
         }).then(([metadata, artist, album, track, file]) => {

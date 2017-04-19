@@ -28,7 +28,7 @@ class FileBreadcrumb extends React.Component {
         ...acc,
         [...acc[acc.length - 1], el]
       ]
-    }, [[]]).splice(1);
+    }, [[]]).slice(1);
     const items = folders.map((tree) =>
       <MenuItem iconName="folder-close" text={tree[tree.length - 1]}
         key={tree.join('/')} path={`/${tree.join('/')}`}
