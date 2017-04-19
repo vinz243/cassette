@@ -8,6 +8,8 @@ const NEXT_STEP = 'cassette/configuration/NEXT_STEP';
 const PREV_STEP = 'cassette/configuration/PREV_STEP';
 const UPDATE_CHECKS = 'cassette/configuration/UPDATE_CHECKS';
 const START_CONFIGURE = 'cassette/configuration/START_CONFIGURE';
+const LOAD_DIR = 'cassette/configuration/LOAD_DIR';
+const SET_CURRENT_PATH = 'cassette/configuration/SET_CURRENT_PATH';
 
 const initialState = {
   checksById: {},
@@ -24,6 +26,8 @@ const initialState = {
     synced: false
   }],
   steps: ['checks', 'login', 'libraries', 'trackers'],
+  currentPath: ['home','vincent'],
+  fs: {},
   currentStep: 'checks',
   checksProcessing: true,
   userConfigured: false
@@ -31,6 +35,19 @@ const initialState = {
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
+    case SET_CURRENT_PATH:
+      return  {
+        ...state,
+        currentPath: action.path
+      };
+    case LOAD_DIR:
+      return {
+        ...state,
+        fs: {
+          ...state.fs,
+          [action.path]: action.content
+        }
+      };
     case START_CONFIGURE:
       return {
         ...state, configuringUser: true, userConfigured: true
@@ -58,6 +75,25 @@ export default function reducer(state = initialState, action = {}) {
       }
     default:
       return state;
+  }
+}
+function setCurrentPath(path = '') {
+  if (typeof path === 'string') {
+    return {
+      type: SET_CURRENT_PATH,
+      path: path.split('/').filter(str => str)
+    }
+  }
+  return {
+    type: SET_CURRENT_PATH,
+    path
+  }
+}
+async function loadPath(path) {
+  const {data} = await axios.get(`/api/v2/fs${path}`);
+  return {
+    content: data, type: LOAD_DIR,
+    path,
   }
 }
 
@@ -114,5 +150,5 @@ function prevStep () {
 }
 
 export const actionCreators = {
-  nextStep, prevStep, updateChecks, configureApp
+  nextStep, prevStep, updateChecks, configureApp, loadPath, setCurrentPath
 }

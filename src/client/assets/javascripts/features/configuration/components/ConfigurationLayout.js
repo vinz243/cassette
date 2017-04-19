@@ -58,7 +58,7 @@ class ConfigurationLayout extends React.Component {
               text="Previous" onClick={actions.prevStep}/>
             <Button rightIconName="arrow-right" className="pt-large"
               text="Next" onClick={actions.nextStep} disabled={
-                !step.valid
+                !step.valid 
               } loading={
                 step.loading
               }/>

@@ -12,7 +12,7 @@ div.configuration-libraries-view {
     	overflow: hidden;
     }
     span.library-path {
-      width: 225px;
+      width: 325px;
 
     	text-overflow: ellipsis;
     	white-space: nowrap;
@@ -21,11 +21,24 @@ div.configuration-libraries-view {
   }
   div.add-library {
     margin: 1em 0.4em;
-    .input-name {
-      width: 75px;
+    padding: 0.4em;
+    div.add-lib-header {
+      font-size: 20px;
+      margin: 1em;
     }
-    .input-path {
-      width: 225px;
+    div.add-lib-path {
+      margin: 20px 20px;
+    }
+    div.add-lib-name {
+      margin: 0 20px;
+      display: inline-block;
+    }
+    div.add-lib-button {
+      button {
+        float: none;
+      }
+      display: inline-block;
+      padding: 0 10px;
     }
   }
 }

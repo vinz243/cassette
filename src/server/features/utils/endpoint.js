@@ -20,8 +20,10 @@ module.exports = {
       try {
         const content = await fs.readdir(src);
         const dirs = content.filter(file =>
-          fs.statSync(path.join(src, file)).isDirectory());
-          ctx.body = [...(src === '/' ? ['.'] : ['.', '..']), ...dirs];
+          fs.statSync(path.join(src, file)).isDirectory()).filter(
+            (file) => file[0] !== '.'
+          );
+          ctx.body = [...(src === '/' ? ['.'] : ['.']), ...dirs];
           ctx.status = 200;
       } catch (err) {
         ctx.throw(404);
