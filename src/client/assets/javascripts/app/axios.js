@@ -1,4 +1,5 @@
 import axios from 'axios';
+import socket from 'app/socket';
 
 const request = function (method, url, config = {}, additionalConfig = {}) {
   if (['post', 'put', 'patch'].includes(method)) {
@@ -30,6 +31,7 @@ export default {
   login: async function ({username, password}) {
     const {data} = await axios.post('/api/v2/sessions', {username, password});
     localStorage.setItem('sessionToken', data.token);
+    socket.authenticate();
     return;
   },
   get: request.bind(null, 'get'),

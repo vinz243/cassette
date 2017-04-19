@@ -34,4 +34,9 @@ const emit = function (event, ...args) {
 
 const on = (...args) => io.on(...args);
 
-export default {listen, emit, on};
+const authenticate = function () {
+  const token = localStorage.getItem('sessionToken');
+  io.emit('authenticate', {token});
+}
+
+export default {listen, emit, on, authenticate};
