@@ -2,6 +2,8 @@ import { createStructuredSelector } from 'reselect';
 
 import axios from 'app/axios';
 import shortid from 'shortid';
+import path from 'path';
+
 export const NAME = 'configuration';
 
 const NEXT_STEP = 'cassette/configuration/NEXT_STEP';
@@ -38,14 +40,14 @@ export default function reducer(state = initialState, action = {}) {
     case SET_CURRENT_PATH:
       return  {
         ...state,
-        currentPath: action.path
+        currentPath: [...action.path, '.']
       };
     case LOAD_DIR:
       return {
         ...state,
         fs: {
           ...state.fs,
-          [action.path]: action.content
+          [action.folder]: action.content
         }
       };
     case START_CONFIGURE:
@@ -77,23 +79,20 @@ export default function reducer(state = initialState, action = {}) {
       return state;
   }
 }
-function setCurrentPath(path = '') {
-  if (typeof path === 'string') {
+function setCurrentPath(folder = '') {
+  if (typeof folder === 'string') {
     return {
       type: SET_CURRENT_PATH,
-      path: path.split('/').filter(str => str)
-    }
+      path: path.join(folder).split('/').filter(str => str)
+    };
   }
-  return {
-    type: SET_CURRENT_PATH,
-    path
-  }
+  return setCurrentPath('/' + folder.join('/'));
 }
-async function loadPath(path) {
-  const {data} = await axios.get(`/api/v2/fs${path}`);
+async function loadPath(folder) {
+  const {data} = await axios.get(`/api/v2/fs${folder}`);
   return {
     content: data, type: LOAD_DIR,
-    path,
+    folder,
   }
 }
 

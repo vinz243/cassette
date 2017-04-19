@@ -33,12 +33,18 @@ div.configuration-libraries-view {
       margin: 0 20px;
       display: inline-block;
     }
+    div.second-row {
+      vertical-align: middle;
+      &> div {
+        vertical-align: middle;
+      }
+    }
     div.add-lib-button {
       button {
         float: none;
       }
       display: inline-block;
-      padding: 0 10px;
+      margin: 0 10px;
     }
   }
 }

@@ -45,10 +45,10 @@ class FileBreadcrumb extends React.Component {
     if (props.key != null) {
         return <a className={Classes.BREADCRUMB}>{props.text}</a>;
     } else {
-
-      const items = (this.props.fs[props.path] || []).map((folder) => {
+      const dir = path.join(props.path, props.text === '.' ? '.' : '..');
+      const items = (this.props.fs[dir] || []).map((folder) => {
         return <MenuItem iconName="folder-close" text={folder} onClick={
-            () => this.props.onChange(props.path + '/' + folder)
+            () => this.props.onChange(path.join(dir, folder))
           }/>
       })
       return <span className={classnames(Classes.BREADCRUMB,
@@ -56,7 +56,7 @@ class FileBreadcrumb extends React.Component {
             cursor: 'pointer'
           }}>
           <Popover
-            popoverWillOpen={() => this.props.onLoad(props.path)}
+            popoverWillOpen={() => this.props.onLoad(dir)}
             content={<Menu>{items}</Menu>}
             position={Position.BOTTOM}>{props.text}</Popover>
       </span>;

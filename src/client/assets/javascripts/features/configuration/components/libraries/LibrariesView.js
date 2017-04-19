@@ -23,11 +23,13 @@ class LibrariesView extends React.Component {
             fs={configuration.fs} onLoad={actions.loadPath}
             onChange={actions.setCurrentPath}/>
         </div>
-        <div className="add-lib-name">
-          <input className="pt-input input-name pt-minimal" placeholder="Name" />
-        </div>
-        <div className="add-lib-button">
-          <Button iconName="add" text="add" className="pt-minimal" />
+        <div className="second-row">
+          <div className="add-lib-name">
+            <input className="pt-input input-name pt-minimal" placeholder="Name" />
+          </div>
+          <div className="add-lib-button">
+            <Button iconName="add" text="add" className="pt-minimal" />
+          </div>
         </div>
       </div>
     </div>
