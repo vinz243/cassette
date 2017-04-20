@@ -6,22 +6,26 @@ import axios from 'app/axios';
 export default class AudioPlayer extends Component {
   constructor() {
     super();
+    this.buffered = 0;
   }
-  updateProgress (val = this.range.value) {
+  updateProgress (val = this.range.value, buffer = this.buffered) {
 
     const percent =
       ((val - this.range.min) /
         (this.range.max - this.range.min)) * 100;
 
-      `-webkit-linear-gradient(left, white 0%, #5a5a61 ${
-        percent
-      }%, #5a5a61 ${
-        percent
-      }%)`;
+    const buffered =
+      ((buffer - this.range.min) /
+        (this.range.max - this.range.min)) * 100;
+
     this.range.style.background = `linear-gradient(to right, #ffffff 0%,#ffffff ${
       percent
-    }%,#363439 ${
+    }%,#586785 ${
       percent
+    }%,#586785 ${
+      buffered
+    }%,#363439 ${
+      buffered
     }%,#363439 100%)`;
 
   }
@@ -31,7 +35,6 @@ export default class AudioPlayer extends Component {
     });
     this.audio.addEventListener('timeupdate', (evt) => {
       window.requestAnimationFrame(() => {
-        console.log(this.audio.currentTime, evt);
         this.range.value = this.audio.currentTime;
         this.updateProgress();
       });
@@ -59,7 +62,7 @@ export default class AudioPlayer extends Component {
       const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
 
       const onAudioLoaded = (data, index) => {
-
+        this.buffered = this.buffered + 10.0;
         const gaplessMetadata = {
           audioDuration: 10.0,
           frontPaddingDuration: 0.025057
@@ -102,12 +105,12 @@ export default class AudioPlayer extends Component {
   componentWillReceiveProps(nextProps) {
 
     if (nextProps.source && this.audio && this.props.source !== nextProps.source) {
+      this.buffered = 0;
       this.audio.src = URL.createObjectURL(this.createMediaSource());
       this.audio.currentTime = 0;
       this.range.value = 0;
       this.range.min = "0";
       this.range.max = `${nextProps.source.duration}`;
-      console.log(nextProps.source.duration);
 
       this.audio.play();
       this.props.onPlay && this.props.onPlay();
