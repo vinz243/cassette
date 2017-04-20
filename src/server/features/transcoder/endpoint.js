@@ -64,9 +64,8 @@ module.exports = {
   '/api/v2/transcodes/:id/chunks/:chunk': {
     get: function (ctx) {
       const mimeType = 'audio/mpeg';
-
-      console.log(ctx.req.header('Accept-Encoding'));
-      if (ctx.req.header('Accept-Encoding') === 'identity;q=1, *;q=0') {
+      const acceptedHeaders = ['audio/mpeg', 'identity;q=1, *;q=0'];
+      if (acceptedHeaders.includes(ctx.req.header('Accept-Encoding')) || true) {
         ctx.respond = false;
         ctx.res.writeHead(200, {
           'Content-Type': mimeType,

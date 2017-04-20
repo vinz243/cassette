@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 
 import './AudioPlayer.scss';
+import axios from 'app/axios';
 
 export default class AudioPlayer extends Component {
   constructor() {
@@ -51,9 +52,56 @@ export default class AudioPlayer extends Component {
   componentWillMount() {
 
   }
+  createMediaSource (src) {
+    const mediaSource = new MediaSource();
+    mediaSource.addEventListener('sourceopen', () => {
+      const sourceBuffer = mediaSource.addSourceBuffer('audio/mpeg');
+
+      const onAudioLoaded = (data, index) => {
+
+        const gaplessMetadata = {
+          audioDuration: 10.0,
+          frontPaddingDuration: 0.025057
+        };
+
+        const appendTime = index > 0 ? sourceBuffer.buffered.end(0) : 0;
+        sourceBuffer.appendWindowEnd = appendTime + gaplessMetadata.audioDuration - 0.02;
+        sourceBuffer.appendWindowStart = appendTime;
+        sourceBuffer.timestampOffset = appendTime - gaplessMetadata.frontPaddingDuration;
+
+        if (index === 0) {
+          sourceBuffer.addEventListener('updateend', () => {
+            if (++index < this.props.source.chunks) {
+              this.getChunk(index).then(function(data) { onAudioLoaded(data, index); } );
+            } else {
+              // We've loaded all available segments, so tell MediaSource there are no
+              // more buffers which will be appended.
+              mediaSource.endOfStream();
+              URL.revokeObjectURL(this.audio.src);
+            }
+          });
+        }
+
+        sourceBuffer.appendBuffer(data);
+      }
+
+      this.getChunk(0).then(function(data) { onAudioLoaded(data, 0); } );
+    });
+    return mediaSource;
+  }
+  getChunk (index) {
+    return axios.get({
+      url: `/api/v2/transcodes/${this.props.source._id}/chunks/${index}`,
+      headers: {
+        // 'Accept-Encoding': 'audio/mpeg'
+      },
+      responseType: 'arraybuffer'
+    }).then(({data}) => Promise.resolve(data));
+  }
   componentWillReceiveProps(nextProps) {
+    console.log('will', nextProps);
     if (nextProps.source && this.audio && this.props.source !== nextProps.source) {
-      this.audio.src = nextProps.source;
+      this.audio.src = URL.createObjectURL(this.createMediaSource());
       this.audio.currentTime = 0;
       this.range.value = 0;
 
@@ -76,7 +124,6 @@ export default class AudioPlayer extends Component {
       <div className="audioPlayer">
         <audio
          className="react-audio-player"
-         src={this.props.source || ''}
          autoPlay={false}
          preload={true}
          controls={false}

@@ -49,7 +49,11 @@ const Transcode = module.exports = class Transcode {
     .noVideo()
     .format('mp3')
     .on('stderr', function(stderrLine) {
-    }).output(output).run();
+    })
+    .on('error', function (err) {
+      
+    })
+    .output(output).run();
   }
   get props () {
     const chunks = Math.ceil(this.duration / this.opts.chunkLength);

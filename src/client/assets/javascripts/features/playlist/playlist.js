@@ -1,5 +1,6 @@
 import {createStructuredSelector} from 'reselect';
 import assert from 'assert';
+import axios from 'app/axios';
 import shortid from 'shortid';
 
 const SET_TRACKS      = 'cassette/playlist/SET_TRACKS';
@@ -10,6 +11,7 @@ const CLEAR           = 'cassette/playlist/SET_PLAYLIST';
 const JUMP_TO         = 'cassette/playlist/JUMP_TO';
 const MOVE            = 'cassette/playlist/MOVE';
 const REMOVE          = 'cassette/playlist/REMOVE';
+const SET_TRANSCODE   = 'cassette/playlist/SET_TRANSCODE';
 
 export const NAME = 'playlist';
 
@@ -24,10 +26,19 @@ const initialState = {
     album: {
       name: 'To listen it'
     }
-  }
+  },
+  transcodes: {}
 }
 export default function reducer (state = initialState, action) {
   switch(action.type) {
+    case SET_TRANSCODE:
+      return {
+        ...state,
+        transcodes: {
+          ...state.transcodes,
+          [action.track]: action.transcode
+        }
+      };
     case SET_TRACKS:
       return Object.assign({}, state, {
         nextStack: action.tracks.slice(1),
@@ -110,20 +121,41 @@ export const selector = createStructuredSelector({
   playlist
 });
 
+function loadTranscode (track) {
+  return (dispatch, getState) => {
+    if (getState().playlist.transcodes[track]) {
+      return;
+    }
+    axios.post('/api/v2/transcodes', {track}).then(({data}) => {
+      dispatch({
+        type: SET_TRANSCODE,
+        transcode: data,
+        track
+      });
+    });
+  }
+}
+
 function setTracks (tracks) {
-  return {
-    type: SET_TRACKS,
-    tracks: tracks.map((track) => Object.assign({}, track, {
-      uid: shortid.generate()
-    }))
+  return (dispatch, getState) => {
+    dispatch({
+      type: SET_TRACKS,
+      tracks: tracks.map((track) => Object.assign({}, track, {
+        uid: shortid.generate()
+      }))
+    });
+    tracks.forEach(({_id}) => loadTranscode(_id)(dispatch, getState));
   }
 }
 
 function addAsNext (track) {
   const uid = shortid.generate();
-  return {
-    type: ADD_NEXT,
-    track: Object.assign({}, track, {uid})
+  return (dispatch, getState) => {
+    dispatch({
+      type: ADD_NEXT,
+      track: Object.assign({}, track, {uid})
+    });
+    loadTranscode(track._id)(dispatch, getState);
   }
 }
 

@@ -59,8 +59,7 @@ export default class CurrentTrackStatus extends Component {
              &#8212; {((current || {}).artist || {}).name}</div>
           <div className="currentTrackTime">
           <AudioPlayer source={
-              current ?
-              `/api/v2/tracks/${current._id}/stream?${current.uid}` : ''
+              playlist.transcodes[playlist.current._id]
             } playing={toolbar.playing} onEnded={this.onEnded.bind(this)}/>
           </div>
 	    	</div>
