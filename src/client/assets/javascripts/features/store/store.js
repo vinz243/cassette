@@ -118,6 +118,7 @@ function invalidateWanted (id) {
 function onUpdate (newProps, props) {
   return (dispatch, getState) => {
     const {wantedById, currentWanted} = getState().store;
+    if (!wantedById[props._id]) return;
     dispatch({
       type: FETCH_WANTED,
       id: props._id,

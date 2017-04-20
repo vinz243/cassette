@@ -190,9 +190,14 @@ function clear () {
 }
 
 function jumpTo (index) {
-  return {
-    type: JUMP_TO,
-    index
+  return (dispatch, getState) => {
+    dispatch({
+      type: JUMP_TO,
+      index
+    });
+    const playlist = getState().playlist;
+    loadTranscodesAsync([playlist.current, ...playlist.nextStack], true)
+      (dispatch, getState);
   }
 }
 
