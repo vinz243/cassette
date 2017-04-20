@@ -39,4 +39,10 @@ const authenticate = function () {
   io.emit('authenticate', {token});
 }
 
+
+const token = localStorage.getItem('sessionToken');
+if (token) {
+  authenticate();
+}
+
 export default {listen, emit, on, authenticate};
