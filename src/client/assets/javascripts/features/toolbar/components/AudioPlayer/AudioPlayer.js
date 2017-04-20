@@ -111,6 +111,7 @@ export default class AudioPlayer extends Component {
       this.range.value = 0;
       this.range.min = "0";
       this.range.max = `${nextProps.source.duration}`;
+      this.range.style.display = 'inline-block';
 
       this.audio.play();
       this.props.onPlay && this.props.onPlay();
@@ -137,7 +138,9 @@ export default class AudioPlayer extends Component {
          ref={(ref) => { this.audio = ref; }}
          onPlay={this.onPlay || new Function()}
        > </audio>
-        <input type="range" ref={(ref) => this.range = ref } />
+     <input type="range" ref={(ref) => this.range = ref } style={{
+         'display': 'none'
+       }}/>
       </div>
     );
   }
