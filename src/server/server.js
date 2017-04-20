@@ -112,7 +112,7 @@ app.use(async function (ctx, next) {
     ctx.status = 200;
     return;
   }
-  if (ctx.isAuthenticated()) {
+  if (ctx.isAuthenticated() || process.argv.includes('--guest')) {
     await next();
   } else {
     ctx.status = 401;
