@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import PlayerControls from './PlayerControls';
 import CurrentTrackStatus from './CurrentTrackStatus';
+import ToolbarActions from './ToolbarActions';
 
 import './ToolbarApp.scss';
 
@@ -40,6 +41,7 @@ export default class ToolbarLayout extends Component {
            <CurrentTrackStatus {...this.props} />
   	      </Box>
           <Box>
+            <ToolbarActions />
              {/*<BrowserControls  {...this.props} />*/}
   	      </Box>
         </Flex>

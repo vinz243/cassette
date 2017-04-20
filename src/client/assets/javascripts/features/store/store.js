@@ -421,7 +421,6 @@ function downloadAlbum (mbid, props) {
 }
 
 function selectResult (id, wantedId) {
-  console.log('hey', id, wantedId);
   return (dispatch, getState) => {
     dispatch({
       type: FETCH_WANTED,
