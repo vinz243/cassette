@@ -12,6 +12,15 @@ const route      = require("./routes");
 const jwt        = require("jsonwebtoken");
 const passport   = require('./passport');
 const checks     = require('features/checks');
+const path       = require('path');
+const fs         = require("fs-promise");
+const sharp      = require('sharp');
+
+const TYPES = {
+  '.jpg': 'image/jpg',
+  '.png': 'image/png',
+  '.svg': 'image/svg+xml'
+}
 
 const { mainStory, addListener } = require('storyboard');
 const consoleListener = require("storyboard/lib/listeners/console").default;
@@ -67,6 +76,46 @@ app.use(async (ctx, next) => {
     ctx.status = 200;
     ctx.body = {'status': 'ok'};
     return;
+  }
+  if (ctx.url.startsWith('/api/v2/assets/') && ctx.method === 'GET') {
+    const ext = path.basename(ctx.url);
+    const name = ext.substr(0, ext.indexOf('?')) || ext;
+    console.log(`"${name}"`);
+    const {size, height = size, width = size} = ctx.query;
+
+    if (/^[\w-_]+\.\w+$/i.test(name)) {
+      const file = path.join(__dirname, `../../assets/${name}`);
+      const ext = path.extname(file);
+
+      if (await fs.exists(file)) {
+        const buffer = await fs.readFile(file);
+
+        if (TYPES[ext]) {
+          ctx.set('Content-Type', TYPES[ext]);
+        }
+
+        if(['.jpg', '.png'].includes(ext)) {
+          if (height * width > 1)  {
+            ctx.body = await sharp(buffer).resize(+height, +width).toBuffer();
+          } else {
+            ctx.body = await fs.readFile(file);
+          }
+          ctx.status = 200;
+          return;
+        } else {
+          ctx.body = buffer;
+          ctx.status = 200;
+          return;
+        }
+      } else {
+        ctx.status = 404;
+        return;
+      }
+    } else {
+      ctx.body   = 'Asset name does not match specified format';
+      ctx.status = 400;
+      return;
+    }
   }
   if (ctx.url.startsWith('/api/v2/checks/')
     && ctx.method === 'GET'

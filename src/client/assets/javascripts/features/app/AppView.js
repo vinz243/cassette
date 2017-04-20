@@ -48,7 +48,7 @@ export default class AppView extends Component {
             </Box>
             <Box auto style={{
                 marginLeft: '90px',
-                marginRight: '300px'
+                marginRight: '275px'
               }}>
               {this.props.children}
             </Box>

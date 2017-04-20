@@ -3,6 +3,7 @@ import './PlaylistApp.scss';
 
 import DraggableList from 'react-draggable-list';
 import PlaylistItem from './PlaylistItem';
+import BetterImage from 'components/BetterImage';
 
 export default class PlaylistLayout extends Component {
   static propTypes = {
@@ -77,9 +78,9 @@ export default class PlaylistLayout extends Component {
           <div className="album">{playlist.current.album.name}</div>
         </div>
         {playlist.current.album ?
-          <img src={`/api/v2/albums/${
+          <BetterImage src={`/api/v2/albums/${
               playlist.current.album._id
-            }/artwork?size=275`} /> :
+            }/artwork?size=275`} size={275} /> :
           <span className="pt-icon-standard pt-icon-pulse"></span>}
       </div>
     );

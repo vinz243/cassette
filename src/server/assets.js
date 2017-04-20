@@ -8,7 +8,7 @@ const TYPES = {
   '.svg': 'image/svg+xml'
 }
 
-module.exports = {
+module.exports = {}; const route = {
   '/api/v2/assets/:name': {
     get: async function (ctx) {
       const {name,} = ctx.params;

@@ -7,6 +7,8 @@ import classnames from 'classnames';
 import ViewScope from '../ViewScope';
 import { browserHistory } from 'react-router';
 import LoaderProxy from '../LoaderProxy';
+import BetterImage from 'components/BetterImage';
+import ScrollableDiv from 'components/ScrollableDiv';
 
 export default class AlbumsView extends Component {
   componentDidMount() {
@@ -30,13 +32,11 @@ export default class AlbumsView extends Component {
       const artistAlbums = albums[id];
       const ctt = artistAlbums.map((album, index) => {
         return <div className="albumCard" onClick={
-            browserHistory.push.bind(null,
-              `/app/library/albums/${album._id}/tracks`)}
-              style={{
-                'background-image': `url(/api/v2/albums/${
-                  album._id
-                }/artwork?size=200)`
-              }} key={album._id}>
+            browserHistory.push.bind(null, `/app/library/albums/${
+              album._id}/tracks`)} key={album._id}>
+          <BetterImage src={`/api/v2/albums/${
+              album._id
+            }/artwork?size=200`} size={200} className="album-cover"/>
           <div className="desc">
             <span>
               <div className="album">{album.name}</div>
@@ -45,16 +45,18 @@ export default class AlbumsView extends Component {
           </div>
         </div>
       });
-      return <div className="albumRow">
+      return <div className="albumRow" key={id}>
         <div className="albumArtist">{artistAlbums[0].artist.name}</div>
         {ctt}
       </div>
     });
 
     return <LoaderProxy {...this.props}>
-      <div className="albumsView">
-        {content}
-      </div>
+      <ScrollableDiv>
+        <div className="albumsView">
+          {content}
+        </div>
+      </ScrollableDiv>
     </LoaderProxy>
   }
 }

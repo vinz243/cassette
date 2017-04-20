@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import classnames from 'classnames';
+import axios from 'app/axios';
 
 export default class BetterImage extends Component {
   componentDidMount () {
@@ -9,9 +10,19 @@ export default class BetterImage extends Component {
         this.image.src = fallback;
       }
     }
+    if (this.props.src) {
+      axios.get(this.props.src, {responseType: 'blob'}).then(({data}) => {
+        let url = URL.createObjectURL(data);
+        this.image.src = url;
+      });
+    }
   }
   componentWillReceiveProps (nextProps) {
-    if (nextProps.src) {
+    if (nextProps.src && this.props.src !== nextProps.src) {
+      axios.get(nextProps.src, {responseType: 'blob'}).then(({data}) => {
+        let url = URL.createObjectURL(data);
+        this.image.src = url;
+      })
     }
   }
   render() {

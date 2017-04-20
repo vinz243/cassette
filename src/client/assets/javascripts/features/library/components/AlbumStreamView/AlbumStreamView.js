@@ -3,6 +3,9 @@ import './AlbumStreamView.scss';
 import {Flex, Box} from 'reflexbox';
 import classnames from 'classnames';
 import { browserHistory } from 'react-router';
+import BetterImage from 'components/BetterImage';
+import ScrollableDiv from 'components/ScrollableDiv';
+
 
 export default class AlbumStreamView extends Component {
   static propTypes = {
@@ -72,7 +75,8 @@ export default class AlbumStreamView extends Component {
     	<div>
         <Flex className="albumStreamItem">
           <Box col={2} m={2}>
-            <img className="albumArt" src={`/api/v2/albums/${album._id}/artwork`} />
+            <BetterImage className="albumArt"
+              src={`/api/v2/albums/${album._id}/artwork?size=200`} size={200} />
           </Box>
           <Box col={10} m={2}>
             <div className="albumHeader">

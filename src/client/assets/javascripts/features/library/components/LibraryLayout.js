@@ -2,6 +2,8 @@ import React, { Component, PropTypes } from 'react';
 import AlbumStreamView from './AlbumStreamView';
 import './LibraryApp.scss';
 import LoaderProxy from './LoaderProxy';
+import ScrollableDiv from 'components/ScrollableDiv'
+
 export default class LibraryLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
@@ -41,9 +43,11 @@ export default class LibraryLayout extends Component {
     }
     return (
       <LoaderProxy {...this.props}>
-        <div className="albumsView">
-          {content}
-        </div>
+        <ScrollableDiv>
+          <div className="albumsView">
+            {content}
+          </div>
+        </ScrollableDiv>
       </LoaderProxy>
     );
   }

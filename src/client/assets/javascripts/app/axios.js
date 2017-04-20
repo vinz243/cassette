@@ -36,5 +36,11 @@ export default {
   },
   get: request.bind(null, 'get'),
   post: request.bind(null, 'post'),
-  put: request.bind(null, 'put')
+  put: request.bind(null, 'put'),
+  image: function (src) {
+    return axios.get(src, {responseType: 'blob'}).then(({data}) => {
+      const uri = URL.createObjectURL(data);
+      return uri;
+    });
+  }
 }
