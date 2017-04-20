@@ -27,11 +27,12 @@ export default class AudioPlayer extends Component {
   }
   componentDidMount()  {
     this.audio.addEventListener('loadedmetadata', (evt) => {
-      this.range.max = this.audio.duration * 1000;
+      // this.range.max = this.audio.duration;
     });
     this.audio.addEventListener('timeupdate', (evt) => {
       window.requestAnimationFrame(() => {
-        this.range.value = this.audio.currentTime * 1000;
+        console.log(this.audio.currentTime, evt);
+        this.range.value = this.audio.currentTime;
         this.updateProgress();
       });
     });
@@ -45,7 +46,7 @@ export default class AudioPlayer extends Component {
         this.updateProgress(this.range.value);
       });
       if (this.range.value  !== this.audio.currentTime) {
-        this.audio.currentTime = this.range.value / 1000;
+        this.audio.currentTime = this.range.value;
       }
     };
   }
@@ -99,11 +100,14 @@ export default class AudioPlayer extends Component {
     }).then(({data}) => Promise.resolve(data));
   }
   componentWillReceiveProps(nextProps) {
-    console.log('will', nextProps);
+
     if (nextProps.source && this.audio && this.props.source !== nextProps.source) {
       this.audio.src = URL.createObjectURL(this.createMediaSource());
       this.audio.currentTime = 0;
       this.range.value = 0;
+      this.range.min = "0";
+      this.range.max = `${nextProps.source.duration}`;
+      console.log(nextProps.source.duration);
 
       this.audio.play();
       this.props.onPlay && this.props.onPlay();
