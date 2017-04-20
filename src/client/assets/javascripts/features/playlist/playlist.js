@@ -135,6 +135,18 @@ function loadTranscode (track) {
     });
   }
 }
+function loadTranscodesAsync (tracks, first) {
+  return (dispatch, getState) => {
+    if (!tracks.length) return;
+    const playlist = getState().playlist;
+    const inNext = playlist.nextStack.find(({_id}) => +tracks[0]._id === +_id);
+    if (inNext || first) {
+      loadTranscode(tracks[0]._id)(dispatch, getState);
+    }
+    setTimeout(() =>
+      loadTranscodesAsync(tracks.slice(1))(dispatch, getState), 10000);
+  }
+}
 
 function setTracks (tracks) {
   return (dispatch, getState) => {
@@ -144,7 +156,7 @@ function setTracks (tracks) {
         uid: shortid.generate()
       }))
     });
-    tracks.forEach(({_id}) => loadTranscode(_id)(dispatch, getState));
+    loadTranscodesAsync(tracks, true)(dispatch, getState);
   }
 }
 
