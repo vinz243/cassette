@@ -32,7 +32,7 @@ export default class ToolbarLayout extends Component {
     const { toolbar, actions } = this.props;
     return (
     	<div>
-        <Flex className="mainRow" align="center" justify="space-between">
+        <Flex className="mainRow" justify="space-between">
           <Box>
             <PlayerControls {...this.props} />
   	      </Box>
