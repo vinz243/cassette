@@ -129,5 +129,10 @@ module.exports.isConfigured = function () {
 
 module.exports.markConfigured = function () {
   configured = true;
+  fs.writeFile(file, 'configured=true', function (attach) {
+    if (attach) {
+      mainStory.warn('config', `Couldn't write file ${file}`, {attach})
+    }
+  });
   return;
 }
