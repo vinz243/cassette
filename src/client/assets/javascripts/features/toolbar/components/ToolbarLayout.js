@@ -41,7 +41,7 @@ export default class ToolbarLayout extends Component {
            <CurrentTrackStatus {...this.props} />
   	      </Box>
           <Box>
-            <ToolbarActions />
+            <ToolbarActions {...this.props}/>
              {/*<BrowserControls  {...this.props} />*/}
   	      </Box>
         </Flex>

@@ -4,6 +4,20 @@ import './AudioPlayer.scss';
 import axios from 'app/axios';
 
 export default class AudioPlayer extends Component {
+  static propTypes = {
+    src: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.object
+    ]),
+    onPlay: PropTypes.func,
+    onEnded: PropTypes.func,
+    opts: PropTypes.shape({
+      chunkDuration: PropTypes.number,
+      chunkFrontPadding: PropTypes.number,
+      chunkBackPadding: PropTypes.number
+    }),
+    directPlayback: PropTypes.bool.isRequired
+  };
   constructor() {
     super();
     this.buffered = 0;
@@ -31,11 +45,16 @@ export default class AudioPlayer extends Component {
   }
   componentDidMount()  {
     this.audio.addEventListener('loadedmetadata', (evt) => {
-      // this.range.max = this.audio.duration;
+      if (this.props.directPlayback) {
+        this.range.max = this.audio.duration;
+      }
     });
     this.audio.addEventListener('timeupdate', (evt) => {
       window.requestAnimationFrame(() => {
         this.range.value = this.audio.currentTime;
+        if (this.props.directPlayback && this.audio.buffered.length) {
+          this.buffered = this.audio.buffered.end(0);
+        }
         this.updateProgress();
       });
     });
@@ -67,8 +86,9 @@ export default class AudioPlayer extends Component {
           audioDuration: 10.0,
           frontPaddingDuration: 0.025057
         };
+        const buffered = sourceBuffer.buffered;
+        const appendTime = index > 0 ? (buffered.length ? buffered.end(0) : 10) : 0;
 
-        const appendTime = index > 0 ? sourceBuffer.buffered.end(0) : 0;
         sourceBuffer.appendWindowEnd = appendTime + gaplessMetadata.audioDuration - 0.02;
         sourceBuffer.appendWindowStart = appendTime;
         sourceBuffer.timestampOffset = appendTime - gaplessMetadata.frontPaddingDuration;
@@ -96,9 +116,6 @@ export default class AudioPlayer extends Component {
   getChunk (index) {
     return axios.get({
       url: `/api/v2/transcodes/${this.props.source._id}/chunks/${index}`,
-      headers: {
-        // 'Accept-Encoding': 'audio/mpeg'
-      },
       responseType: 'arraybuffer'
     }).then(({data}) => Promise.resolve(data));
   }
@@ -106,12 +123,18 @@ export default class AudioPlayer extends Component {
 
     if (nextProps.source && this.audio && this.props.source !== nextProps.source) {
       this.buffered = 0;
-      this.audio.src = URL.createObjectURL(this.createMediaSource());
-      this.audio.currentTime = 0;
       this.range.value = 0;
       this.range.min = "0";
-      this.range.max = `${nextProps.source.duration}`;
       this.range.style.display = 'inline-block';
+
+      if (nextProps.directPlayback) {
+        this.audio.src = nextProps.source;
+      } else {
+        this.range.max = `${nextProps.source.duration}`;
+        this.audio.src = URL.createObjectURL(this.createMediaSource());
+      }
+
+      this.audio.currentTime = 0;
 
       this.audio.play();
       this.props.onPlay && this.props.onPlay();

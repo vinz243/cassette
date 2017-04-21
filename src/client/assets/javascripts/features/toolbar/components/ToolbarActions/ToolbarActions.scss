@@ -1,3 +1,17 @@
+div.direct-tooltip-title {
+
+}
+div.direct-tooltip-desc > p {
+  display: content;
+  width: 150px;
+  color: #afadc6;
+  white-space: normal !important;
+  overflow: hidden;
+  margin-top: 0.6em;
+  // height: 3em;
+
+  font-size: 12px;
+}
 div.toolbar-actions {
   div.switch {
     margin: 1.6em 1em 0 2em;

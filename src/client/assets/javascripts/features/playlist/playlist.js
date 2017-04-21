@@ -12,6 +12,8 @@ const JUMP_TO         = 'cassette/playlist/JUMP_TO';
 const MOVE            = 'cassette/playlist/MOVE';
 const REMOVE          = 'cassette/playlist/REMOVE';
 const SET_TRANSCODE   = 'cassette/playlist/SET_TRANSCODE';
+const SET_TOKEN       = 'cassette/playlist/SET_TOKEN';
+const TOGGLE_LOSSLESS = 'cassette/playlist/TOGGLE_LOSSLESS';
 
 export const NAME = 'playlist';
 
@@ -27,10 +29,26 @@ const initialState = {
       name: 'To listen it'
     }
   },
-  transcodes: {}
+  transcodes: {},
+  tokens: {},
+  directPlayback: !!localStorage.getItem('config.playback.direct')
 }
 export default function reducer (state = initialState, action) {
   switch(action.type) {
+    case SET_TOKEN:
+      return {
+        ...state,
+        tokens: {
+          ...state.tokens,
+          [action.track]: action.token
+        }
+      }
+    case TOGGLE_LOSSLESS:
+      localStorage.setItem('config.playback.direct', !state.directPlayback);
+      return {
+        ...state,
+        directPlayback: !state.directPlayback
+      }
     case SET_TRANSCODE:
       return {
         ...state,
@@ -121,12 +139,49 @@ export const selector = createStructuredSelector({
   playlist
 });
 
-function loadTranscode (track) {
+function toggleLosslessPlayback () {
   return (dispatch, getState) => {
-    if (getState().playlist.transcodes[track]) {
+    dispatch({type: TOGGLE_LOSSLESS});
+    const playlist = getState().playlist;
+    if (playlist.current._id) {
+      // loadTranscodesAsync([playlist.current, ...playlist.nextStack], true)
+      //   (dispatch, getState);
+    }
+  }
+}
+
+function prepareTrack (track) {
+  return (dispatch, getState) => {
+    if (getState().playlist.directPlayback) {
+      return loadToken(track)(dispatch, getState);
+    }
+    return loadTranscode(track)(dispatch, getState);
+  }
+}
+
+function loadToken (track) {
+  return (dispatch, getState) => {
+    if (getState().playlist.tokens[track]) {
       return;
     }
-    axios.post('/api/v2/transcodes', {track}).then(({data}) => {
+    axios.post(`/api/v2/tracks/${track}/stream`, {}).then(({data}) => {
+      dispatch({
+        type: SET_TOKEN,
+        token: data.stream_token,
+        track
+      });
+    });
+  }
+}
+
+function loadTranscode (track) {
+  return (dispatch, getState) => {
+    if (!getState().playlist.directPlayback && getState().playlist.transcodes[track]) {
+      return;
+    }
+    axios.post('/api/v2/transcodes', {
+      track, format: getState().playlist.directPlayback ? 'flac': 'mp3'
+    }).then(({data}) => {
       dispatch({
         type: SET_TRANSCODE,
         transcode: data,
@@ -224,4 +279,6 @@ export const actionCreators = {
   jumpTo,
   move,
   remove,
+  prepareTrack,
+  toggleLosslessPlayback
 }

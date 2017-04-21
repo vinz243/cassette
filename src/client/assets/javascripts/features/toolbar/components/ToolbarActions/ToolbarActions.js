@@ -4,12 +4,23 @@ import './ToolbarActions.scss';
 
 class ToolbarActions extends React.Component {
   render () {
+    const {actions, playlist} = this.props;
     return (
       <div className="toolbar-actions">
         <div className="switch">
-          <Tooltip content="Lossless playback" inline={true}
+          <Tooltip content={<div>
+              <div className="direct-tooltip-title">Direct playback</div>
+              <div className="direct-tooltip-desc">
+                <p>
+                  This will stream the audio directly without transcoding.
+                  This allows to listen to flac music.
+                </p>
+              </div>
+          </div>} inline={true}
             position={Position.BOTTOM}>
-            <Switch />
+            <Switch checked={playlist.directPlayback} onChange={
+                () => actions.toggleLosslessPlayback()
+              } />
           </Tooltip>
         </div>
         <div className="logout">

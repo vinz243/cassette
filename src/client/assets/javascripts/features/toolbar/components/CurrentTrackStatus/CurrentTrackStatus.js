@@ -42,12 +42,20 @@ export default class CurrentTrackStatus extends Component {
   }
   componentDidMount() {
   }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.playlist && nextProps.playlist.current._id) {
+      if (+nextProps.playlist.current._id !== +this.props.playlist.current._id) {
+        this.props.actions.prepareTrack(nextProps.playlist.current._id);
+      }
+    }
+  }
   onEnded() {
     this.props.actions.playNextTrack();
   }
   render() {
     const { playlist, actions, toolbar } = this.props;
     const current = playlist.current;
+    const token = playlist.tokens[current._id];
 
     const boundTipFormattter = this.tipFormatter.bind(this);
 
@@ -58,8 +66,10 @@ export default class CurrentTrackStatus extends Component {
           <div className="currentTrackTitle">{(current || {}).name}
              &#8212; {((current || {}).artist || {}).name}</div>
           <div className="currentTrackTime">
-          <AudioPlayer source={
-              playlist.transcodes[playlist.current._id]
+          <AudioPlayer directPlayback={playlist.directPlayback} source={
+              playlist.directPlayback ?
+              (token ? `/api/v2/streams/${token}` : '')
+              : playlist.transcodes[playlist.current._id]
             } playing={toolbar.playing} onEnded={this.onEnded.bind(this)}/>
           </div>
 	    	</div>
