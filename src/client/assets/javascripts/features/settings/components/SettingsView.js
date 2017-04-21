@@ -23,14 +23,9 @@ class SettingsView extends React.Component {
         margin: '3em 2em'
       }}>
       <Tabs2 id="settings" onChange={this.handleTabChange}>
-        <Tab2 id="pb" title="Playback" panel={<PlaybackView {...this.props} />} />
         <Tab2 id="li" title="Libraries" panel={<LibrariesView {...this.props}/>} />
         <Tab2 id="tk" title="Trackers" panel={<TrackersView {...this.props}/>} />
-        <Tab2 id="sc" title="Searching" panel={null} />
-        <Tab2 id="st" title="System" panel={null} />
-        <Tabs2.Expander />
-        <input className="pt-input" type="text" placeholder="Search..." />
-    </Tabs2>
+      </Tabs2>
     </div>
   }
 }
