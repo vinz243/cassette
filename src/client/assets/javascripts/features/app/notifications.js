@@ -43,7 +43,6 @@ function scan () {
   });
 
   socket.listen('scanner::scanfinished::*', function (evt) {
-    console.log(evt);
     toaster.dismiss(toast);
     toaster.show({
       message: evt.clean ? 'No changes since last scan'

@@ -74,7 +74,6 @@ export default function reducer(state = initialState, action = {}) {
         [action.wanted._id]: action.wanted
       };
       if (index) {
-        console.log('INDEX FOUND');
 
         return Object.assign({}, state, {
           wantedById,

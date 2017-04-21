@@ -30,10 +30,8 @@ const model = {
     return (await model.getValue(key)).value || defVal;
   },
   updateValue: async (key, value) => {
-    // console.log(key);
     let found = await db.find({key: key});
 
-    // console.log('found', found);
     if(found.length == 0) {
       return {
         success: false,

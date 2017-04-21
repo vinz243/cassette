@@ -81,7 +81,6 @@ module.exports = async function (req, tracker) {
         } - ${Date.now() - time}ms`);
 
         if (status !== 'success' || !response) {
-          console.log(response, status);
           throw new Error(`Remote: error`);
         }
         if (!response.results.length) {

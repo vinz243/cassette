@@ -88,7 +88,6 @@ test.serial('/api/v2/artists/:id/albums and tracks', async t => {
 
   t.not(res.body[0].name, undefined);
   t.not(res.body[1].name, undefined);
-  // console.log(res.body[0].artist, alborosie.doc);
   // t.deepEqual(res.body[0].artist, alborosie.doc);
   // t.deepEqual(res.body[1].artist, alborosie.doc);
 

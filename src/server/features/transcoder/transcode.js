@@ -63,24 +63,18 @@ const Transcode = module.exports = class Transcode {
       .noVideo()
       .format(this.validFormat(opts.format))
       .on('start', function(commandLine) {
-        console.log('Spawned Ffmpeg with command: ' + commandLine);
       })
       .on('codecData', function(data) {
-        console.log('Input is ' + data.audio + ' audio ' +
-          'with ' + data.video + ' video');
       })
       .on('progress', function(progress) {
-        console.log('Processing: ' + progress.percent + '% done');
       })
       .on('end', function(stdout, stderr) {
-        console.log('Transcoding succeeded !');
         resolve();
       })
       .on('stderr', function(stderrLine) {
-        console.log(stderrLine);
       })
       .on('error', function (err) {
-        console.log(err);
+        mainStory.error('transcoder', `Couldn't transcode using ffmpeg`, {attach: err})
         reject(err);
       })
       .output(output).run();

@@ -15,7 +15,6 @@ passport.use(new LocalStrategy(
         return done(null, false, {message: 'Incorrect username or password.'});
       }
       password(pass).verifyAgainst(user.hash, (err, verified) => {
-        console.log(err, verified);
         if (!verified) {
           return done(null, false, {message: 'Incorrect username or password.'});
         }
@@ -34,7 +33,6 @@ passport.use(new CustomStrategy(
     const [bearer, token] = auth.split(' ');
     try {
       const user = jwt.verify(token, config.get('jwtSecret'));
-      console.log(user);
       return done(null, user)
     } catch (err) {
       return done(err);
