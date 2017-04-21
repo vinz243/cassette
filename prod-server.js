@@ -1,14 +1,18 @@
 #! /usr/bin/env node
 require('sudo-block')();
 // console.log(require('config.js'));
-const path = require('path');
-const config = require('./src/server/config');
+const path    = require('path');
+const config   = require('./src/server/config');
 const express = require('express');
 const backend = require('./src/server/server');
-
-const assert = require('assert');
+const socket  = require('./src/server/socket');
+const http    = require('http');
+const assert  = require('assert');
 
 const app = express();
+
+const server = http.createServer(app);
+socket(server);
 
 const host = config.get('ip');
 const port = config.get('port');
@@ -31,7 +35,7 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, './build/client/index.html'));
 });
 
-app.listen(port, host, (err) => {
+server.listen(port, host, (err) => {
   if (err) {
     log(err);
     return;
