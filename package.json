@@ -56,6 +56,7 @@
     "koa-better-body": "^3.0.0",
     "koa-bodyparser": "^4.2.0",
     "koa-convert": "^1.2.0",
+    "koa-ctx-cache-control": "^1.0.0",
     "koa-generic-session": "^1.11.5",
     "koa-jwt": "^3.2.1",
     "koa-passport": "^3.0.0",

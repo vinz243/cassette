@@ -72,7 +72,8 @@ module.exports = {
           'Content-Type': mimeType,
           'Transfer-Encoding': 'chunked',
           'Connection': 'close',
-          'Accept-Ranges': 'none'
+          'Accept-Ranges': 'none',
+          'Cache-Control': 'max-age=600'
         });
         if (mimeType === 'audio/flac') {
           const tmp = `/home/vincent/.cassette/${shortid.generate()}.tmp`;

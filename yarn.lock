@@ -4616,6 +4616,12 @@ koa-convert@^1.2.0:
     co "^4.6.0"
     koa-compose "^3.0.0"
 
+koa-ctx-cache-control@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/koa-ctx-cache-control/-/koa-ctx-cache-control-1.0.0.tgz#deaf71022bcc0c093cf0d9e70df2f9972dc56dc0"
+  dependencies:
+    ms "^0.7.1"
+
 koa-generic-session@^1.11.5:
   version "1.11.5"
   resolved "https://registry.yarnpkg.com/koa-generic-session/-/koa-generic-session-1.11.5.tgz#430467152ccfc6f81baa944bad8683dd37df24ff"

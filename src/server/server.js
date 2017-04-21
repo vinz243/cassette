@@ -1,22 +1,23 @@
 require('./init.js');
 
-const body       = require("koa-better-body");
-const bodyParser = require('koa-bodyparser');
-const convert    = require("koa-convert");
-const Koa        = require("koa");
-const koaRouter  = require("koa-router");
-const session    = require('koa-generic-session')
-const chalk      = require("chalk");
-const config      = require("./config.js");
-const route      = require("./routes");
-const jwt        = require("jsonwebtoken");
-const passport   = require('./passport');
-const checks     = require('features/checks');
-const path       = require('path');
-const fs         = require("fs-promise");
-const sharp      = require('sharp');
-const cjwt       = require('jwt');
-const File       = require('models/File');
+const body         = require("koa-better-body");
+const bodyParser   = require('koa-bodyparser');
+const convert      = require("koa-convert");
+const Koa          = require("koa");
+const koaRouter    = require("koa-router");
+const session      = require('koa-generic-session')
+const chalk        = require("chalk");
+const config        = require("./config.js");
+const route        = require("./routes");
+const jwt          = require("jsonwebtoken");
+const passport     = require('./passport');
+const checks       = require('features/checks');
+const path         = require('path');
+const fs           = require("fs-promise");
+const sharp        = require('sharp');
+const cjwt         = require('jwt');
+const File         = require('models/File');
+const cacheControl = require('koa-ctx-cache-control');
 
 const TYPES = {
   '.jpg': 'image/jpg',
@@ -26,6 +27,7 @@ const TYPES = {
 
 const { mainStory, addListener } = require('storyboard');
 const consoleListener = require("storyboard/lib/listeners/console").default;
+
 if (config.get('env') !== 'test') {
   addListener(consoleListener);
 }
@@ -36,7 +38,7 @@ mainStory.info('Starting server');
 
 let app = new Koa();
 let router = koaRouter();
-
+cacheControl(app);
 app.use(bodyParser());
 
 app.use(async (ctx, next) => {
@@ -80,6 +82,7 @@ app.use(async (ctx, next) => {
     return;
   }
   if (ctx.url.startsWith('/api/v2/streams/') && ctx.method === 'GET') {
+    ctx.cacheControl('1h');
     const token = path.basename(ctx.url);
     try {
 
@@ -128,6 +131,7 @@ app.use(async (ctx, next) => {
     }
   }
   if (ctx.url.startsWith('/api/v2/assets/') && ctx.method === 'GET') {
+    ctx.cacheControl('10m');
     const ext = path.basename(ctx.url);
     const name = ext.substr(0, ext.indexOf('?')) || ext;
     const {size, height = size, width = size} = ctx.query;
@@ -169,6 +173,7 @@ app.use(async (ctx, next) => {
   if (ctx.url.startsWith('/api/v2/checks/')
     && ctx.method === 'GET'
     && !config.isConfigured()) {
+    ctx.cacheControl(false);
     const route = koaRouter();
     route.get('/api/v2/checks/:id', checks['/api/v2/checks/:id'].get);
     const mw = route.routes();
@@ -206,6 +211,7 @@ app.use(async (ctx, next) => {
 
 app.use(async function (ctx, next) {
   if (ctx.url === '/api/v2/status' && ctx.method === 'GET') {
+    ctx.cacheControl(false);
     ctx.body = {
       loggedIn: ctx.isAuthenticated(),
       configured: config.isConfigured()

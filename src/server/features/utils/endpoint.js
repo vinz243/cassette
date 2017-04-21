@@ -6,6 +6,7 @@ const path = require('path');
 module.exports = {
   '/api/v2/vars': {
     get: function (ctx) {
+      ctx.cacheControl('30m');
       ctx.body = {
         configRoot: config.get('configRoot'),
         homedir: os.homedir()
@@ -23,6 +24,7 @@ module.exports = {
           fs.statSync(path.join(src, file)).isDirectory()).filter(
             (file) => file[0] !== '.'
           );
+          ctx.cacheControl('3min');
           ctx.body = [...(src === '/' ? ['.'] : ['.']), ...dirs];
           ctx.status = 200;
       } catch (err) {

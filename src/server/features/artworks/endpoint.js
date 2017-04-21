@@ -19,6 +19,8 @@ const dataDir = path.join(config.get('configPath'), 'artworks');
 module.exports = {
   '/api/v2/albums/:id/artwork': {
     get: async (ctx) => {
+
+
       const {size = 300} = ctx.request.query;
       let filePath = '';
       if (ctx.params.id !== "undefined") {
@@ -54,6 +56,7 @@ module.exports = {
         })
       }));
       ctx.set('Content-Type', 'image/png');
+      ctx.cacheControl('10m');
       return;
     }
 
@@ -80,6 +83,7 @@ module.exports = {
       }
 
       if (fs.existsSync(filePath)) {
+        ctx.cacheControl('10m');
         ctx.body = await (new Promise((resolve, reject) => {
           const stat = fs.lstatSync(filePath);
           const image = stat.size > 20 ?
