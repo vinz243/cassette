@@ -177,12 +177,15 @@ app.use(async (ctx, next) => {
   }
   if (ctx.url === '/api/v2/sessions' && ctx.method === 'POST') {
     await passport.authenticate('local', function (err, {username, _id}) {
-
       if (err) {
         ctx.throw(err);
         return;
       }
-
+      if (!username || !_id) {
+        ctx.body = {error: 'Wrong username or password'};
+        ctx.status = 400;
+        return;
+      }
       const token = jwt.sign({username, _id}, config.get('jwtSecret'), {
         expiresIn: '14d'
       });

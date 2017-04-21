@@ -1,9 +1,14 @@
 import React, { PropTypes } from 'react'
-import {Button} from '@blueprintjs/core';
+import {Button, Intent} from '@blueprintjs/core';
 import './LoginView.scss';
 import classnames from 'classnames';
+import axios from 'app/axios';
+import Toaster from 'app/toaster';
 
 class LoginView extends React.Component {
+  static contextTypes = {
+    router: React.PropTypes.object
+  }
   constructor () {
     super();
     this.state = {
@@ -19,6 +24,17 @@ class LoginView extends React.Component {
   handlePasswordChange(evt) {
     this.setState({
       password: evt.target.value
+    });
+  }
+  login() {
+    axios.login({...this.state}).then(() => {
+      this.context.router.push('/app/library');
+    }).catch((err) => {
+      Toaster.show({
+        iconName: 'warning',
+        intent: Intent.DANGER,
+        message: 'Wrong username or password'
+      })
     });
   }
   render () {
@@ -70,7 +86,9 @@ class LoginView extends React.Component {
           <Button rightIconName="arrow-right" className="pt-large"
             text="Login" onClick={() => {}} loading={
               false
-            } onClick={() => {}}/>
+            } onClick={() => {
+              this.login()
+            }}/>
         </div>
       </div>
     </div>

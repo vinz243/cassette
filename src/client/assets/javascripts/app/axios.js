@@ -30,6 +30,7 @@ const request = function (method, url, config = {}, additionalConfig = {}) {
 export default {
   login: async function ({username, password}) {
     const {data} = await axios.post('/api/v2/sessions', {username, password});
+    console.log(data);
     localStorage.setItem('sessionToken', data.token);
     socket.authenticate();
     return;
