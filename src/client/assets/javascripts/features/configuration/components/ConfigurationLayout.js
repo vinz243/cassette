@@ -69,8 +69,8 @@ class ConfigurationLayout extends React.Component {
         <div className="configuration-content">
           {step.render({active: stepName === configuration.currentStep})}
           {step.customButtons ? null : <div className="configuration-next">
-            <Button iconName="arrow-left" className="pt-large pt-minimal"
-              text="Previous" onClick={actions.prevStep}/>
+            {allSteps.indexOf(stepName) ? <Button iconName="arrow-left" className="pt-large pt-minimal"
+              text="Previous" onClick={actions.prevStep}/> : null}
             <Button rightIconName="arrow-right" className="pt-large"
               text="Next" onClick={actions.nextStep} disabled={
                 !step.valid
