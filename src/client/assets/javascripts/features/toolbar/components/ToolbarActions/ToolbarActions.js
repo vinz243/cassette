@@ -23,7 +23,10 @@ class ToolbarActions extends React.Component {
               } />
           </Tooltip>
         </div>
-        <div className="logout">
+        <div className="logout" onClick={() => {
+            localStorage.setItem('sessionToken', undefined);
+            window.location.pathname = '/';
+          }}>
           <span className="pt-icon-large pt-icon-log-out"></span>
         </div>
       </div>

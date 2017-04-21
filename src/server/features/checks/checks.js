@@ -1,11 +1,12 @@
-const semver     = require('semver');
-const config      = require('config');
-const {scgi}     = require('features/store/utils');
-const emitter    = require('emitter');
-const shortid    = require('shortid');
-const fs         = require('fs-promise');
-const path       = require('path');
-const entropy    = require('string-entropy');
+const semver       = require('semver');
+const config        = require('config');
+const {scgi}       = require('features/store/utils');
+const emitter      = require('emitter');
+const shortid      = require('shortid');
+const fs           = require('fs-promise');
+const path         = require('path');
+const entropy      = require('string-entropy');
+const capabilities = require('fluent-ffmpeg/lib/capabilities');
 
 const REQUIRED_NODE = '^7.7.0';
 const MIN_ENTROPY = 1024;
@@ -16,7 +17,8 @@ module.exports.checklist = [
   'rtorrent',
   'socketio_connected',
   'write_access',
-  'secret_entropy'
+  'secret_entropy',
+  'ff_path'
 ]
 
 module.exports.checks = {
@@ -135,6 +137,28 @@ module.exports.checks = {
         details: err.message
       };
     }
+  },
+  ff_path: function () {
+    return new Promise((resolve, reject) => {
+      const caps = {};
+      capabilities(caps);
 
+      caps._getFfmpegPath.call(caps, function (err1, ffmpegPath) {
+        caps._getFfprobePath.call(caps, function (err2, ffprobePath) {
+          if (err1 || err2) {
+            mainStory.error('checks', 'Couldnt find ffmpeg/ffprobe', {attach:
+              [err1, err2]});
+            return resolve({
+              status: 'ko',
+              message: `FFmpeg couldn't be found. Please make sure it's installed`
+            });
+          }
+          resolve({
+            status: 'ok',
+            message: `FFmpeg was found in ${ffmpegPath}`
+          });
+        });
+      });
+    })
   }
 }
