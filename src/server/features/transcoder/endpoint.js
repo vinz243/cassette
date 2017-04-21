@@ -1,7 +1,8 @@
 const Transcode = require('./transcode');
 const File      = require('models/File');
 const shortid   = require('shortid');
-
+const config = require('config');
+const fs = require('fs');
 const transcodes = {};
 
 module.exports = {
@@ -16,7 +17,6 @@ module.exports = {
     //   fadeIn:      fade duration in ms at the beginning of the audio
     //   fadeout:     fade duration in ms at the end of the audio
     post: async function (ctx) {
-      console.log(ctx.request.body);
       const {format, codec, quality, chunkLength, fadeIn, fadeOut} = ctx.request.body;
       const params = {format, codec, quality, chunkLength, fadeIn, fadeOut};
 
@@ -63,8 +63,9 @@ module.exports = {
   },
   '/api/v2/transcodes/:id/chunks/:chunk': {
     get: function (ctx) {
-      const mimeType = 'audio/mpeg';
-      const acceptedHeaders = ['audio/mpeg', 'identity;q=1, *;q=0'];
+      const transcode = transcodes[ctx.params.id];
+      const mimeType = transcode.getMimeType();
+      const acceptedHeaders = ['audio/mpeg', 'identity;q=1, *;q=0', 'audio/flac'];
       if (acceptedHeaders.includes(ctx.req.header('Accept-Encoding')) || true) {
         ctx.respond = false;
         ctx.res.writeHead(200, {
@@ -73,8 +74,16 @@ module.exports = {
           'Connection': 'close',
           'Accept-Ranges': 'none'
         });
-        transcodes[ctx.params.id]
-          .transcodeChunk(+ctx.params.chunk, ctx.res);
+        if (mimeType === 'audio/flac') {
+          const tmp = `/home/vincent/.cassette/${shortid.generate()}.tmp`;
+          transcode.transcodeChunk(+ctx.params.chunk, tmp).then(() => {
+            fs.createReadStream(tmp).pipe(ctx.res);
+          });
+          return;
+        } else {
+
+          transcode.transcodeChunk(+ctx.params.chunk, ctx.res);
+        }
       } else {
         ctx.set('Content-Type', mimeType);
         ctx.set('Transfer-Encoding', 'chunked');

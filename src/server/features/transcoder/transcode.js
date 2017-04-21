@@ -18,7 +18,6 @@ const Transcode = module.exports = class Transcode {
   }
   probe () {
     return new Promise((resolve, reject) => {
-      console.log(this.opts.source);
       ffmpeg.ffprobe(this.opts.source, (err, metadata) => {
         if (err) {
           return Promise.reject(err);
@@ -34,26 +33,64 @@ const Transcode = module.exports = class Transcode {
       });
     })
   }
+  codecFor (format = 'mp3') {
+    return ({
+        mp3: 'libmp3lame',
+        flac: 'flac'
+    })[format] || 'libmp3lame';
+  }
+  validFormat (format) {
+    if (['mp3', 'flac'].includes(format)) {
+      return format;
+    }
+    return 'mp3';
+  }
   transcodeChunk (index, output) {
+    return new Promise((resolve, reject) => {
+
     const {opts} = this;
     const duration = opts.chunkLength;
     const time = index * opts.chunkLength;
 
-    return ffmpeg(opts.source)
-    .duration(duration)
-    .seekInput(time)
-    .audioCodec('libmp3lame')
-    .audioChannels(opts.audioFrequency)
-    .audioFrequency(opts.audioFrequency)
-    .audioQuality(opts.audioQuality)
-    .noVideo()
-    .format('mp3')
-    .on('stderr', function(stderrLine) {
-    })
-    .on('error', function (err) {
-      
-    })
-    .output(output).run();
+    ffmpeg(opts.source)
+      .duration(duration)
+      .seekInput(time)
+      .audioCodec(this.codecFor(opts.format))
+      .audioChannels(opts.audioFrequency)
+      .audioFrequency(opts.audioFrequency)
+      .audioQuality(opts.audioQuality)
+      // .outputOptions('-map_metadata -1')
+      .noVideo()
+      .format(this.validFormat(opts.format))
+      .on('start', function(commandLine) {
+        console.log('Spawned Ffmpeg with command: ' + commandLine);
+      })
+      .on('codecData', function(data) {
+        console.log('Input is ' + data.audio + ' audio ' +
+          'with ' + data.video + ' video');
+      })
+      .on('progress', function(progress) {
+        console.log('Processing: ' + progress.percent + '% done');
+      })
+      .on('end', function(stdout, stderr) {
+        console.log('Transcoding succeeded !');
+        resolve();
+      })
+      .on('stderr', function(stderrLine) {
+        console.log(stderrLine);
+      })
+      .on('error', function (err) {
+        console.log(err);
+        reject(err);
+      })
+      .output(output).run();
+    });
+  }
+  getMimeType () {
+    return ({
+      mp3: 'audio/mpeg',
+      flac: 'audio/flac'
+    })[this.opts.format] || 'audio/mpeg';
   }
   get props () {
     const chunks = Math.ceil(this.duration / this.opts.chunkLength);

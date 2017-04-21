@@ -15,6 +15,8 @@ const checks     = require('features/checks');
 const path       = require('path');
 const fs         = require("fs-promise");
 const sharp      = require('sharp');
+const cjwt       = require('jwt');
+const File       = require('models/File');
 
 const TYPES = {
   '.jpg': 'image/jpg',
@@ -77,10 +79,57 @@ app.use(async (ctx, next) => {
     ctx.body = {'status': 'ok'};
     return;
   }
+  if (ctx.url.startsWith('/api/v2/streams/') && ctx.method === 'GET') {
+    const token = path.basename(ctx.url);
+    try {
+
+      const {tr_id} = cjwt.read(token);
+      const file = await File.findById(+tr_id);
+      const stat = fs.statSync(file.props.path);
+      let mimeType = 'audio/mpeg';
+
+      if (file.props.path.endsWith('.flac')) {
+        mimeType = 'audio/flac';
+      }
+
+      let opts = {}, code = 200;
+
+      ctx.set('Content-Type', mimeType);
+      ctx.set('Content-Length', stat.size);
+      ctx.set('Accept-Ranges', 'bytes');
+
+      if (ctx.headers['range']) {
+        let [b, range] = ctx.headers['range'].split('=');
+
+        if (b === 'bytes') {
+          let [start, end] = range.split('-');
+
+          if (!end || end === '' || end < start)
+            end = stat.size - 1;
+
+          opts = {
+            start: start - 0,
+            end: end - 0
+          };
+
+          code = 206;
+          ctx.set('Content-Range',`bytes ${start}-${end}/${stat.size}`);
+          ctx.set('Content-Length', end - start + 1);
+        }
+      }
+      ctx.status = code;
+      ctx.body = fs.createReadStream(file.props.path, opts);
+      return;
+    } catch (err) {
+      mainStory.warn('streams', 'Error raised while trying to stream', {attach: err});
+      ctx.status = 410;
+      ctx.body = 'Token has expired';
+      return;
+    }
+  }
   if (ctx.url.startsWith('/api/v2/assets/') && ctx.method === 'GET') {
     const ext = path.basename(ctx.url);
     const name = ext.substr(0, ext.indexOf('?')) || ext;
-    console.log(`"${name}"`);
     const {size, height = size, width = size} = ctx.query;
 
     if (/^[\w-_]+\.\w+$/i.test(name)) {
