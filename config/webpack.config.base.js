@@ -40,13 +40,13 @@ module.exports = {
       {
         test: /\.jsx?$/,
         include: path.resolve(__dirname, '../src/client/assets/javascripts'),
-        loader: 'babel'
+        loader: 'babel-loader'
       },
       // Images
       // Inline base64 URLs for <=8k images, direct URLs for the rest
       {
         test: /\.(png|jpg|jpeg|gif|svg)$/,
-        loader: 'url',
+        loader: 'url-loader',
         query: {
           limit: 8192,
           name: 'images/[name].[ext]?[hash]'
@@ -55,19 +55,12 @@ module.exports = {
       // Fonts
       {
         test: /\.(woff|woff2|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-        loader: 'url',
+        loader: 'url-loader',
         query: {
           limit: 8192,
           name: 'fonts/[name].[ext]?[hash]'
         }
       }
     ]
-  },
-  postcss: function () {
-    return [
-      autoprefixer({
-        browsers: ['last 2 versions']
-      })
-    ];
   }
 };

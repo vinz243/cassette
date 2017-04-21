@@ -1,6 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import './SidebarApp.scss';
-import SidebarLibraryItem from './SidebarLibraryItem';
+
 import classnames from 'classnames';
 import {Link} from 'react-router';
 

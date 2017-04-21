@@ -7,3 +7,4 @@ downloads
 secure.json
 npm-debug.log
 lib
+build/

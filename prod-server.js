@@ -1,12 +1,13 @@
 #! /usr/bin/env node
-
+require('sudo-block')();
 // console.log(require('config.js'));
 const path = require('path');
 const config = require('./src/server/config');
 const express = require('express');
-const backend = require('./src/server/server').default;
+const backend = require('./src/server/server');
 
 const assert = require('assert');
+
 const app = express();
 
 const host = config.get('ip');
@@ -17,7 +18,7 @@ assert.equal(config.get('env'), 'production');
 const callback = backend.app.callback();
 
 app.use((req, res, next) => {
-  if (req.path.startsWith('/v1/')) {
+  if (req.path.startsWith('/v1/') || req.path.startsWith('/api/')) {
     callback(req, res);
   } else {
     next();
