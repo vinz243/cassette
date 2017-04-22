@@ -54,7 +54,7 @@ export default class PlayerControls extends Component {
     return (
     	<div className="controlsContainer">
     		<div className="playerControls">
-          <Flex justify="space-between">
+          <Flex justify="space-between" align="center">
             <Box ml={2}>
     					<span onClick={boundRewind} className={classNames('rewindControl', {
                   disabled: !(toolbar.previousTracks.length > 0 || toolbar.currentTrack)
