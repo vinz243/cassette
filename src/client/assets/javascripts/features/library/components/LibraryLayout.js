@@ -13,6 +13,12 @@ export default class LibraryLayout extends Component {
     actions.loadContent({scope: 'TRACKS', album: this.props.params.albumId});
 
   }
+  componentWillReceiveProps(nextProps) {
+    const { library, actions } = this.props;
+    if (nextProps.location && nextProps.location.key !== this.props.location.key) {
+      actions.loadContent({scope: 'TRACKS', album: nextProps.params.albumId});
+    }
+  }
   render() {
     const { library, actions, params } = this.props;
     let content;

@@ -14,6 +14,12 @@ export default class ArtistsView extends Component {
     actions.loadContent({scope: 'ARTISTS'});
 
   }
+  componentWillReceiveProps(nextProps) {
+    const { library, actions } = this.props;
+    if (nextProps.location && nextProps.location.key !== this.props.location.key) {
+      actions.loadContent({scope: 'ARTISTS'});
+    }
+  }
   render() {
     const COLUMNS = 12;
     let artists = chunk(this.props.library.items.artists,

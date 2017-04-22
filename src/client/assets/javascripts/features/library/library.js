@@ -29,7 +29,6 @@ const initialState: State = {
 };
 
 export default function reducer(state: State = initialState, action: any = {}): State {
-  let newState = deepAssign({}, state);
   switch (action.type) {
     case SET_VIEW_TYPE:
       return state;
@@ -40,31 +39,7 @@ export default function reducer(state: State = initialState, action: any = {}): 
     case OPEN_SELECTION:
       return state;
     case LOAD_CONTENT:
-      switch (state.viewScope) {
-        case 'TRACKS':
-          newState.loading = false;
-          newState.items = Object.assign({}, newState.items, action.data);
-          // newState.items.artist = newState.items.artists..map((track) => {
-          //     return deepAssign({}, {
-          //       id: track._id,
-          //       name: track.name.replace(/\(.+\)$/, ''),
-          //       originalName: track.name,
-          //       number: track.trackNumber,
-          //       duration: track.duration * 1000,
-          //       artist: {
-          //         id: track.artistId,
-          //         name: track.artist.name
-          //       },
-          //       album: {
-          //         id: track.albumId,
-          //         name: track.album.name.replace(/\(.+\).*$/, '')
-          //       },
-          //     }
-          //   );
-          // }).sort((a, b) => (b.number || 0) - (a.number || 0));
-          return newState;
-      }
-      return state;
+      return {...state, items: {...state.items, ...action.data}, loading: false};
     case '@@router/LOCATION_CHANGE':
       return Object.assign({}, state, {
         loading: true
@@ -122,6 +97,7 @@ function playTracks(tracks) {
 //   }
 // }
 function loadContent(opts) {
+  console.log('loadContent', opts);
   switch (opts.scope) {
     case 'ARTISTS':
       return axios.get(`/api/v2/artists?sort=name`).then((res) => {

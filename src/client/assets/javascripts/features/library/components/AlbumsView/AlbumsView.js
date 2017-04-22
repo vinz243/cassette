@@ -16,6 +16,12 @@ export default class AlbumsView extends Component {
     actions.loadContent({scope: 'ALBUMS', artist: this.props.params.id});
 
   }
+  componentWillReceiveProps(nextProps) {
+    const { library, actions } = this.props;
+    if (nextProps.location && nextProps.location.key !== this.props.location.key) {
+      actions.loadContent({scope: 'ALBUMS', artist: nextProps.params.id});
+    }
+  }
   render() {
     let artistId = this.props.params.id;
     let artistName = (this.props.library.items.albums.find(
