@@ -16,6 +16,7 @@ const request = function (method, url, config = {}, additionalConfig = {}) {
     url.startsWith('/api/v2/checks') || url === '/api/v2/configure'
     || url === '/api/v2/status'
   )) {
+    window.location.pathname = '/';
     throw new Error('Please login before accessing protected endpoint');
   }
   const params = {

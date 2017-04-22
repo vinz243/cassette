@@ -17,6 +17,9 @@ import toaster from 'app/toaster';
 import notifications from './notifications';
 
 export default class AppView extends Component {
+  static contextTypes = {
+    router: React.PropTypes.object
+  }
   componentDidMount() {
     notifications();
   }

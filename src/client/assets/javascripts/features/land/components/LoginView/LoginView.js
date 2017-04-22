@@ -26,7 +26,8 @@ class LoginView extends React.Component {
       password: evt.target.value
     });
   }
-  login() {
+  login(evt) {
+    evt.preventDefault();
     axios.login({...this.state}).then(() => {
       this.context.router.push('/app/library');
     }).catch((err) => {
@@ -43,53 +44,54 @@ class LoginView extends React.Component {
         <h3>Welcome back on cassette!</h3>
       </div>
       <div className="login-content">
-        <div className={classnames("pt-form-group", {
-          'pt-intent-danger': false
-        })}>
-          <label className="pt-label" for="input-username">
-            Username
-          </label>
-          <div className="pt-form-content">
-            <input
-              value={this.state.username}
-              onChange={this.handleUsernameChange.bind(this)}
-              id="input-username"
-              className={classnames("pt-input", {
-                'pt-intent-danger': false
-              })}
-              placeholder="admin"
-              type="text"
-              dir="auto" />
+        <form onSubmit={(evt) => this.login(evt)}>
+          <div className={classnames("pt-form-group", {
+              'pt-intent-danger': false
+            })}>
+            <label className="pt-label" htmlFor="input-username">
+              Username
+            </label>
+            <div className="pt-form-content">
+              <input
+                autoFocus={true}
+                value={this.state.username}
+                onChange={this.handleUsernameChange.bind(this)}
+                id="input-username"
+                className={classnames("pt-input", {
+                  'pt-intent-danger': false
+                })}
+                placeholder="admin"
+                type="text"
+                dir="auto" />
+            </div>
           </div>
-        </div>
-        <div className={classnames("pt-form-group", {
-          'pt-intent-danger': this.state.passwordChanged
-            && this.state.password.length < 8
-        })}>
-          <label className="pt-label" for="input-password">
-            Password
-          </label>
-          <div className="pt-form-content">
-            <input
-              value={this.state.password}
-              onChange={this.handlePasswordChange.bind(this)}
-              id="input-password"
-              className={classnames("pt-input", {
-               'pt-intent-danger': false
-               })}
-              placeholder="password"
-              type="password"
-              dir="auto" />
+          <div className={classnames("pt-form-group", {
+              'pt-intent-danger': this.state.passwordChanged
+              && this.state.password.length < 8
+            })}>
+            <label className="pt-label" htmlFor="input-password">
+              Password
+            </label>
+            <div className="pt-form-content">
+              <input
+                value={this.state.password}
+                onChange={this.handlePasswordChange.bind(this)}
+                id="input-password"
+                className={classnames("pt-input", {
+                  'pt-intent-danger': false
+                })}
+                placeholder="password"
+                type="password"
+                dir="auto" />
+            </div>
           </div>
-        </div>
-        <div className="login-button">
-          <Button rightIconName="arrow-right" className="pt-large"
-            text="Login" onClick={() => {}} loading={
-              false
-            } onClick={() => {
-              this.login()
-            }}/>
-        </div>
+          <div className="login-button">
+            <Button rightIconName="arrow-right" className="pt-large"
+              text="Login" type="submit" loading={
+                false
+              }/>
+            </div>
+        </form>
       </div>
     </div>
   }
