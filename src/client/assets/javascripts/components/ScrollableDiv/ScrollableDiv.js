@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react'
 import './ScrollableDiv.scss';
+import classnames from 'classnames'
 
 class ScrollableDiv extends React.Component {
   componentDidMount () {
@@ -21,7 +22,9 @@ class ScrollableDiv extends React.Component {
     this.updateHeight();
   }
   render () {
-    return <div ref={(ref) => this.div = ref} className="scrollable-div">
+    return <div ref={(ref) => this.div = ref} className={
+        classnames("scrollable-div", this.props.className || '')
+      }>
       {this.props.children}
     </div>
   }

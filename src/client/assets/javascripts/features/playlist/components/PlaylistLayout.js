@@ -4,6 +4,7 @@ import './PlaylistApp.scss';
 import DraggableList from 'react-draggable-list';
 import PlaylistItem from './PlaylistItem';
 import BetterImage from 'components/BetterImage';
+import ScrollableDiv from 'components/ScrollableDiv';
 
 export default class PlaylistLayout extends Component {
   static propTypes = {
@@ -45,7 +46,7 @@ export default class PlaylistLayout extends Component {
     });
 
     return (
-      <div>
+      <div className="playlist-layout">
         {playlist.current.name ? <PlaylistItem item={
             playlist.current
           } style={{
@@ -58,7 +59,7 @@ export default class PlaylistLayout extends Component {
               fontSize: '14px'
             }}></span>}
           } itemSelected={0} playing/> : ''}
-        <div className="playlistView" ref={(ref) => this.div = ref}>
+        <ScrollableDiv offset={-357} className="playlistView">
           <DraggableList
             list={playlist.nextStack}
             itemKey="uid"
@@ -71,17 +72,18 @@ export default class PlaylistLayout extends Component {
               }
             }}
             container={() => this.div} />
-        </div>
+        </ScrollableDiv>
         <div className="currentTrackInfo">
-          <div className="title">{playlist.current.name}</div>
-          <div className="artist">{playlist.current.artist.name}</div>
-          <div className="album">{playlist.current.album.name}</div>
+          <div className="text title">{playlist.current.name}</div>
+          <div className="text artist">{playlist.current.artist.name}</div>
+          <div className="text album">{playlist.current.album.name}</div>
+          {playlist.current.album ?
+            <BetterImage src={`/api/v2/albums/${
+                playlist.current.album._id
+              }/artwork?size=275`} size={275} /> :
+              <span className="pt-icon-standard pt-icon-pulse"></span>}
         </div>
-        {playlist.current.album ?
-          <BetterImage src={`/api/v2/albums/${
-              playlist.current.album._id
-            }/artwork?size=275`} size={275} /> :
-          <span className="pt-icon-standard pt-icon-pulse"></span>}
+
       </div>
     );
   }

@@ -1,7 +1,9 @@
 .playlistView {
+  // bottom: 360px;
+  // right: 16px;
   padding: 1.4em;
   color: #fff;
-  height: 47vh;
+  // height: 47vh;
   overflow-y: scroll;
   &::-webkit-scrollbar {
     -webkit-appearance: none;
@@ -13,21 +15,28 @@
     -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
   }
 }
-
+.playlist-layout {
+  position: fixed;
+  top: 64px;
+  right: 0;
+  width: 275px;
+}
 .currentTrackInfo {
+  position: fixed;
+  bottom: 0;
   color: #fff;
-  padding: 0.7em;
   background-color: rgba(23, 25, 26, 0.37);
+  .text {
+    padding: 0 0.7em;
+    &.title {
+      margin-top: 0.7em;
+    }
+    &.album {
+      margin-bottom: 0.7em;
 
+    }
+  }
   .title {
     font-weight: bold;
   }
-}
-.pt-icon-pulse {
-  font-size: 3em !important;
-  /* margin: auto; */
-  width: 100%;
-  height: 40vh;
-  text-align: center;
-  line-height: 30vh !important;
 }
