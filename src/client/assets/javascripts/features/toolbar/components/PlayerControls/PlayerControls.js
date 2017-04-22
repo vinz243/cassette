@@ -1,7 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 
 // import './ToolbarApp.scss';
-import { ContextMenuTarget, Menu, MenuItem  } from "@blueprintjs/core";
+import {
+  ContextMenuTarget,
+  Menu,
+  MenuItem,
+  Hotkey,
+  Hotkeys,
+  HotkeysTarget  } from "@blueprintjs/core";
 import createMenu from 'app/menu';
 
 import './PlayerControls.scss';
@@ -9,12 +15,33 @@ import {Flex, Box} from 'reflexbox';
 
 import classNames from 'classnames';
 
+@HotkeysTarget
 @ContextMenuTarget
 export default class PlayerControls extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     toolbar: PropTypes.object.isRequired
   };
+  renderHotkeys() {
+    const {actions, toolbar} = this.props;
+    return <Hotkeys>
+        <Hotkey
+          global={true}
+          combo="k"
+          label="Pause/Unpause playback"
+          onKeyDown={() => actions.togglePause()} />
+        <Hotkey
+          global={true}
+          combo="l"
+          label="Jump to next track"
+          onKeyDown={() => actions.playNextTrack()} />
+        <Hotkey
+          global={true}
+          combo="j"
+          label="Play previous track"
+          onKeyDown={() => actions.playPreviousTrack()} />
+    </Hotkeys>
+  }
   renderContextMenu() {
     const {actions, toolbar} = this.props;
     return createMenu([{
