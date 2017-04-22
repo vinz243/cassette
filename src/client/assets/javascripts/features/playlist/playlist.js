@@ -14,6 +14,7 @@ const REMOVE          = 'cassette/playlist/REMOVE';
 const SET_TRANSCODE   = 'cassette/playlist/SET_TRANSCODE';
 const SET_TOKEN       = 'cassette/playlist/SET_TOKEN';
 const TOGGLE_LOSSLESS = 'cassette/playlist/TOGGLE_LOSSLESS';
+const TOGGLE_STOP_AFTER = 'cassette/playlist/TOGGLE_STOP_AFTER';
 
 export const NAME = 'playlist';
 
@@ -29,12 +30,15 @@ const initialState = {
       name: 'To listen it'
     }
   },
+  stopAfter: false,
   transcodes: {},
   tokens: {},
   directPlayback: !!localStorage.getItem('config.playback.direct')
 }
 export default function reducer (state = initialState, action) {
   switch(action.type) {
+    case TOGGLE_STOP_AFTER:
+      return {...state, stopAfter: !state.stopAfter};
     case SET_TOKEN:
       return {
         ...state,
@@ -226,9 +230,20 @@ function addAsNext (track) {
   }
 }
 
-function playNextTrack () {
+function toggleStopAfter () {
   return {
-    type: NEXT_TRACK
+    type: TOGGLE_STOP_AFTER
+  }
+}
+
+function playNextTrack (userOriginated = true) {
+  return (dispatch, getState) => {
+    dispatch({
+      type: NEXT_TRACK, userOriginated
+    });
+    if (getState().playlist.stopAfter) {
+      dispatch({type: 'cassette/toolbar/TOGGLE_PAUSE'});
+    }
   }
 }
 
@@ -280,5 +295,6 @@ export const actionCreators = {
   move,
   remove,
   prepareTrack,
-  toggleLosslessPlayback
+  toggleLosslessPlayback,
+  toggleStopAfter
 }

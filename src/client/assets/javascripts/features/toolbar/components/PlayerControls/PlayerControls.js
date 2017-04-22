@@ -1,18 +1,45 @@
 import React, { Component, PropTypes } from 'react';
 
 // import './ToolbarApp.scss';
-import { Slider } from "@blueprintjs/core";
+import { ContextMenuTarget, Menu, MenuItem  } from "@blueprintjs/core";
+import createMenu from 'app/menu';
 
 import './PlayerControls.scss';
 import {Flex, Box} from 'reflexbox';
 
 import classNames from 'classnames';
 
+@ContextMenuTarget
 export default class PlayerControls extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     toolbar: PropTypes.object.isRequired
   };
+  renderContextMenu() {
+    const {actions, toolbar} = this.props;
+    return createMenu([{
+      text: 'Stop after',
+      icon: 'stop',
+      shortcut: 'Alt + K',
+      action: actions.toggleStopAfter
+    }, {
+      text: 'Previous',
+      icon: 'step-backward',
+      shortcut: 'J',
+      action: actions.playPreviousTrack
+    }, {
+      text: toolbar.playing ? 'Pause' : 'Play',
+      icon: toolbar.playing ? 'pause' : 'play',
+      shortcut: 'K',
+      action: actions.togglePause
+    }, {
+      text: 'Next',
+      icon: 'step-forward',
+      shortcut: 'L',
+      action: actions.playNextTrack
+    }
+  ]);
+  }
   rewind(e) {
     this.props.actions.playPreviousTrack();
   }

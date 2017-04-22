@@ -30,7 +30,7 @@ export default class AppView extends Component {
         <div className="toolbarContainer" style={{
           boxShadow: '0px 0px 12px 0px rgba(0,0,0,0.75)',
           width: '100%',
-          zIndex: 39,
+          zIndex: 19,
           position: 'fixed',
         }}>
           <ToolbarView {...this.props} />
@@ -40,7 +40,7 @@ export default class AppView extends Component {
           }}>
           <Flex align="center" justify="space-between">
             <Box style={{
-                zIndex: 38,
+                zIndex: 18,
                 position: 'fixed',
                 boxShadow: '0px 0px 18px 0px rgba(0,0,0,0.75)',
                 backgroundColor: 'rgb(45, 45, 52)',
@@ -56,7 +56,7 @@ export default class AppView extends Component {
               {this.props.children}
             </Box>
             <Box style={{
-                zIndex: 35,
+                zIndex: 18,
                 position: 'fixed',
                 right: '0',
                 boxShadow: '0px 0px 18px 0px rgba(0,0,0,0.75)',
