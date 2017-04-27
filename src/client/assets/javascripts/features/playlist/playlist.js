@@ -71,6 +71,14 @@ export default function reducer (state = initialState, action) {
         nextStack: [action.track, ...state.nextStack]
       });
     case NEXT_TRACK:
+      if (!state.nextStack.length) {
+        return {
+          ...state,
+          nextStack: [],
+          current: {...initialState.current},
+          prevStack: [state.current, ...state.prevStack],
+        };
+      }
       return Object.assign({}, state, {
         nextStack: [...state.nextStack.slice(1)],
         prevStack: [state.current, ...state.prevStack],

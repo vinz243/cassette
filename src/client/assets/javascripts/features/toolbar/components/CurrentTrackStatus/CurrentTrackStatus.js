@@ -54,7 +54,7 @@ export default class CurrentTrackStatus extends Component {
   }
   render() {
     const { playlist, actions, toolbar } = this.props;
-    const current = playlist.current;
+    const current = playlist.current || {};
     const token = playlist.tokens[current._id];
 
     const boundTipFormattter = this.tipFormatter.bind(this);

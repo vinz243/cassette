@@ -120,8 +120,16 @@ export default class AudioPlayer extends Component {
     }).then(({data}) => Promise.resolve(data));
   }
   componentWillReceiveProps(nextProps) {
-
+    if (!nextProps.source && this.audio) {
+      this.audio.src = undefined;
+      this.buffered = 0;
+      this.range.value = 0;
+      this.range.min = "0";
+      this.range.max = "1";
+      return;
+    }
     if (nextProps.source && this.audio && this.props.source !== nextProps.source) {
+
       this.buffered = 0;
       this.range.value = 0;
       this.range.min = "0";
