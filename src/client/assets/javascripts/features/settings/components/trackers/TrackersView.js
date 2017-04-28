@@ -2,6 +2,7 @@ import React, { PropTypes } from 'react'
 import './TrackersView.scss';
 
 import TrackerCard from './TrackerCard';
+import TrackerDialog from './TrackerDialog';
 
 class TrackersView extends React.Component {
   componentDidMount() {
@@ -9,19 +10,23 @@ class TrackersView extends React.Component {
   }
   render () {
     const {settings, actions} = this.props;
-    const trackers = settings.trackers.map((tracker) => {
+    const cards = settings.trackers.map((tracker) => {
       return <TrackerCard tracker={tracker} onChange={
           (props) => actions.editTracker(tracker._id, props)
-        } key={tracker._id}/>
+        } key={tracker._id} {...this.props}/>
     })
-    trackers.push(<div className="pt-card pt-elevation-0 pt-interactive ph"
+    const dialogs = settings.trackers.map((tracker) => {
+      return <TrackerDialog tracker={tracker} key={tracker._id} {...this.props}/>
+    });
+    cards.push(<div className="pt-card pt-elevation-0 pt-interactive ph"
     onClick={
       () => actions.addTracker()
     }>
       <span className="pt-icon pt-icon-add add-placeholder"></span>
     </div>)
     return <div className="trackers settings">
-        {trackers}
+        {cards}
+        {dialogs}
       </div>
   }
 }

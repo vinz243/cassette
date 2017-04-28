@@ -8,17 +8,21 @@ const PREPARE_ADD_LIBRARY = 'cassette/settings/PREPARE_ADD_LIBRARY';
 const EDIT_TRACKER        = 'cassette/settings/EDIT_TRACKER';
 const SET_TRACKERS        = 'cassette/settings/SET_TRACKERS';
 const SET_LIBRARIES       = 'cassette/settings/SET_LIBRARIES';
+const OPEN_TRACKER_DIALOG = 'cassette/settings/OPEN_TRACKER_DIALOG';
 
 const initialState = {
   trackers: [],
   addingLib: false,
-  libraries: []
+  libraries: [],
+  currentTracker: undefined,
 }
 
 export const NAME = 'settings';
 
 export default function reducer(state = initialState, action = {}) {
   switch (action.type) {
+    case OPEN_TRACKER_DIALOG:
+      return {...state, currentTracker: action.tracker};
     case ADD_TRACKER:
       return Object.assign({}, state, {
         trackers: [...state.trackers, action.tracker]
@@ -56,6 +60,11 @@ const settings = (state) => state[NAME];
 export const selector = createStructuredSelector({
   settings
 });
+
+function openTrackerDialog (tracker) {
+  return {type: OPEN_TRACKER_DIALOG, tracker};
+}
+
 function loadTrackers (id, props) {
   return (dispatch) => {
     axios.get('/api/v2/trackers').then((res) => {
@@ -123,5 +132,5 @@ function addTracker () {
   }
 }
 export const actionCreators = {
-  addTracker, editTracker, loadTrackers, addLibrary, loadLibraries
+  addTracker, editTracker, loadTrackers, addLibrary, loadLibraries, openTrackerDialog
 }

@@ -1,6 +1,7 @@
 .trackers.settings {
   .pt-card {
-    height: 10em;
+    width: 200px;
+    height: 8em;
     margin: 1em;
     display: inline-block;
     vertical-align: bottom;
@@ -8,8 +9,10 @@
       margin: 0.6em;
       line-height: 0.7em;
       vertical-align: baseline;
+      color: #645c7c;
     }
     .status {
+      margin-top: -6px;
       line-height: 1em !important;
       font-size: 12px;
       float: right;
@@ -38,7 +41,7 @@
       width: 10em;
       text-align: center;
       .pt-icon {
-        line-height: 3.6em;
+        line-height: 2.7em;
         font-size: 2em;
         color: #6b7086;
       }
