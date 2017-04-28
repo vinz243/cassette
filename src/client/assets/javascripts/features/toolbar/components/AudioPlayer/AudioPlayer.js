@@ -2,6 +2,7 @@ import React, { Component, PropTypes } from 'react';
 
 import './AudioPlayer.scss';
 import axios from 'app/axios';
+import classnames from 'classnames';
 
 export default class AudioPlayer extends Component {
   static propTypes = {
@@ -44,6 +45,9 @@ export default class AudioPlayer extends Component {
 
   }
   componentDidMount()  {
+    this.audio = new Audio();
+    this.audio.onPlay = this.props.onPlay || new Function();
+
     this.audio.addEventListener('loadedmetadata', (evt) => {
       if (this.props.directPlayback) {
         this.range.max = this.audio.duration;
@@ -154,24 +158,18 @@ export default class AudioPlayer extends Component {
     }
   }
   shouldComponentUpdate(nextProps, nextState) {
-    return false;
+    return true;
   }
   render() {
-    const { source } = this.props;
+    const { source, playing } = this.props;
 
     return (
-      <div className="audioPlayer">
-        <audio
-         className="react-audio-player"
-         autoPlay={false}
-         preload={true}
-         controls={false}
-         ref={(ref) => { this.audio = ref; }}
-         onPlay={this.onPlay || new Function()}
-       > </audio>
+      <div className={classnames("audioPlayer", {
+          playing
+        })}>
      <input type="range" ref={(ref) => this.range = ref } style={{
          'display': 'none'
-       }}/>
+       }} min="0" max={(this.audio || {}).duration} />
       </div>
     );
   }

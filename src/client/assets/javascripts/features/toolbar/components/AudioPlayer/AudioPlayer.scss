@@ -24,6 +24,7 @@ input[type=range]::-ms-track {
   color: transparent;
 }
 /* Special styling for WebKit/Blink */
+
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   // border: 1px solid #000000;
@@ -35,6 +36,12 @@ input[type=range]::-webkit-slider-thumb {
   margin-top: -4px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
   // box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d; /* Add cool effects to your sliders! */
 
+  box-shadow: 0 0 0px 42px rgba(255, 255, 255, 0);
+  transition: all 0.5s ease;
+}
+.audioPlayer.playing input[type=range]::-webkit-slider-thumb {
+  box-shadow: 0 0 0px 0px rgba(255, 255, 255, 0.85);
+  transition: box-shadow 0.5s ease;
 }
 
 input[type=range]::-webkit-slider-runnable-track {
