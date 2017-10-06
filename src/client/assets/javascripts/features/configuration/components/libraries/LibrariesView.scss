@@ -1,0 +1,50 @@
+div.configuration-libraries-view {
+  div.library-item {
+    span {
+      margin: 0.3em;
+      display: inline-block;
+    }
+    span.library-name {
+      width: 75px;
+      min-width: 75px;
+    	text-overflow: ellipsis;
+    	white-space: nowrap;
+    	overflow: hidden;
+    }
+    span.library-path {
+      width: 325px;
+
+    	text-overflow: ellipsis;
+    	white-space: nowrap;
+    	overflow: hidden;
+    }
+  }
+  div.add-library {
+    margin: 1em 0.4em;
+    padding: 0.4em;
+    div.add-lib-header {
+      font-size: 20px;
+      margin: 1em;
+    }
+    div.add-lib-path {
+      margin: 20px 20px;
+    }
+    div.add-lib-name {
+      margin: 0 20px;
+      display: inline-block;
+    }
+    div.second-row {
+      vertical-align: middle;
+      &> div {
+        vertical-align: middle;
+      }
+    }
+    div.add-lib-button {
+      button {
+        float: none;
+      }
+      display: inline-block;
+      margin: 0 10px;
+    }
+  }
+}

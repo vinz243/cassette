@@ -1,4 +1,23 @@
-body {
-  background: #f1f1f1;
-  padding-top: 30px;
+* {
+  font-size: 16px;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  outline: none !important;
+}
+*:focus {
+  outline: none !important;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+div.context-menu-item {
+  span {
+    color: #515774;
+    font-size: 12px;
+    float: right;
+    line-height: 16px;
+  }
 }

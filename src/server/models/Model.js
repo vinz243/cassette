@@ -1,267 +1,61 @@
-import Datastore from 'nedb-promise';
-import conf from '../config.js';
-import config from './config.js';
-import { mainStory } from 'storyboard';
+const conf        = require("../config.js");
+const {mainStory} = require('storyboard');
+const tingodb     = require("tingodb");
+const assert      = require("assert");
 
-import assert from 'assert';
-import events from 'events';
-import mkdirp from 'mkdirp';
-import path from 'path';
-import Lazy from 'lazy.js';
+const events = require("events");
+const mkdirp = require("mkdirp");
+const path   = require("path");
+const Boom   = require("boom");
+const pick   = require("lodash/pick");
+const omit   = require("lodash/omit");
 
-import pascalCase from 'pascal-case';
-import pluralize from 'pluralize';
-import snakeCase from 'snake-case';
+const assignWith = require("lodash/assignWith");
+const pluralize  = require("pluralize");
+const changeCase = require('change-case');
 
-let dataDir = path.join(conf.get('configPath'), '/data/');
+const dataDir = path.join(conf.get('configPath'), '/database/');
+const emitter = require('emitter');
+const diff    = require('object-diff');
+
 mkdirp.sync(dataDir);
 
-class ModelField {
-  constructor(name, model) {
-    this.name = name;
-    this.model = model;
+const databases = {};
+const db = new (tingodb({
+  nativeObjectID: false
+}).Db)(dataDir, {});
+
+// This function returns the nedb datastore corresponding to a name
+// Useful for manyToOne. if it wasn't found it will create it
+const getDatabase = module.exports.getDatabase = (name, database = db) => {
+  if (databases[name]) {
+    return databases[name];
   }
-  int() {
-    this.type = 'int';
-    this.validator = (data) => {
-      let value = data;
-      if (data === parseInt(data, 10)) {
-        return true;
+  databases[name] = database.collection(pluralize(name));
+  return getDatabase(name, database);
+}
+
+const findOrCreateFactory = module.exports.findOrCreateFactory = (model) => {
+  return (query, props = {}) => {
+
+    let obj = model(query);
+    return obj.populate().then(() => {
+      if (obj.props._id) {
+        return Promise.resolve(obj);
       }
-      return false;
-    }
-    return this;
-  }
-  defaultParam () {
-    this._default = true;
-    this.model._default = this.name;
-    return this;
-  }
-  defaultValue(val) {
-    this._defaultValue = val;
-    return this;
-  }
-  float() {
-    this.type = 'float';
-    this.validator = (n) => Number(n) === n;
-    return this;
-  }
-  string() {
-    this.type = 'string';
-    this.validator = (data) => typeof data === 'string';
-    return this;
-  }
-  boolean() {
-    this.type = 'boolean';
-    this.validator = (data) => typeof data === 'boolean';
-    return this;
-  }
-  oneToOne() {
-    this.type = 'oneToOne';
-    this.validator = (data) => typeof data === 'string';
-    return this;
-  }
-  any() {
-    this.type = 'any';
-    this.validator = (data) => true;
-    return this;
-  }
-  regex(reg) {
-    if(this.type !== 'string')
-      throw new Error('Using regex on a non-string field');
-    return this;
-  }
-  required() {
-    this._required = true;
-    return this;
-  }
-  notIdentity() {
-    this._notIdentity = true;
-    return this;
-  }
-  done() {
-    return this.model;
+      let newObj = model(Object.assign({}, query, props));
+      return newObj.create().then(() => Promise.resolve(newObj));
+    }).then((object) => {
+      return Promise.resolve(object);
+    });
   }
 }
 
-let databases = {};
-
-class Model {
-  constructor(name) {
-    this.name = name;
-    this.dbName = snakeCase(name) + 's';
-    this.dbPath = path.join(dataDir, this.dbName + '.db');
-    this.fields = [];
-    this.relations = [];
-    this.methods = [];
-
-    this.emitter = new events.EventEmitter();
-
-    this.field('_id').string();
-  }
-  field(name) {
-    let field = new ModelField(name, this);
-    this.fields.push(field);
-    return field;
-  }
-  oneToMany(manyModel, fieldName) {
-    assert(manyModel !== undefined);
-    assert(manyModel !== {});
-    this.relations.push({
-      model: manyModel,
-      fieldName: fieldName,
-      type: 'oneToMany'
-    });
-    return this;
-  }
-  noDuplicates() {
-    this._noDuplicates = true;
-    return this;
-  }
-  acceptsEmptyQuery() {
-    this.acceptsEmptyQuery = true;
-    return this;
-  }
-  implement(funcName, func) {
-    this.methods.push({
-      name: funcName,
-      callback: func
-    });
-    return this;
-  }
-  hook(evt, callback) {
-    this.emitter.on(evt, callback);
-    return this;
-  }
-
-  done() {
-    let db = undefined, self = this;
-    self.emitter.emit('done:before');
-
-    if (databases[self.dbPath]) {
-      mainStory.warn('db', 'Not loading DB again..');
-      db = databases[self.dbPath];
-    } else {
-      db = new Datastore(self.dbPath);
-      db.loadDatabase();
-      databases[self.dbPath] = db;
-    }
-
-    let model = function (d) {
-      self.emitter.emit('construct:before', this);
-      d = d || {};
-      if (typeof d === 'string') {
-        if (self._default) {
-          let val = d;
-          d = {};
-          d[self._default] = val;
-        } else {
-          throw new Error('Cannot accept a string as an object');
-        }
-      }
-      this.data = {};
-      // let data = Lazy(d).pick(this.fields.map(f => f.name));
-      for (let index in self.fields) {
-        let field = self.fields[index];
-        let value = d[field.name];
-        this.data[field.name] = value || field._defaultValue;
-      }
-      this._id = this.data._id;
-      self.emitter.emit('construct:after', this);
-    }
-
-    // We add the custom functions
-    for (let index in self.methods) {
-        let method = self.methods[index];
-        model.prototype[method.name] = method.callback;
-    }
-
-    model.model = self;
-    model.prototype.getPayload = function () {
-      self.emitter.emit('getPayload:before', this);
-      let payload = {};
-
-      for (let index in self.fields) {
-        let field = self.fields[index];
-        let value = this.data[field.name];
-
-        if (typeof value === 'undefined' && field._required)
-          throw new Error(`Field ${field.name} is required`);
-
-        if (field.validator && !field.validator(value)) {
-          if (field._required)
-            throw new Error(`Field ${field.name} is required but has invalid value`);
-          else if (value !== undefined)
-             mainStory.info('db', `Dropping field ${field.name} with ${value}`);
-        } else {
-          payload[field.name] = value;
-        }
-      }
-      self.emitter.emit('getPayload:after', this);
-      return payload;
-    }
-
-    model.prototype.create = async function () {
-      self.emitter.emit('create:before', this);
-      if (this._id || this.data._id)
-        throw new Error('Object is already from database');
-
-      if (self._noDuplicates) {
-        if (!self._default) {
-          throw new Error('No dups specified but no default field');
-        }
-        let q = {};
-        q[self._default] = this.data[self._default];
-        let res = await db.find(q);
-        if (res.length > 0)
-          throw new Error('Entry is already existing and dups found');
-      }
-
-
-     let res = await db.insert(this.getPayload());
-     mainStory.debug('db', `created ${self.name}#${this._id}`);
-
-      this._id = this.data._id = res._id;
-      self.emitter.emit('create:after', this);
-    }
-
-    model.prototype.set = function (key, value) {
-      if (key === '_id') {
-        throw new Error('Cannot set _id');
-      }
-      this.data[key] = value;
-    }
-
-    model.prototype.update = async function (key, value) {
-      self.emitter.emit('update:before', this);
-      if (!this._id) {
-        throw new Error('Cannot update ghost model');
-      }
-
-      await db.update({_id: this._id}, this.getPayload());
-      self.emitter.emit('update:after', this);
-      mainStory.debug('db', `updated ${self.name}#${this._id}`);
-      return;
-    }
-
-    model.findById = async function (id) {
-      return (await model.find({_id: id, limit: 1}))[0];
-    }
-
-    model.find = async function (query, forceEmpty) {
-      let q = Lazy(query)
-        .omit(self.fields.filter(f => f.notIdentity))
-        .pick(self.fields.map(f => f.name))
-        .value();
-
-      // if (Object.keys(q).length  == 0 && !self.acceptsEmptyQuery
-      //   && !forceEmpty) {
-      //   throw new Error('Empty or invalid query');
-      // }
-
-      let opts = Lazy(query).pick([
-        'limit', 'offset', 'sort', 'direction'
-      ]).value();
+const findFactory = module.exports.findFactory = (model, name, getDB = getDatabase) => {
+  return (query = {}) => {
+    return new Promise((resolve, reject) => {
+      let optFields = ['limit', 'sort', 'skip', 'direction']
+      let opts = pick(query, optFields);
 
       if (!opts.limit || opts.limit > 500 || opts.limit < 1) {
         opts.limit = 500;
@@ -271,51 +65,360 @@ class Model {
       sort[opts.sort || 'name'] = opts.direction ?
         (opts.direction == 'asc' ? 1 : -1) : 1;
 
-      let res = (await db.cfind(q).sort(sort).limit(opts.limit)
-        .skip(opts.skip || 0).exec()).map(d => new model(d));
+      const db = getDatabase(name);
+      const q = Object.assign({}, omit(query, optFields), query._id ? {
+          _id: query._id - 0
+        } : {});
 
-      res.query = Lazy(q).merge(opts).value();
-      return res;
-    }
-    // for (let i in this.fields.filter(t => t.type == 'oneToOne')) {
-    //   let field = this.fields[i];
-    //   model.prototype['get' + pascalCase(field.name)] = {
-    //
-    //   }
-    // }
+      let res = db.find(q)
+        .sort(sort)
+        .limit(+opts.limit)
+        .skip(opts.skip || 0)
+        .toArray((err, docs) => {
+          if (err) return reject(err);
+          let models = docs.map((el) => model({_id: el._id}));
 
-    for (let rel of this.relations) {
-
-      if (rel.type === 'oneToMany') {
-        let m = 'get' + pascalCase(pluralize(rel.model.model.name));
-        model.prototype[m] = function (query) {
-          self.emitter.emit(m + ':before', this);
-          query = query || {};
-          if (!this._id) {
-            throw new Error('Can\'t get children of unserialized object');
-          }
-          query[rel.fieldName] = this._id;
-          self.emitter.emit(m + ':after', this);
-          return rel.model.find(query);
-        }
-      }
-    }
-    return model;
+          Promise.all(models.map(el => el.populate())).then(() => {
+            resolve(models);
+          });
+        });
+    });
   }
 }
 
-// Chaining example:
-//
-// (new Model('MyModel'))
-//   .field('itemName')
-//     .required()
-//     .string()
-//     .regex(/Regex/)
-//     .done()
-//   .field('itemCategory')
-//     .float()
-//     .notIdentity() <-- means won't be accepted as a query
-//     .done()
-//   .done()
+// useful for defaults
+const notImplemented = (name) => {
+  return function () {
+    throw new Boom.create(500, `Function ${name} isn't implemented yet`);
+  }
+}
 
-export default Model;
+// This function is a customized version of _.assign
+// use this in models for composition !!!
+const assignFunctions = module.exports.assignFunctions = (obj, ...sources) => {
+  return assignWith(obj, ...sources,
+    (objValue, srcValue, key, object, source) => {
+    let descriptor = Object.getOwnPropertyDescriptor(source, key);
+    // if this is a post hook, we will want to stack those methods
+    // a bit like middlewares. This allows things like postPopulate
+    // for populating all childs with several manyToOne.
+    if (key.startsWith('post')) {
+      const method = key[4].toLowerCase() + key.slice(5);
+      object[method] = (function (fun) {
+        return (...args) => {
+          let res = fun(...args);
+          // If the result is a promise we wait and call next after that
+          if (res && res.then) {
+            return res.then(srcValue);
+          } else {
+            return srcValue(res);
+          }
+        }
+      })(object[method]);
+    // This is a pre-hook. While post-hook can mutate the result of the core
+    // function, pre-hook can mutates its arguments. Useful for defaults.
+    } else if (key.startsWith('pre')) {
+      const method = key[3].toLowerCase() + key.slice(4);
+      object[method] = (function (fun) {
+        return (...args) => {
+          let res = srcValue(...args) || args;
+          if (res && res.then) {
+            return res.then((transformedArgs) => {
+              if (!transformedArgs || !transformedArgs.length) {
+                // Pre-hook resolved undefined, then we call source
+                // With original args
+                return fun(...args);
+              }
+              return fun(...transformedArgs);
+            });
+          } else {
+            if (res.length) {
+              return fun(...res);
+            } else {
+              return fun(...args);
+            }
+          }
+        }
+      })(object[method]);
+
+    } else if (descriptor.get) {
+      object.__defineGetter__(key, () => source[key]);
+      return;
+    } else {
+      // if this is not a post/pre, then just do as we're supposed to
+      return srcValue ? srcValue : objValue;
+    }
+  })
+}
+
+// This function returns a composite object with the default values.
+// Any composition should use that otherwise their might be some problem
+// like undefined is not a function
+const defaultFunctions = module.exports.defaultFunctions = (state) => {
+  return Object.assign.apply({},
+    ['update', 'set', 'create', 'remove', 'populate'].map((method) => ({
+      [method]: notImplemented(method)
+    }))
+  );
+}
+
+// call this function with a model factory to get a function that will
+// return a promise, which when fulfilled, returns the object wuth matching props
+// (unless _id is provided, then it only find by _id)
+const findOneFactory = module.exports.findOneFactory = (model) => {
+  return (props) => {
+    let obj = model(Object.assign({}, props, props._id ? {
+      _id: props._id - 0
+    } : {}));
+    return obj.populate().then(() => {
+      if (!obj.props._id)
+        return Promise.resolve();
+      return Promise.resolve(obj)
+    });
+  }
+}
+
+// Composite that allows loading an object from the database
+// This is done by using populate. So to find an object in the db
+// create a object with the query, then populate. See findOneFactory
+const databaseLoader = module.exports.databaseLoader =  (state, db = getDatabase(state.name)) => ({
+  populate: () => {
+    let query = state.props._id ? {
+      _id: state.props._id - 0
+    } : Object.assign({}, state.props);
+    return new Promise((resolve, reject) => {
+      db.findOne(query, {}, (err, doc) => {
+        if (err) return reject(err);
+        state.props = Object.assign({}, doc || {});
+        state.originalProps = Object.assign({}, doc || {});
+        resolve();
+      });
+    });
+  }
+});
+
+const publicProps = module.exports.publicProps = (state) => ({
+  getProps:() => {
+    return Object.assign({}, state.props);
+  },
+  get doc () {
+    return Object.assign({}, state.props);
+  },
+  get props() {
+    return Object.assign({}, state.functions.getProps());
+  }
+});
+
+// This creates a composite object that populates field `name` with
+// the child props. This is a hook.
+const manyToOne = module.exports.manyToOne = (state, name, getDB = getDatabase) => ({
+  postGetProps: (props) => {
+    const parentId = props[name];
+    const pop      = state.populated[name];
+    return Object.assign({}, props, (pop && Object.keys(pop).length) ? {
+      [name]: pop
+    } : {});
+  },
+  postPopulate: () => {
+    return new Promise((resolve, reject) => {
+      if (!state.props[name]) return resolve();
+      getDB(name).findOne({
+        _id: state.props[name]
+      }, {}, (err, doc) => {
+        if (err) return reject(err);
+        state.populated[name] = doc;
+        resolve();
+      });
+    });
+  }
+})
+
+// Enables legacy support, the old model.data field
+const legacySupport = module.exports.legacySupport = (state) => ({
+  get data() {
+    return state.functions.getProps();
+  }
+});
+
+// Composite to allow updating a document
+const updateable = module.exports.updateable = (state, db = getDatabase(state.name)) => ({
+  update: () => {
+    if (!state.dirty) {
+      mainStory.info('db', 'Trying to update a non dirty document');
+      return;
+    }
+    return new Promise((resolve, reject) => {
+      emitter.emit(
+        ['model', 'willupdate', state.name, state.props._id],
+        Object.assign({}, diff(state.originalProps, state.props)),
+        Object.assign({}, state.props)
+      );
+      db.update({_id: state.props._id}, state.props, (err) => {
+        if (err) return reject(err);
+        emitter.emit(
+          ['model', 'didupdate', state.name, state.props._id],
+          Object.assign({}, diff(state.originalProps, state.props)),
+          Object.assign({}, state.props)
+        );
+        state.originalProps = Object.assign({}, state.props);
+        resolve();
+      });
+    });
+  },
+  set: (key, value) => {
+    if (state.fields.includes(key)) {
+      emitter.emit(['model', 'setprop', state.name, state.props._id], {
+        [key]: value
+      }, Object.assign({}, state.props));
+      state.props = Object.assign({}, state.props, {[key]: value});
+      state.dirty = true;
+      state.dirtyFields = [key, ...(state.dirtyFields || [])];
+    }
+  }
+});
+
+// (recommended) composite to allow the creation of a document
+const createable = module.exports.createable = (state, db = getDatabase(state.name)) => ({
+  create: async () => {
+    if (state.props._id) {
+      throw Boom.create('Cannot create a document that already exists');
+    }
+    return new Promise((resolve, reject) => {
+      emitter.emit(['model', 'willcreate', state.name, state.props._id],
+        Object.assign({}, state.props));
+
+      db.insert(state.props, (err, [props]) => {
+        if (err)
+          return reject(Boom.wrap(err));
+        state.props = Object.assign({}, props);
+        emitter.emit(['model', 'didcreate', state.name, state.props._id],
+          Object.assign({}, state.props));
+        resolve();
+      });
+    });
+  }
+});
+
+const removeable = module.exports.removeable = (state, db = getDatabase(state.name)) => ({
+  remove: async () => {
+    if (state.props._id) {
+      emitter.emit(['model', 'willremove', state.name, state.props._id],
+        Object.assign({}, state.props));
+      return new Promise((resolve, reject) => {
+        db.remove({_id: state.props._id}, {}, (err) => {
+          if (err) return reject(err);
+          delete state.props._id;
+          emitter.emit(['model', 'didremove', state.name, state.props._id],
+            Object.assign({}, state.props));
+          resolve();
+        });
+      });
+    }
+    return;
+  }
+})
+
+
+const defaultValues = module.exports.defaultValues = (state, mutators) => {
+  const hook = function () {
+    Object.keys(mutators).forEach((name) => {
+      const mutator = mutators[name];
+      const prop = state.props[name];
+      if (!prop && !['boolean', 'number'].includes(typeof prop)) {
+        if (typeof mutator === 'function') {
+          state.props[name] = mutator();
+        } else {
+          state.props[name] = mutator;
+        }
+      }
+    });
+  };
+  return {
+    preUpdate: hook,
+    preCreate: hook
+  };
+}
+
+// This is a hook that uses preUpdate and preCreate to validate props
+// First argument is the state, the second is ...validators
+// Each validator must be an object with, for each prop name
+// its corresponding validator function array. The array is then reduced,
+// and each validator is called with the previous value returned by the previous
+// validator (the first validator is called with the real value)
+// The prop key will then take the value returned by the last validator,
+// unless an exception is thrown. Then the object is not created/updated
+const validator = module.exports.validator = (state, ...validators) => {
+  const val = Object.assign({}, ...validators);
+
+  const hook = function () {
+    return new Promise((resolve, reject) => {
+      try {
+        Object.keys(val).forEach((key) => {
+          const validators = [].concat(val[key]);
+          const value = validators.reduce((value, validate) => {
+            return validate(value, key, state.props[key]);
+          }, state.props[key]);
+          state.props[key] = value;
+        });
+        resolve();
+      } catch (err) {
+        reject(err);
+      }
+    })
+  };
+
+  return {
+    preUpdate: hook,
+    preCreate: hook
+  };
+}
+const enforce = module.exports.enforce = {
+  required: function () {
+    return (value, key, origValue) => {
+      if (['null', 'undefined', ''].includes(`${value}`)
+        && (typeof value !== 'string' || value === '')) {
+        throw new Error(`Field '${key}' is required, but got '${origValue}'`);
+      }
+      return value;
+    }
+  },
+  number: function () {
+    return (value) => {
+      if (isNaN(+`${value}`) || Array.isArray(value)) {
+        return undefined;
+      }
+      return value;
+    }
+  },
+  string: function () {
+    return (value) => {
+      if (['null', 'undefined'].includes(`${value}`)) {
+        return undefined;
+      }
+      return `${value}`;
+    }
+  },
+  boolean: function () {
+    return (value) => {
+      if (['true', 'false', 0, 1, '0', '1'].includes(value)) {
+        return ['true', 1, '1'].includes(value) ? true : false;
+      }
+      if (typeof value !== 'boolean') {
+        return undefined;
+      }
+      return value;
+    }
+  },
+  range: function (min, max) {
+    assert(min <= max);
+    return (val) => (val >= min && val <= max) ? val : undefined;
+  },
+  oneOf: function (...array) {
+    return (value) => {
+      if ([].concat(...array).includes(value)) {
+        return value;
+      }
+      return undefined;
+    }
+  }
+}

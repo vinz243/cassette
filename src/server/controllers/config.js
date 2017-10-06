@@ -1,4 +1,4 @@
- import config from '../models/config';
+ const config = require("../models/config");
 
 
 let routes = {
@@ -6,7 +6,6 @@ let routes = {
     get: async function (ctx, next) {
 
       let value = await config.getValue(ctx.params.key);
-      // console.log("value", value);
       ctx.body = {
         status: 200,
         success: true,
@@ -17,7 +16,6 @@ let routes = {
     },
     put: async function (ctx, next) {
       let fields = ctx.request.fields || ctx.request.body || {};
-      // console.log('keys', ctx.params);
       ctx.body = await config.updateValue(ctx.params.key, fields.value);
       ctx.status = ctx.body.status;
       return;
@@ -25,7 +23,6 @@ let routes = {
   },
   '/v1/config': {
     post: async function (ctx, next) {
-      // console.log('posting config');
       let fields = ctx.request.fields || ctx.request.body || {};
       ctx.body = await config.insertValue(fields.key,
         fields.value);
@@ -35,4 +32,4 @@ let routes = {
   }
 }
 
-export default routes;
+module.exports = routes;

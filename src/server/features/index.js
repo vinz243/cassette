@@ -1,10 +1,11 @@
-import search from './store';
-import indexers from './indexers';
-import downloaders from './downloaders';
-import artworks from './artworks';
-import jobs from './jobs';
-import updater from './updater';
 
-export default Object.assign({
+const artworks = require("./artworks");
+const updater  = require("./updater");
+const store    = require("./store");
+const transcoder    = require("./transcoder");
+const checks    = require("./checks");
+const utils    = require("./utils");
 
-}, search, indexers, downloaders, artworks, jobs, updater);
+module.exports = Object.assign({
+
+}, store, artworks, updater, checks, utils, transcoder);

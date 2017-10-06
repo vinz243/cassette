@@ -1,0 +1,50 @@
+body {
+  overflow: hidden;
+}
+div.landing-layout {
+  background-color: #393b46;
+  color: #d5dbe7;
+  height: 100vh;
+  max-width: 100vw;
+  overflow-x: hidden;
+  display: relative;
+  div.landing-header {
+    margin: 3em 4em;
+  }
+  div.landing-container {
+    margin: 0 0 0 0;
+
+    background-color: #262830;
+    padding: 15vh 0;
+    height: 100vh;
+    box-shadow: -1px 0px 36px 0px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    z-index: 1;
+    opacity: 0.5;
+    width: 75%;
+    margin: 0 0 0 25%;
+    opacity: 1;
+    background-color: #333340;
+    margin: 0 0 0 100%;
+    transition: all 375ms ease;
+    opacity: 1;
+    background-color: #333340;
+    &.loaded {
+      margin: 0 0 0 25%;
+      transition: all 375ms ease;
+      opacity: 1;
+      background-color: #333340;
+    }
+  }
+  div.landing-content {
+    margin: 3em 5em;
+    .pt-minimal {
+      float: left;
+    }
+    div.configuration-next {
+      margin: 4em 0;
+      width: 30%;
+      text-align: right;
+    }
+  }
+}

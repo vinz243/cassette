@@ -1,5 +1,5 @@
-import test from 'ava';
-import {sizesArray, sizesMap, getClosestSize} from './sizes';
+const test = require("ava");
+const {sizesArray, sizesMap, getClosestSize} = require('./sizes');
 
 test('sizesArray should be as expected', t => {
   t.deepEqual(sizesArray, [{

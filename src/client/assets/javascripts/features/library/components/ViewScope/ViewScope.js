@@ -1,6 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import './ViewScope.scss';
-import {Row, Col, Card} from 'antd';
 import classnames from 'classnames';
 import { Link } from 'react-router';
 export default class ViewScope extends Component {

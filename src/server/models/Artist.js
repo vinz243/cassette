@@ -1,25 +1,51 @@
-import Album from './Album';
-import Track from './Track';
-import Model from './Model';
+const {
+  assignFunctions,
+  defaultFunctions,
+  manyToOne,
+  legacySupport,
+  updateable,
+  createable,
+  removeable,
+  databaseLoader,
+  publicProps,
+  findOneFactory,
+  findFactory,
+  findOrCreateFactory
+} = require('./Model');
 
-// ARTIST SCHEMA:
-//   _id: artistsid
-//   name: artist name
-//   coverArt: art id (not implemented)
-//   genre: genre
+const Artist = module.exports = function(props) {
+  if (typeof props === 'string') {
+    props = {
+      name: props
+    };
+  }
+  let state = {
+    name: 'artist',
+    fields: ['name', 'genre'],
+    functions: {},
+    populated: {},
+    props
+  };
+  return assignFunctions(
+    state.functions,
+    defaultFunctions(state),
+    updateable(state),
+    createable(state),
+    removeable(state),
+    databaseLoader(state),
+    publicProps(state),
+    legacySupport(state)
+  );
+}
 
-let Artist = (new Model('artist'))
-  .field('name')
-    .defaultParam()
-    .required()
-    .string()
-    .done()
-  .field('genre')
-    .string()
-    .done()
-  .noDuplicates()
-  .oneToMany(Album, 'artistId')
-  .oneToMany(Track, 'artistId')
-  .done();
+module.exports.Artist = Artist;
 
-export default Artist;
+const findOne = module.exports.findOne = findOneFactory(Artist);
+
+const findOrCreate = module.exports.findOrCreate = findOrCreateFactory(Artist);
+
+const findById = module.exports.findById = (_id) => findOne({
+  _id
+});
+
+const find = module.exports.find = findFactory(Artist, 'artist');

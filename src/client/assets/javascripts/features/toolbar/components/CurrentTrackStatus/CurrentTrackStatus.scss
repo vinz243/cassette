@@ -2,23 +2,24 @@ $iconOpacity: 0.3;
 
 .currentTrackStatus {
   color: rgba(0, 0, 0, $iconOpacity);
+  margin-left: 2em;
+  margin-right: 2em;
 }
 
 .currentTrackTitle {
-  width: 100%;
-  margin-top: 5px;
+  float: left;
+  margin-top: 1em;
+  margin-bottom: 0;
 
   text-align: center;
 
-  font-weight: bolder;
-  font-size: 1em;
+  font-size: 0.9em;
+  color: #fff;
 }
 
 .currentTrackSubtitle {
-  width: 100%;
-
-  text-align: center;
-  font-size: 0.8em;
+  font-size: 1em;
+  color: #fff;
 }
 
 .currentTime {

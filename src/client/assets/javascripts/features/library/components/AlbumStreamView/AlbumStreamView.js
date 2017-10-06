@@ -1,8 +1,11 @@
 import React, { Component, PropTypes } from 'react';
 import './AlbumStreamView.scss';
-import {Row, Col, Spin} from 'antd';
+import {Flex, Box} from 'reflexbox';
 import classnames from 'classnames';
 import { browserHistory } from 'react-router';
+import BetterImage from 'components/BetterImage';
+import ScrollableDiv from 'components/ScrollableDiv';
+
 
 export default class AlbumStreamView extends Component {
   static propTypes = {
@@ -24,40 +27,60 @@ export default class AlbumStreamView extends Component {
 
     return sign + minStr + ':' + secStr;
   }
-
+  playTracks (number) {
+    const { album } = this.props;
+    this.props.playTracks(album.tracks.filter(t => t.trackNumber >= number));
+  }
   render() {
     const { album } = this.props;
     let tracksDOM = album.tracks.map((t) => (
-      <div className={classnames('trackItem', {'playing': t.playing})} key={t.id}>
-        <Row onClick={t.play} gutter={16}>
-          <Col span={2} className="trackNumber">
+      <div className={classnames('trackItem', {'playing': t.playing})} key={t._id}>
+        <Flex onClick={(evt) => {
+            if (evt.altKey) {
+              this.props.playNext(t);
+            } else {
+              this.playTracks(t.trackNumber)
+            }
+          }}>
+          <Box className="trackNumber" ml={1}>
             {t.playing ? <div className={classnames('spinner', {'paused': this.props.paused})}>
               <div className="bounce1"></div>
               <div className="bounce2"></div>
               <div className="bounce3"></div>
-            </div>: t.number}
-          </Col>
-          <Col span={16}>
-            {t.name}
-            <span className="nameExt">
-              {t.originalName.substr(t.name.length).replace(/\(|\)/g, '')}
+            </div>: t.trackNumber}
+          </Box>
+          <Box auto ml={2} >
+            <span className="trackTitle">
+              {t.name}
             </span>
-          </Col>
-          <Col span={3} className="duration">
-            {this.msToTime(t.duration)}
-          </Col>
-        </Row>
+            <span className="nameExt">
+              {/*t.name*/}
+            </span>
+          </Box>
+          <Box className="actions" mr={1}>
+            <span className="pt-icon-standard pt-icon-add-to-artifact" onClick={
+                (evt) => {
+                  evt.stopPropagation();
+                  this.props.playNext(t);
+                }
+              }></span>
+          </Box>
+          <Box className="duration" mr={1}>
+            {this.msToTime(t.duration * 1000)}
+          </Box>
+        </Flex>
       </div>
     ))
     return (
     	<div>
-        <Row gutter={32} className="albumStreamItem">
-          <Col span={6}>
-            <img className="albumArt" src={`/v1/albums/${album.id}/art`} />
-          </Col>
-          <Col span={18}>
+        <Flex className="albumStreamItem">
+          <Box col={2} m={2}>
+            <BetterImage className="albumArt"
+              src={`/api/v2/albums/${album._id}/artwork?size=200`} size={200} />
+          </Box>
+          <Box col={10} m={2}>
             <div className="albumHeader">
-              <span   className="artist" onClick={browserHistory.push.bind(null, `/app/library/artists/${album.artist.id}/albums`)}>
+              <span   className="artist" onClick={browserHistory.push.bind(null, `/app/library/artists/${album.artist._id}/albums`)}>
                 {album.artist.name}
               </span>
               &#8210;
@@ -66,8 +89,8 @@ export default class AlbumStreamView extends Component {
               </span>
             </div>
             {tracksDOM}
-          </Col>
-        </Row>
+          </Box>
+        </Flex>
       </div>
     );
   }

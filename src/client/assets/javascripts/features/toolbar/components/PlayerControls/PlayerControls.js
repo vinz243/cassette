@@ -1,30 +1,77 @@
 import React, { Component, PropTypes } from 'react';
 
 // import './ToolbarApp.scss';
-import {Button, Row, Col, Slider} from 'antd';
-import 'antd/dist/antd.css';
+import {
+  ContextMenuTarget,
+  Menu,
+  MenuItem,
+  Hotkey,
+  Hotkeys,
+  HotkeysTarget  } from "@blueprintjs/core";
+import createMenu from 'app/menu';
+
 import './PlayerControls.scss';
-import GoPlaybackRewind from 'react-icons/lib/go/playback-rewind';
-import GoPlaybackPause from 'react-icons/lib/go/playback-pause';
-import GoPlaybackPlay from 'react-icons/lib/go/playback-play';
-import GoPlaybackFastForward from 'react-icons/lib/go/playback-fast-forward';
+import {Flex, Box} from 'reflexbox';
 
-import GoMute from 'react-icons/lib/go/mute';
-import GoUnmute from 'react-icons/lib/go/unmute';
+import classNames from 'classnames';
 
-
+@HotkeysTarget
+@ContextMenuTarget
 export default class PlayerControls extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
     toolbar: PropTypes.object.isRequired
   };
+  renderHotkeys() {
+    const {actions, toolbar} = this.props;
+    return <Hotkeys>
+        <Hotkey
+          global={true}
+          combo="k"
+          label="Pause/Unpause playback"
+          onKeyDown={() => actions.togglePause()} />
+        <Hotkey
+          global={true}
+          combo="l"
+          label="Jump to next track"
+          onKeyDown={() => actions.playNextTrack()} />
+        <Hotkey
+          global={true}
+          combo="j"
+          label="Play previous track"
+          onKeyDown={() => actions.playPreviousTrack()} />
+    </Hotkeys>
+  }
+  renderContextMenu() {
+    const {actions, toolbar} = this.props;
+    return createMenu([{
+      text: 'Stop after',
+      icon: 'stop',
+      shortcut: 'Alt + K',
+      action: actions.toggleStopAfter
+    }, {
+      text: 'Previous',
+      icon: 'step-backward',
+      shortcut: 'J',
+      action: actions.playPreviousTrack
+    }, {
+      text: toolbar.playing ? 'Pause' : 'Play',
+      icon: toolbar.playing ? 'pause' : 'play',
+      shortcut: 'K',
+      action: actions.togglePause
+    }, {
+      text: 'Next',
+      icon: 'step-forward',
+      shortcut: 'L',
+      action: actions.playNextTrack
+    }
+  ]);
+  }
   rewind(e) {
-    const { toolbar, actions } = this.props;
-    actions.playPrevious();
+    this.props.actions.playPreviousTrack();
   }
   fastForward(e) {
-    const { toolbar, actions } = this.props;
-    actions.playNext();
+    this.props.actions.playNextTrack();
   }
   pauseUnpause(e) {
     const { toolbar, actions } = this.props;
@@ -45,13 +92,6 @@ export default class PlayerControls extends Component {
   render() {
     const { toolbar, actions } = this.props;
 
-    let PlayPauseButton;
-    if (toolbar.playing) {
-      PlayPauseButton = <GoPlaybackPause />;
-    } else {
-      PlayPauseButton = <GoPlaybackPlay />;
-    }
-
     const boundPauseUnpause = this.pauseUnpause.bind(this);
     const boundMute = this.mute.bind(this);
     const boundChangeVolume = this.changeVolume.bind(this);
@@ -59,55 +99,33 @@ export default class PlayerControls extends Component {
     const boundRewind = this.rewind.bind(this);
     const boundFastForward = this.fastForward.bind(this);
 
+    let PlayPauseButton;
+    if (toolbar.playing) {
+      PlayPauseButton = <span className="pt-icon-large pt-icon-pause playbackControl" onClick={boundPauseUnpause}></span>;
+    } else {
+      PlayPauseButton = <span className="pt-icon-large pt-icon-play playbackControl" onClick={boundPauseUnpause}></span>;
+    }
     return (
     	<div className="controlsContainer">
-	    	<div>
-	    		<Row gutter={24} className="playerControls">
-            <Col span={2}></Col>
-	    			<Col span={10}>
-	    				<Row gutter={16}>
-			    			<Col span={8}>
-			    				<div onClick={boundRewind} className={'rewindControl' +
-                    ((toolbar.previousTracks.length > 0 || toolbar.currentTrack) ?
-                        '' : ' disabled')}>
-			    					<GoPlaybackRewind />
-			    				</div>
-			    			</Col>
-			    			<Col span={8}>
-			    				<div className="playbackControl" onClick={boundPauseUnpause}>
-			    					{PlayPauseButton}
-			    				</div>
-			    			</Col>
-			    			<Col span={8}>
-			    				<div onClick={boundFastForward}
-                    className={'fastForwardControl' +
-                      (toolbar.nextTracks.length > 0 ? '' : ' disabled')}>
-			    					<GoPlaybackFastForward />
-			    				</div>
-			    			</Col>
-		    			</Row>
-		    		</Col>
-            <Col span={2}>
-            </Col>
-	    			<Col span={10}>
-	    				<Row gutter={8}>
-	    					<Col span={4}>
-			    				<div className={'soundSliderLeftIcon' + (toolbar.volume > 0 ? ' disabled': '')} onClick={boundMute}>
-			    					<GoMute />
-	    						</div>
-	    					</Col>
-	    					<Col span={16}>
-	    						<Slider onChange={boundChangeVolume} value={toolbar.volume * 100}/>
-	    					</Col>
-	    					<Col span={4}>
-			    				<div onClick={boundUnmute} className={'soundSliderRightIcon' + (toolbar.volume < 1 ? ' disabled': '')}>
-			    					<GoUnmute />
-			    				</div>
-			    			</Col>
-			    		</Row>
-			    	</Col>
-	    		</Row>
-	    	</div>
+    		<div className="playerControls">
+          <Flex justify="space-between" align="center">
+            <Box ml={2}>
+    					<span onClick={boundRewind} className={classNames('rewindControl', {
+                  disabled: !(toolbar.previousTracks.length > 0 || toolbar.currentTrack)
+                }, 'pt-icon-standard pt-icon-step-backward')}></span>
+            </Box>
+            <Box auto className="play-pause-box">
+    					{PlayPauseButton}
+            </Box>
+            <Box>
+      				<span onClick={boundFastForward}
+                className={classNames('fastForwardControl', {
+                  disabled: !(toolbar.nextTracks.length > 0)
+                }, 'pt-icon-standard pt-icon-step-forward')}>
+      				</span>
+            </Box>
+          </Flex>
+  			</div>
 	    </div>
     );
   }

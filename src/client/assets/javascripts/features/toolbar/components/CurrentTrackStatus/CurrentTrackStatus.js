@@ -1,8 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 
 // import './ToolbarApp.scss';
-import {Button, Row, Col, Slider} from 'antd';
-import 'antd/dist/antd.css';
 import './CurrentTrackStatus.scss';
 import GoPlaybackRewind from 'react-icons/lib/go/playback-rewind';
 import GoPlaybackPause from 'react-icons/lib/go/playback-pause';
@@ -10,7 +8,8 @@ import GoPlaybackFastForward from 'react-icons/lib/go/playback-fast-forward';
 
 import GoMute from 'react-icons/lib/go/mute';
 import GoUnmute from 'react-icons/lib/go/unmute';
-
+import AudioPlayer from '../AudioPlayer';
+import shortid from 'shortid';
 
 export default class CurrentTrackStatus extends Component {
   static propTypes = {
@@ -35,22 +34,28 @@ export default class CurrentTrackStatus extends Component {
   }
   handleTimeChange(val) {
     const { toolbar, actions } = this.props;
-    actions.seek((val/100) * (toolbar.currentTrack || {}).duration);
+    actions.seek((val/100) * (toolbar.currentTrack || {}).duration * 1000);
   }
   tipFormatter(val) {
     const { toolbar, actions } = this.props;
-    return this.msToTime((val/100) * (toolbar.currentTrack || {}).duration);
+    return this.msToTime((val/100) * (toolbar.currentTrack || {}).duration * 1000);
   }
   componentDidMount() {
-    setInterval(() => {
-      if (this.props.toolbar.playing)
-        this.props.actions.updateTime();
-    }, 1000);
+  }
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.playlist && nextProps.playlist.current._id) {
+      if (+nextProps.playlist.current._id !== +this.props.playlist.current._id) {
+        this.props.actions.prepareTrack(nextProps.playlist.current._id);
+      }
+    }
+  }
+  onEnded() {
+    this.props.actions.playNextTrack();
   }
   render() {
-    const { toolbar, actions } = this.props;
-    const boundHandleTimeStatusChange =
-      this.handleTimeStatusChange.bind(this);
+    const { playlist, actions, toolbar } = this.props;
+    const current = playlist.current || {};
+    const token = playlist.tokens[current._id];
 
     const boundTipFormattter = this.tipFormatter.bind(this);
 
@@ -58,34 +63,15 @@ export default class CurrentTrackStatus extends Component {
     return (
     	<div className="currentTrackStatus">
 	    	<div>
-	    		<Row gutter={24} className="currentTrackStatusRow">
-            <div className="currentTrackTitle">{(toolbar.currentTrack || {}).name}</div>
-            <div className="currentTrackSubtitle">{((toolbar.currentTrack || {}).artist || {}).name} &#8212; {((toolbar.currentTrack || {}).album || {}).name}</div>
-            <div className="currentTrackTime">
-              <Row gutter={4}>
-                <Col span={2}>
-                  <span className="currentTime">
-                    {this.msToTime(toolbar.currentTime)}
-                  </span>
-                </Col>
-                <Col span={20}>
-                  <Slider className="trackTimeSlider"
-                    value={(toolbar.currentTime / (toolbar.currentTrack || {duration: 1}).duration) * 100}
-                    tipFormatter={boundTipFormattter}
-                    onChange={boundHandleTimeChange} />
-                </Col>
-                <Col span={2}>
-                  <span className="timeLeft" onClick={boundHandleTimeStatusChange}>
-                    {false ?
-                      this.msToTime((toolbar.currentTrack ||
-                        {duration: 0}).duration) :
-                      this.msToTime(toolbar.currentTime
-                        - (toolbar.currentTrack || {duration: 0}).duration)}
-                  </span>
-                </Col>
-              </Row>
-            </div>
-	    		</Row>
+          <div className="currentTrackTitle">{(current || {}).name}
+             &#8212; {((current || {}).artist || {}).name}</div>
+          <div className="currentTrackTime">
+          <AudioPlayer directPlayback={playlist.directPlayback} source={
+              playlist.directPlayback ?
+              (token ? `/api/v2/streams/${token}` : '')
+              : playlist.transcodes[playlist.current._id]
+            } playing={toolbar.playing} onEnded={this.onEnded.bind(this)}/>
+          </div>
 	    	</div>
 	    </div>
     );

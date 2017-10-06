@@ -1,34 +1,18 @@
 .storeContainer {
-  margin-top: 6em;
-  .lossless {
-    margin-left: 1em;
-  }
-}
-
-.storeSearch {
-  width: 100%;
-  margin-bottom: 6em;
-}
-
-.albumSelect, .releaseSelect {
-  cursor: pointer;
-}
-
-.searchAlbumCard {
-  padding: 1em;
-  cursor: pointer;
-  h3 {
-    font-size: 1.2em;
-    margin: 0.6em 0.6em 0.6em 0.6em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  span {
-    // padding: 0.1em 0.6em 0.6em 0.6em;
-    color: #7a7878;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  margin-top: 1.6em;
+  .storeNav {
+    div.chevrons {
+      position: absolute;
+      span {
+        margin-bottom: 0.5em;
+        margin-right: 0.8em;
+      }
+    }
+    div.search-box {
+      margin-left: 4em;
+    }
+    .pt-tag {
+      margin-left: 4px;
+    }
   }
 }

@@ -1,64 +1,81 @@
-import {Artist, Album} from './index';
+const {Album, findById, find}  = require('./Album');
+const Artist = require('./Artist');
 
-import test from 'ava';
-
+const test = require("ava");
 
 test('creates an Album object with correct props', t => {
-  let soulPirate = new Album('Soul Pirate');
+  let soulPirate = Album('Soul Pirate');
   t.is(soulPirate.data.name, 'Soul Pirate');
 
-  let freedomAndFyah = new Album({
+  let freedomAndFyah = Album({
     name: 'Freedom & Fyah',
     year: 2016,
-    artistId: 42
+    artist: 42
   });
-
   t.is(freedomAndFyah.data.name, 'Freedom & Fyah');
   t.is(freedomAndFyah.data.year, 2016);
-  t.is(freedomAndFyah.data.artistId, 42);
+  t.is(freedomAndFyah.data.artist, 42);
 });
 
 test('inserts an album to DB and fetch it', async t => {
-  let foo = new Album('foo');
-  t.falsy(foo._id);
+  let foo = Album('foo');
+  t.falsy(foo.props._id);
   await foo.create();
-  t.not(foo._id, undefined);
+  t.not(foo.props._id, undefined);
 
-  let res = await Album.findById(foo._id);
+  let res = await findById(foo.props._id);
 
   t.is(res.data.name, 'foo');
-  t.truthy(res instanceof Album);
 });
 
 test('find multiple docs', async t => {
-  let albumOne = new Album('Album One');
-  albumOne.data.year = 1998;
+  let albumOne = Album({
+    name: 'Album One',
+    year: 1998
+  });
   await albumOne.create();
 
-  let albumTwo = new Album('Album Two');
-  albumTwo.data.year = 1998;
+  let albumTwo = Album({
+    name: 'Album Two',
+    year: 1998
+  });
   await albumTwo.create();
-
-  let res = await Album.find({year: 1998});
+  let res = await find({year: 1998});
   t.is(res.length, 2);
 });
 
 test('won\'t create multiple time', async t => {
-  let bar = new Album('bar');
-  bar.data.year = 1337;
+  let bar = Album('bar');
   await bar.create();
   t.throws(bar.create());
 });
 
 test('won\'t create fetched album', async t => {
-  let another =  new Album('Another Album');
+  let another =  Album('Another Album');
   await another.create();
 
-  let a = await Album.findById(another._id);
+  let a = await findById(another.data._id);
   t.throws(a.create());
+});
+
+test('populate - populates artist', async t => {
+  let artist = Artist('someDude');
+  await artist.create();
+
+  let album = Album({name: 'some random shit', artist: artist.props._id});
+  await album.create();
+  let res = (await findById(album.props._id)).props;
+  t.deepEqual(res, {
+    _id: album.props._id,
+    name: 'some random shit',
+    artist: {
+      _id: artist.props._id,
+      name: 'someDude'
+    }
+  });
 });
 //
 // test('won\'t query nothing', async t => {
-//   t.throws(Album.find({}));
-//   t.throws(Album.find({foo: 'bar'}));
+//   t.throws(find({}));
+//   t.throws(find({foo: 'bar'}));
 // })

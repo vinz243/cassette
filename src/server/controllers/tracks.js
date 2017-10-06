@@ -1,63 +1,36 @@
-import {Artist, Album, Track, File} from '../models';
-import Controller from './Controller';
-import fs from 'fs';
+const Artist = require('../models/Artist');
+const Album  = require('../models/Album');
+const Track  = require('../models/Track');
+const File   = require('../models/File');
 
-const routes = new Controller(Track).done();
+const {fetchable, oneToMany, updateable} = require('./Controller');
 
-routes['/v1/tracks/:id/file'] = {
-  get: async (ctx, next) => {
-    let tracks = await File.find({
-      trackId: ctx.params.id,
-      sort: 'bitrate',
-      direction: 'desc',
-      limit: 3
-    });
-    if (tracks.length == 0)
-      return res.writeHead(404, {});
-    let stat = fs.statSync(tracks[0].data.path);
-    let mimeType = 'audio/mpeg';
+const merge = require("lodash/merge");
+const fs    = require("fs");
+const jwt   = require('jwt');
 
-    if (tracks[0].data.path.endsWith('.flac')) {
-      mimeType = 'audio/flac';
-    }
+module.exports = merge({},
+  fetchable('track', Track.find, Track.findById),
+  updateable('track', Track.findById),
+  oneToMany('track', 'file', File.find), {
+    '/api/v2/tracks/:id/stream':  {
+      post: async (ctx, next) => {
+        let tracks = await File.find({
+          track: ctx.params.id - 0,
+          sort: 'bitrate',
+          direction: 'desc',
+          limit: 3
+        });
 
-    let opts = {}, res = 200;
-
-    let resHeaders = {
-      'Content-Type': mimeType,
-      'Content-Length': stat.size,
-      'Accept-Ranges': 'bytes'
-    };
-    // console.log(ctx.headers);
-    // if (ctx.headers.accept !== '*/*') {
-    //   ctx.res.writeHead(200, resHeaders);
-    //   return;
-    // }
-    if (ctx.headers['range']) {
-      let [b, range] = ctx.headers['range'].split('=');
-
-      if (b === 'bytes') {
-        let [start, end] = range.split('-');
-
-        if (!end || end === '' || end < start)
-          end = stat.size - 1;
-
-        opts = {
-          start: start - 0,
-          end: end - 0
-        };
-
-        res = 206;
-        resHeaders['Content-Range'] = `bytes ${start}-${end}/${stat.size}`;
-        resHeaders['Content-Length'] = end - start + 1;
+        ctx.body = {
+          stream_token: jwt.create({
+            tr_id: tracks[0].props._id
+          }, {
+            expiresIn: '15m'
+          })
+        }
+        ctx.status = 201;
       }
     }
-
-    ctx.res.writeHead(res, resHeaders);
-
-    ctx.body = fs.createReadStream(tracks[0].data.path, opts);
-
-    // readStream.pipe(ctx.res);
   }
-}
-export default routes;
+);

@@ -1,0 +1,38 @@
+div.wanted-item {
+  display: inline-block;
+
+  margin: 2em;
+  cursor: pointer;
+
+  div.wanted-image {
+    position: relative;
+    opacity: 0.7;
+    div.wanted-overlay {
+      position: absolute;
+      color: #fff;
+      bottom: 1em;
+      right: 1em;
+      div.wanted-status {
+        text-shadow: 0 0 3px #373654;
+      }
+    }
+  }
+
+  div.wanted-props {
+    text-align: center;
+    width: 140px;
+    div.wanted-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    div.wanted-artist {
+      font-size: 12px;
+      color: #5c5d6e;
+
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

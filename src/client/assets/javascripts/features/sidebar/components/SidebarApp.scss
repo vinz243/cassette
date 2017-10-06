@@ -1,44 +1,64 @@
 .sidebar {
-  margin: 2.5em;
-}
-
-.addButton {
-  cursor: pointer;
-}
-
-.parentItem {
-  text-transform: uppercase;
-  color: rgba(0, 0, 0, 0.35);
-  margin-bottom: 1em;
-}
-
-.childrenItem {
-  color: rgba(0, 0, 0, 0.35);
-  margin-left: 1em;
-}
-
-.newLibraryPath {
-    background-color: rgba(255, 255, 255, 0.11);
-    border-width: 0;
-    color: white;
-}
-
-.newLibraryName {
-  background-color: rgba(255, 255, 255, 0.11);
-  border-width: 0;
+  // margin: 2.5em;
+  // height: 100vh;
+  // background-color: rgb(45, 45, 46);
   color: white;
-}
+  position: relative;
+  // box-shadow: inset -16px 0px 24px 0px rgba(0,0,0,0.30);
+  // background: linear-gradient(to right,
+  //   rgb(45, 45, 46) 0%,
+  //   rgb(45, 45, 46) 80%,
+  //   rgb(32, 31, 31) 100%);
+  min-width: 54.38px;
+  div {
+    padding: 0.6em 1.2em;
+    display: block !important;
+    cursor: pointer;
 
-.storeLinkParent {
-    margin-top: 3.5em;
+    .itemName {
+      padding-left: 1.2em;
+      padding-right: 1.2em;
+      display: none;
+    }
+    &:not(.divider){
+      &:hover {
+        background-color: #fff;
+        color: #000;
+      }
+    }
+    .working {
+      animation: spin 3s infinite linear;
+    }
+    &.working {
+      cursor: default;
+      background-color: rgba(255, 255, 255, 0);
+      color: #a3a3a3;
+      &:hover {
+        cursor: default;
+        background-color: rgba(255, 255, 255, 0);
+        color: #a3a3a3;
+      }
+    }
+    &.selected {
+      background-color: rgba(255, 255, 255, 0.16);
+    }
+    &.divider {
+      height: 22px;
+    }
+    &.bottom {
+    }
+  }
 }
-.storeLink, .storeLink:hover, .storeLink:focus{
-  text-transform: uppercase;
-  text-decoration: none;
-  color: rgba(0, 0, 0, 0.35);
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
-.librariesLink, .librariesLink:hover, .librariesLink:focus {
-  text-transform: uppercase;
-  text-decoration: none;
-  color: rgba(0, 0, 0, 0.35);
+.sidebar:hover {
+  .itemName {
+    display: inline-block;
+  }
 }

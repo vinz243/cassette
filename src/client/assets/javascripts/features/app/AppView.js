@@ -1,58 +1,74 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import {Row, Col, Modal} from 'antd';
 
 import ToolbarView from 'features/toolbar/components/ToolbarView';
 import LibraryView from 'features/library/components/LibraryView';
 import SidebarView from 'features/sidebar/components/SidebarView';
 import UpdaterView from 'features/updater/components/UpdaterView';
+import PlaylistView from 'features/playlist/components/PlaylistView';
 import JobsView from 'features/jobs/components/JobsView';
-import axios from 'axios';
 
+import axios from 'app/axios';
+import { Flex, Box } from 'reflexbox';
+import {Intent} from '@blueprintjs/core';
+import socket from 'app/socket';
+import toaster from 'app/toaster';
+import notifications from './notifications';
 
 export default class AppView extends Component {
+  static contextTypes = {
+    router: React.PropTypes.object
+  }
   componentDidMount() {
-    // let canCancel = true;
-    // let showError = () => setTimeout(() => {
-    //   Modal.error({
-    //     title: 'Ooops, something went wrong...',
-    //     content: 'Could not update cassette to latest version. You should probably check the logs or try manually.'
-    //   })
-    // }, 250);
-    // axios.get('/v1/updates').then((res) => {
-    //   if (res.data.data.length !== 0) {
-    //     Modal.confirm({
-    //       title: 'A new update is available',
-    //       content: 'A new version is available. You can choose to update now.'
-    //        + '\nThis is will update it automatically without you taking any further action.',
-    //       onOk() {
-    //         canCancel = false;
-    //
-    //       },
-    //       okText: 'Update Now',
-    //       cancelText: 'Maybe later',
-    //       onCancel(e) {
-    //         return canCancel ? Promise.resolve() : null;
-    //       },
-    //     });
-    //   }
-    // });
+    notifications();
   }
   render() {
     return (
-      <div>
-        <ToolbarView {...this.props} />
-        <Row>
-          <Col span={4}>
-            <SidebarView {...this.props} />
-            <JobsView />
-          </Col>
-          <Col span={16}>
-            {this.props.children}
-          </Col>
-          <UpdaterView {...this.props} />
-        </Row>
+      <div className="rootContainer" style={{
+        }}>
+        <div className="toolbarContainer" style={{
+          boxShadow: '0px 0px 12px 0px rgba(0,0,0,0.75)',
+          width: '100%',
+          zIndex: 19,
+          position: 'fixed',
+        }}>
+          <ToolbarView {...this.props} />
+        </div>
+        <div className="bodyContainer" style={{
+            paddingTop: '64px'
+          }}>
+          <Flex align="center" justify="space-between">
+            <Box style={{
+                zIndex: 18,
+                position: 'fixed',
+                boxShadow: '0px 0px 18px 0px rgba(0,0,0,0.75)',
+                backgroundColor: 'rgb(45, 45, 52)',
+                top: '64px',
+                bottom: '0px'
+              }} >
+              <SidebarView {...this.props} />
+            </Box>
+            <Box auto style={{
+                marginLeft: '90px',
+                marginRight: '275px'
+              }}>
+              {this.props.children}
+            </Box>
+            <Box style={{
+                zIndex: 18,
+                position: 'fixed',
+                right: '0',
+                boxShadow: '0px 0px 18px 0px rgba(0,0,0,0.75)',
+                backgroundColor: 'rgb(37, 37, 47)',
+                top: '64px',
+                bottom: '0px',
+                width: '275px'
+              }}>
+              <PlaylistView {...this.props} />
+            </Box>
+          </Flex>
+        </div>
       </div>
     );
   }

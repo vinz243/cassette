@@ -1,9 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import './SidebarApp.scss';
-import {Row, Col, Tooltip, Input} from 'antd';
-import 'antd/dist/antd.css';
-import SidebarLibraryItem from './SidebarLibraryItem';
-import IonPlusRound from 'react-icons/lib/io/plus-round';
+
+import classnames from 'classnames';
 import {Link} from 'react-router';
 
 export default class SidebarLayout extends Component {
@@ -18,31 +16,22 @@ export default class SidebarLayout extends Component {
       newLibraryPath: ''
     };
   }
-  librarySubmit(e) {
+  refreshLibraries () {
     const { sidebar, actions } = this.props;
-    actions.addLibrary(this.state.newLibraryName, this.state.newLibraryPath);
+    actions.scanLibraries();
   }
-  libraryNameChange(e) {
-    this.setState({
-      newLibraryName: e.target.value,
-      newLibraryPath: this.state.newLibraryPath
-        // ...this.state
-    });
+  itemSelected(re) {
+    return re.test(this.props.location.pathname) ? 'selected' : '';
   }
-  libraryPathChange(e) {
-    this.setState({
-      newLibraryPath: e.target.value,
-      newLibraryName: this.state.newLibraryName
-    });
-  }
-  componentDidMount() {
-    this.props.actions.loadContent();
+  componentWillReceiveProps(props) {
+    const { sidebar, actions } = this.props;
+    if (props.sidebar.scanId && props.sidebar.scanId !== sidebar.scanId) {
+      actions.waitScan(props.sidebar.scanId);
+    }
   }
   render() {
     const { sidebar, actions } = this.props;
-    const boundLibrarySubmit = this.librarySubmit.bind(this);
-    const boundLibraryNameChange = this.libraryNameChange.bind(this);
-    const boundLibraryPathChange = this.libraryPathChange.bind(this);
+
 
     let items = (sidebar.libraries || []).map(lib =>
       <SidebarLibraryItem key={lib._id}
@@ -52,32 +41,64 @@ export default class SidebarLayout extends Component {
 
     return (
     	<div className="sidebar">
-        <div className="parentItem">
-          <Row gutter={24}>
-            <Col span={21}>
-              <Link to="/app/library" className="librariesLink">Libraries</Link>
-            </Col>
-            <Col span={2}>
-              <Tooltip
-                trigger="click" title={
-                  <Row gutter={4}>
-                    <Col span={8}>
-                      <Input placeholder="Name" className="newLibraryName"
-                        onChange={boundLibraryNameChange} />
-                    </Col>
-                    <Col span={16}>
-                      <Input placeholder="Path" className="newLibraryPath"
-                        onChange={boundLibraryPathChange}
-                        onPressEnter={boundLibrarySubmit}></Input>
-                    </Col>
-                  </Row>
-                }><IonPlusRound className="addButton"/></Tooltip>
-            </Col>
-          </Row>
+        <div className={this.itemSelected(/artists$/)} onClick={
+            () => this.props.history.push('/app/library/artists')
+          }>
+          <span className="pt-icon-standard pt-icon-user">
+          </span>
+          <span className="itemName">
+            Artists
+          </span>
         </div>
-        {items}
-        <div className="storeLinkParent">
-          <Link to="/app/store" className="storeLink">Store</Link>
+        <div className={this.itemSelected(/albums$/)} onClick={
+            () => this.props.history.push('/app/library/albums')
+          }>
+          <span className="pt-icon-standard pt-icon-unresolve">
+          </span>
+          <span className="itemName">
+            Albums
+          </span>
+        </div>
+          <div className={this.itemSelected(/tracks$/)} onClick={
+              () => this.props.history.push('/app/library/tracks')
+            }>
+          <span className="pt-icon-standard pt-icon-property">
+          </span>
+          <span className="itemName">
+            Tracks
+          </span>
+        </div>
+        <div className="divider"></div>
+        <div className={this.itemSelected(/^\/app\/store/)} onClick={
+            () => this.props.history.push('/app/store')
+          }>
+          <span className="pt-icon-standard pt-icon-shop">
+          </span>
+          <span className="itemName">
+            Store
+          </span>
+        </div>
+        <div className={this.itemSelected(/^\/app\/settings$/)} onClick={
+            () => this.props.history.push('/app/settings')
+          }>
+          <span className="pt-icon-standard pt-icon-settings">
+          </span>
+          <span className="itemName">
+            Settings
+          </span>
+        </div>
+        <div className={classnames("bottom", {
+            working: sidebar.scanning
+          })} onClick={
+            this.refreshLibraries.bind(this)
+          }>
+          <span className={classnames("pt-icon-standard pt-icon-refresh", {
+              working: sidebar.scanning
+            })}>
+          </span>
+          <span className="itemName">
+            Refresh Libraries
+          </span>
         </div>
       </div>
     );

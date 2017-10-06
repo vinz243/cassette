@@ -2,7 +2,7 @@
 import { createStructuredSelector } from 'reselect';
 import assign from 'lodash/assign';
 import uniq from 'lodash/uniq';
-import axios from 'axios';
+import axios from 'app/axios';
 import deepAssign from 'deep-assign';
 
 import {State} from 'models/library';
@@ -18,14 +18,17 @@ const PLAY_TRACKS       = 'cassette/shared/PLAY_TRACKS';
 export const NAME = 'library';
 
 const initialState: State = {
-  items: [ ],
+  items:  {
+    artists: [],
+    albums: [],
+    tracks: []
+  },
   loading: true,
   viewType: 'LIST',
   viewScope: 'TRACKS'
 };
 
 export default function reducer(state: State = initialState, action: any = {}): State {
-  let newState = deepAssign({}, state);
   switch (action.type) {
     case SET_VIEW_TYPE:
       return state;
@@ -36,30 +39,11 @@ export default function reducer(state: State = initialState, action: any = {}): 
     case OPEN_SELECTION:
       return state;
     case LOAD_CONTENT:
-      switch (state.viewScope) {
-        case 'TRACKS':
-          newState.loading = false;
-          newState.items = action.data.map((track) => {
-              return deepAssign({}, {
-                id: track._id,
-                name: track.name.replace(/\(.+\)$/, ''),
-                originalName: track.name,
-                number: track.trackNumber,
-                duration: track.duration * 1000,
-                artist: {
-                  id: track.artistId,
-                  name: track.artist.name
-                },
-                album: {
-                  id: track.albumId,
-                  name: track.album.name.replace(/\(.+\).*$/, '')
-                },
-              }
-            );
-          }).sort((a, b) => (b.number || 0) - (a.number || 0));
-          return newState;
-      }
-      return state;
+      return {...state, items: {...state.items, ...action.data}, loading: false};
+    case '@@router/LOCATION_CHANGE':
+      return Object.assign({}, state, {
+        loading: true
+      });
     default:
       return state;
   }
@@ -112,39 +96,40 @@ function playTracks(tracks) {
 //     ]
 //   }
 // }
-function loadContent() {
-
-  let doneIds = [];
-  let identifiers = {};
-  return axios.get('/v1/tracks').then((res) => {
-    let data = res.data.data;
-    let albums = uniq(data.map((t) => t.albumId)).map((id) => {
-      return axios.get(`/v1/albums/${id}`).then((res) => {
-        identifiers[id] = res.data.data;
-      })
-    });
-
-    let artists = uniq(data.map((t) => t.artistId)).map((id) => {
-      return axios.get(`/v1/artists/${id}`).then((res) => {
-        identifiers[id] = res.data.data;
-      });
-    })
-
-    return Promise.all([...albums, ...artists]).then(() => {
-
-
-      return {
-        type: LOAD_CONTENT,
-        data: data.map((track) => {
-          return Object.assign({}, track, {
-            artist: identifiers[track.artistId],
-            album: identifiers[track.albumId],
-            duration: track.duration || 0
+function loadContent(opts) {
+  console.log('loadContent', opts);
+  switch (opts.scope) {
+    case 'ARTISTS':
+      return axios.get(`/api/v2/artists?sort=name`).then((res) => {
+        return {
+          type: LOAD_CONTENT,
+          data: {
+            artists: res.data
           }
-        )}).sort((a, b) => a.album.name.localeCompare(b.album.name))
-      };
-    });
-  })
+        }
+      });
+    case 'ALBUMS':
+      return axios.get(`/api/v2${opts.artist ?
+        '/artists/' + opts.artist : ''}/albums?sort=artist`).then((res) => {
+        return {
+          type: LOAD_CONTENT,
+          data: {
+            albums: res.data
+          }
+        }
+      });
+    case 'TRACKS':
+      return axios.get(`/api/v2${
+        opts.album ? '/albums/' + opts.album : ''
+      }/tracks?sort=trackNumber`).then((res) => {
+        return {
+          type: LOAD_CONTENT,
+          data: {
+            tracks: res.data
+          }
+        }
+      });
+  }
 }
 
 function pushContent(data) {

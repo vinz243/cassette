@@ -1,0 +1,50 @@
+.trackers.settings {
+  .pt-card {
+    width: 200px;
+    height: 8em;
+    margin: 1em;
+    display: inline-block;
+    vertical-align: bottom;
+    span.pt-icon-standard {
+      margin: 0.6em;
+      line-height: 0.7em;
+      vertical-align: baseline;
+      color: #645c7c;
+    }
+    .status {
+      margin-top: -6px;
+      line-height: 1em !important;
+      font-size: 12px;
+      float: right;
+      cursor: pointer;
+      .updating {
+        color: #939cac;
+      }
+      .radial {
+        color: #5c6971;
+      }
+      .tick {
+        color: #459f3d;
+      }
+      .cross {
+        color: #b33737;
+      }
+    }
+    .discrete {
+      color: #565067;
+      font-size: 12px;
+      span.pt-editable-content {
+        line-height: 2.2em !important;
+      }
+    }
+    &.ph {
+      width: 10em;
+      text-align: center;
+      .pt-icon {
+        line-height: 2.7em;
+        font-size: 2em;
+        color: #6b7086;
+      }
+    }
+  }
+}

@@ -4,14 +4,14 @@
 // https://github.com/jfurrow/flood/blob/master/server/util/scgi.js
 // thanks to jfurrow!
 
-let Deserializer = require('xmlrpc/lib/deserializer');
-let net = require('net');
-let fs = require('fs');
-let Serializer = require('xmlrpc/lib/serializer');
-let mainStory = require('storyboard').mainStory;
+const Deserializer = require('xmlrpc/lib/deserializer');
+const net = require('net');
+const fs = require('fs');
+const Serializer = require('xmlrpc/lib/serializer');
+const mainStory = require('storyboard').mainStory;
 
 
-export default {
+module.exports = {
   methodCall: (methodName, parameters, host, port) => {
 
     let connectMethod = {port: port, host: host};
@@ -52,4 +52,4 @@ export default {
       });
     });
   }
-}
+};

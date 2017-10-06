@@ -1,61 +1,61 @@
-import Lazy from 'lazy.js';
+const {
+  assignFunctions,
+  defaultFunctions,
+  manyToOne,
+  legacySupport,
+  updateable,
+  createable,
+  removeable,
+  databaseLoader,
+  publicProps,
+  findOneFactory,
+  findFactory,
+  findOrCreateFactory
+} = require('./Model');
 
+const File = module.exports = function(props) {
+  if (typeof props === 'string') {
+    props = {
+      name: props
+    };
+  }
+  let state = {
+    name: 'file',
+    fields: [
+      'size',
+      'path',
+      'album',
+      'track',
+      'format',
+      'artist',
+      'bitrate',
+      'duration',
+    ],
+    functions: {},
+    populated: {},
+    props
+  };
+  return assignFunctions(
+    state.functions,
+    defaultFunctions(state),
+    updateable(state),
+    createable(state),
+    removeable(state),
+    databaseLoader(state),
+    publicProps(state),
+    legacySupport(state),
+    manyToOne(state, 'album'),
+    manyToOne(state, 'artist'),
+    manyToOne(state, 'track')
+  );
+}
+module.exports.File = File;
 
-import Artist from './Artist';
-import Album from './Album';
-import Track from './Track';
+const findOne = module.exports.findOne = findOneFactory(File);
+const findOrCreate = module.exports.findOrCreate = findOrCreateFactory(File);
 
-import conf from '../config.js';
+const findById = module.exports.findById = (_id) => findOne({
+  _id
+});
 
-import Model from './Model';
-
-
-// Schema:
-//   _id: id of file
-//   path: abs path to file
-//   format: format
-//   bitrate: audio bitrate in kbps
-//   lossless: boolean
-//   size: file size in bytes
-//   duration: duration in ms
-//   trackId: track id
-//   albumId: album id
-//   artistId: artist id
-
-let File = new Model('file')
-  .field('path')
-    .defaultParam()
-    .required()
-    .string()
-    .done()
-  .field('bitrate')
-    .int()
-    .done()
-  .field('format')
-    .notIdentity()
-    .string()
-    .done()
-  .field('lossless')
-    .boolean()
-    .notIdentity()
-    .done()
-  .field('size')
-    .int()
-    .notIdentity()
-    .done()
-  .field('duration')
-    .int()
-    .notIdentity()
-    .done()
-  .field('trackId')
-    .oneToOne()
-    .done()
-  .field('artistId')
-    .oneToOne()
-    .done()
-  .field('albumId')
-    .oneToOne()
-    .done()
-  .done()
-
-export default File;
+const find = module.exports.find = findFactory(File, 'file');

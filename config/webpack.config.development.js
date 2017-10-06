@@ -12,9 +12,8 @@ const GLOBALS = {
 };
 
 module.exports = merge(config, {
-  debug: true,
   cache: true,
-  devtool: 'cheap-module-eval-source-map',
+  devtool: 'eval',
   entry: {
     application: [
       'webpack-hot-middleware/client',
@@ -38,10 +37,10 @@ module.exports = merge(config, {
           path.resolve(__dirname, '../src/client/scripts')
         ],
         loaders: [
-          'style',
-          'css',
-          'postcss',
-          { loader: 'sass', query: { outputStyle: 'expanded' } }
+          'style-loader',
+          'css-loader',
+          'postcss-loader',
+          { loader: 'sass-loader', query: { outputStyle: 'expanded' } }
         ]
       },
       // Sass + CSS Modules
@@ -65,7 +64,7 @@ module.exports = merge(config, {
       // CSS
       {
         test: /\.css$/,
-        loader: 'style!css!postcss'
+        loader: 'style-loader!css-loader!postcss-loader'
       }
     ]
   }

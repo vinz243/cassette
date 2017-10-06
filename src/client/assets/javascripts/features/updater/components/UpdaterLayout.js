@@ -1,7 +1,5 @@
 import React, { Component, PropTypes } from 'react';
 import './UpdaterApp.scss';
-import {Row, Col, Modal} from 'antd';
-import 'antd/dist/antd.css';
 
 export default class UpdaterLayout extends Component {
   static propTypes = {

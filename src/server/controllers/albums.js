@@ -1,7 +1,15 @@
-import {Artist, Album, Tracks} from '../models';
-import Controller from './Controller';
-import Lazy from 'lazy.js';
+const Artist  = require('../models/Artist');
+const Album   = require('../models/Album');
+const Track   = require('../models/Track');
+const File    = require('../models/File');
 
-const routes = new Controller(Album).done();
+const {fetchable, oneToMany, updateable} = require('./Controller');
+const merge = require("lodash/merge");
 
-export default routes;
+
+module.exports = merge({},
+  fetchable('album', Album.find, Album.findById),
+  updateable('album', Album.findById),
+  oneToMany('album', 'track', Track.find),
+  oneToMany('album', 'file', File.find)
+);

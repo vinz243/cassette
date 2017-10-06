@@ -1,0 +1,97 @@
+div.wanted-collapse {
+  div.wanted-arrow {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 5px 5px 5px;
+    border-color: transparent transparent #c3c9d6 transparent;
+  }
+  div.wanted-arrow-2 {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 5px 5px 5px;
+    margin-top: -4px;
+    border-color: transparent transparent #fff transparent;
+  }
+  div.wanted-content {
+    border-top: 1px solid #c3c9d6;
+    border-bottom: 1px solid #c3c9d6;
+    .wanted-close {
+      float: left;
+      cursor: pointer;
+    }
+    div.wanted-container {
+      margin-top: 1em;
+      margin-bottom: 1em;
+      margin-left: 3em;
+      div.wanted-title {
+        font-weight: bold;
+      }
+      div.wanted-artist {
+        font-size: 14px;
+        color: #525b62;
+      }
+      div.wanted-results {
+        height: 250px;
+        padding-top: 1em;
+
+        div.wanted-empty {
+          padding-top: 70px;
+          text-align:center;
+          div.wanted-text {
+            margin-bottom: 10px;
+            color: #6a6985;
+          }
+          div.wanted-button {
+
+          }
+        }
+        div.wanted-downloading {
+          padding-top: 70px;
+          margin: 0 auto;
+          width: 250px;
+          div.wanted-text {
+            margin-bottom: 20px;
+            text-align: center;
+            color: #6a6985;
+          }
+          div.wanted-progress {
+            width: 250px;
+          }
+        }
+        div.wanted-result {
+          font-size: 13px;
+          color: #808790;
+
+          margin: 0.6em;
+
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          cursor: pointer;
+
+          &:hover {
+            color: #574d66;
+          }
+
+          &:first-child {
+            margin-top: 0 !important;
+          }
+
+          div.wanted-badges {
+            // display: inline-block;
+            float: right;
+            span.pt-minimal {
+              color: #696e88 !important;
+            }
+          }
+        }
+        div.wanted-results-list {
+          column-count: 3;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,203 @@
+const {getFolderEntries,
+  getCachedEntries,
+  writeCachedEntries } = require('./tree');
+
+const Library = require('../../models/Library');
+const Artist  = require('../../models/Artist');
+const Album   = require('../../models/Album');
+const Track   = require('../../models/Track');
+const File    = require('../../models/File');
+
+const {fetchEntityArtworkFactory,
+  agentFactory} = require('../artworks/artwork-agent');
+
+const FSTree    = require("fs-tree-diff");
+const Mediastic = require("mediastic");
+const mainStory = require('storyboard').mainStory;
+const path      = require("path");
+const fs        = require("fs-promise");
+const request   = require("request-promise-native");
+const touch     = require("touch");
+const qs        = require("qs");
+const md5       = require("md5");
+const titlecase = require("titlecase");
+const emitter   = require('emitter');
+
+const fetchArtwork = fetchEntityArtworkFactory(
+  fs, path, touch, request, qs, md5
+);
+
+const trackCase = (title = '') => {
+  if (title.length > 5) {
+    return titlecase(title.toLowerCase());
+  }
+  return title;
+}
+const getMediastic = module.exports.getMediastic = function () {
+  const mediastic = new Mediastic();
+  const artworkAgent = agentFactory(fetchArtwork);
+  mediastic.use((metadata, next) => {
+    mainStory.trace('scanner', 'Working on '+ metadata.path);
+    try {
+      next();
+    } catch (err) {
+      mainStory.error('scanner', 'Uncaught exception', {attach: err});
+    }
+  });
+
+  mediastic.use(Mediastic.tagParser());
+  mediastic.use(Mediastic.fileNameParser());
+  mediastic.use((md, next) => {
+    if (md.probed && md.probed.album_artist) {
+      md.artist = md.probed.album_artist;
+    } else if (md.probed && md.probed.ALBUM_ARTIST) {
+      md.artist = md.probed.ALBUM_ARTIST;
+    } else if (md.probed && md.probed.format &&
+      md.probed.format.tags && md.probed.format.tags.album_artist) {
+      md.artist = md.probed.format.tags.album_artist;
+    } else if (md.probed && md.probed.format &&
+      md.probed.format.tags && md.probed.format.tags.ALBUM_ARTIST) {
+      md.artist = md.probed.format.tags.ALBUM_ARTIST;
+    }
+    md.artist = normalizeArtist(md.artist);
+    md.album = titleCase(md.album);
+    md.title = trackCase(md.title);
+    next();
+  });
+  mediastic.use(artworkAgent());
+  return mediastic;
+}
+const titleCase = module.exports.titleCase = (str = 'Unknown') => {
+  if (/^((([A-Z0-9]{2,}\b).?|(\s(-|:)\s)){2,}|((([a-z0-9])+\b.?\s?)|((-|:)\s))+)$/.test(str)) {
+    return str.toLowerCase().split(/(\.\s?|\s)/g)
+      .filter((w) => !/^\s*$/.test(w))
+      .map((w) => w[0].toUpperCase(0) + w.slice(1)).join(' ');
+  }
+  if (/^(([A-Za-z0-9][a-z0-9]|-|:)*\b\s*)+$/.test(str)) {
+    return titlecase(str);
+  } else if (/^((\w{2,}|a|A)\s)+((\w{2,}|a|A))$/i.test(str)) {
+    return titlecase(str);
+  }
+  return str;
+}
+
+const normalizeArtist = module.exports.normalizeArtist = (str = 'Unknown') => {
+  return titleCase(str.replace(/feat.+$/g, '').trim());
+}
+
+const operationMapper = (models, mediastic, [operation, fileName, entry]) => {
+  let filePath = path.join(entry.basePath, entry.relativePath);
+  switch (operation) {
+    case 'change':
+      return operationMapper(models, mediastic, ['unlink', fileName, entry]).then(() => {
+        return operationMapper(models, mediastic, ['create', fileName, entry]);
+      });
+    case 'create':
+      if (/.+\.(mp3|flac|alac|wav|m4a)$/i.test(filePath)) {
+        return mediastic(filePath).then((metadata) => {
+
+          if (!metadata.duration)
+            return Promise.reject(new Error(`Corrupted file on '${filePath}'`));
+          return models.Artist.findOrCreate({
+            name: metadata.artist
+          }).then((artist) => {
+            return Promise.resolve([metadata, artist])
+          });
+        }).then(([metadata, artist]) => {
+
+          return models.Album.findOrCreate({
+            name: metadata.album
+          }, {
+            artist: artist.props._id
+          }).then((album) => Promise.resolve([metadata, artist, album]));
+        }).then(([metadata, artist, album]) => {
+
+          return models.Track.findOrCreate({
+            name: metadata.title,
+            album: album.props._id,
+            trackNumber: ((metadata.track + '').match(/^\d+/) || [0])[0] - 0,
+          }, {
+            artist: artist.props._id,
+            duration: metadata.duration
+          }).then(track => Promise.resolve([metadata, artist, album, track]));
+        }).then(([metadata, artist, album, track]) => {
+          return File.findOrCreate({
+            path: filePath
+          }, {
+            artist: artist.props._id,
+            album: album.props._id,
+            track: track.props._id,
+            duration: metadata.duration,
+            bitrate: metadata.bitrate
+          }).then((file) => {
+            return Promise.resolve([metadata, artist, album, track, file])
+          });
+        }).then(([metadata, artist, album, track, file]) => {
+
+          return models.File.findById(file.props._id);
+        }).then(file => {
+          // mainStory.info('scanner', `Done working on ${filePath}`);
+          mainStory.trace('scanner', 'Added a new track', {attach: file.props});
+        }).catch(err => {
+          mainStory.warn('scanner', err.message);
+          mainStory.trace('scanner', 'Library scan encountered an error', {attach: err});
+        });
+      }
+      return Promise.resolve();
+    case 'unlink':
+      return File.findOne({path: filePath}).then((file) => {
+        if (!file) {
+          return Promise.resolve();
+        }
+        return file.remove();
+      });
+    case 'mkdir':
+      mainStory.info('scanner', 'Scanning new dir ' + filePath);
+    case 'rmdir':
+      return Promise.resolve();
+  }
+}
+const operationMapperFactory = module.exports.operationMapperFactory = (models, mediastic) => {
+  return operationMapper.bind(null, models, mediastic);
+}
+
+const scan = module.exports.scan = async (libraryId, mediastic = getMediastic()) => {
+
+  let library = await Library.findById(libraryId);
+  let cachedEntries = await getCachedEntries(libraryId);
+
+  let cached = new FSTree({
+    entries: cachedEntries.map((entry) => {
+      return Object.assign({}, entry, {
+        isDirectory: () => {
+          return entry.dir || false;
+        }
+      });
+    })
+  });
+
+  let currentEntries = getFolderEntries(library.props.path);
+
+  let current = new FSTree({
+    entries: currentEntries
+  });
+  // mainStory.info('scanner', 'Loaded', {attach: {cached, current}});
+  let diff = cached.calculatePatch(current);
+  if (!diff.length) {
+    mainStory.info('scanner', 'Library wasn\'t changed since last scan');
+    return;
+  }
+
+  let mapper = operationMapperFactory({
+    Track,
+    Album,
+    Artist,
+    File
+  }, mediastic.call.bind(mediastic));
+
+  await diff.reduce((stack, entry) => stack.then(mapper.bind(null, entry)),
+    Promise.resolve());
+  await writeCachedEntries(libraryId, currentEntries.map((entry) => {
+    return Object.assign({}, entry, {dir: entry.isDirectory()});
+  }));
+}

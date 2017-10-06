@@ -66,6 +66,18 @@ const conf = convict({
     format: "ipaddress",
     default: "127.0.0.1",
     env: "SCGI_HOST"
+  },
+  lastFMAPIKey: {
+    doc: "Last.fm API key",
+    format: '*',
+    default: '85d5b036c6aa02af4d7216af592e1eea',
+    env: 'LAST_FM_API_KEY'
+  },
+  jwtSecret: {
+    doc: 'jsonwebtoken secret',
+    format: '*',
+    default: 'pleaseChangeThisValue',
+    env: 'JWT_SECRET'
   }
 });
 // Load environment dependent configuration
@@ -100,14 +112,27 @@ if (env === 'test') {
 let props = conf.getProperties();
 story.debug('config', 'resolved configuration is', {
   attach: Object.assign({}, props, {
-    pthPassword:  props['pthPassword'].length > 0 ? '<written out>' : ''
+    pthPassword: props['pthPassword'].length > 0 ? '<written out>' : '',
+    jwtSecret: props['jwtSecret'].length > 0 ? '<written out>' : ''
   })
 });
 
-let username = conf.get('pthUsername');
-if (!username || username === '') {
-  story.warn('config', 'no PTH username specified. store will NOT work');
-}
-
 story.close();
 module.exports = conf;
+
+const file = path.join(conf.get('configRoot'), 'configured');
+let configured = fs.existsSync(file);
+
+module.exports.isConfigured = function () {
+  return configured;
+}
+
+module.exports.markConfigured = function () {
+  configured = true;
+  fs.writeFile(file, 'configured=true', function (attach) {
+    if (attach) {
+      mainStory.warn('config', `Couldn't write file ${file}`, {attach})
+    }
+  });
+  return;
+}

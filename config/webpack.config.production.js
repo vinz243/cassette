@@ -13,8 +13,6 @@ const GLOBALS = {
 };
 
 module.exports = merge(config, {
-  debug: false,
-  devtool: 'eval',
   entry: {
     application: 'production',
     vendor: ['react', 'react-dom', 'react-redux', 'react-router', 'react-router-redux', 'redux']
@@ -29,7 +27,7 @@ module.exports = merge(config, {
     // Avoid publishing files when compilation fails
     new webpack.NoErrorsPlugin(),
     new webpack.DefinePlugin(GLOBALS),
-    new webpack.optimize.DedupePlugin(),
+    // new webpack.optimize.DedupePlugin(),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false,
@@ -61,11 +59,11 @@ module.exports = merge(config, {
           path.resolve(__dirname, '../src/client/scripts')
         ],
         loader: ExtractTextPlugin.extract({
-          fallbackLoader: 'style',
+          fallbackLoader: 'style-loader',
           loader: [
-            { loader: 'css', query: { sourceMap: true } },
-            'postcss',
-            { loader: 'sass', query: { outputStyle: 'compressed' } }
+            { loader: 'css-loader', query: { sourceMap: true } },
+            'postcss-loader',
+            { loader: 'sass-loader', query: { outputStyle: 'compressed' } }
           ]
         })
       },
@@ -93,8 +91,8 @@ module.exports = merge(config, {
       {
         test: /\.css$/,
         loader: ExtractTextPlugin.extract({
-          fallbackLoader: 'style',
-          loader: ['css', 'postcss']
+          fallbackLoader: 'style-loader',
+          loader: ['css-loader', 'postcss-loader']
         })
       }
     ]

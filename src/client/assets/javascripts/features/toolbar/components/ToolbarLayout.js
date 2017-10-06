@@ -1,11 +1,29 @@
 import React, { Component, PropTypes } from 'react';
 import PlayerControls from './PlayerControls';
 import CurrentTrackStatus from './CurrentTrackStatus';
-import BrowserControls from './BrowserControls';
-import './ToolbarApp.scss';
-import {Row, Col} from 'antd';
-import 'antd/dist/antd.css';
+import ToolbarActions from './ToolbarActions';
 
+import './ToolbarApp.scss';
+
+import {Box, Flex} from 'reflexbox';
+
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { createStructuredSelector } from 'reselect';
+
+import { actionCreators as playlistActions,
+  selector as playlistSelector } from 'features/playlist';
+import { actionCreators as toolbarActions,
+  selector as toolbarSelector } from 'features/toolbar';
+
+@connect(createStructuredSelector({
+  toolbar: (state) => state['toolbar'],
+  playlist: (state) => state['playlist']
+}), (dispatch) => ({
+    actions: bindActionCreators(
+      Object.assign({}, toolbarActions, playlistActions),
+      dispatch)
+}))
 export default class ToolbarLayout extends Component {
   static propTypes = {
     actions: PropTypes.object.isRequired,
@@ -15,19 +33,18 @@ export default class ToolbarLayout extends Component {
     const { toolbar, actions } = this.props;
     return (
     	<div>
-        <Row className="mainRow">
-          <Col span={1}></Col>
-          <Col span={7}>
+        <Flex className="mainRow" justify="space-between">
+          <Box>
             <PlayerControls {...this.props} />
-  	      </Col>
-          <Col span={7} className="currentTrackStatusCol">
+  	      </Box>
+          <Box auto className="currentTrackStatusCol">
            <CurrentTrackStatus {...this.props} />
-  	      </Col>
-          <Col span={7}>
+  	      </Box>
+          <Box>
+            <ToolbarActions {...this.props}/>
              {/*<BrowserControls  {...this.props} />*/}
-  	      </Col>
-          <Col span={2}></Col>
-        </Row>
+  	      </Box>
+        </Flex>
       </div>
     );
   }

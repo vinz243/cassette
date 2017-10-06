@@ -7,6 +7,10 @@ import library, {NAME as libraryName} from 'features/library';
 import store, {NAME as storeName} from 'features/store';
 import jobs, {NAME as jobsName} from 'features/jobs';
 import updater, {NAME as updaterName} from 'features/updater';
+import playlist, {NAME as playlistName} from 'features/playlist';
+import settings, {NAME as settingsName} from 'features/settings';
+import configuration, {NAME as configurationName} from 'features/configuration';
+import land, {NAME as landName} from 'features/land';
 
 export default combineReducers({
   routing,
@@ -16,4 +20,8 @@ export default combineReducers({
   [storeName]: store,
   [jobsName]: jobs,
   [updaterName]: updater,
+  [playlistName]: playlist,
+  [settingsName]: settings,
+  [configurationName]: configuration,
+  [landName]: land
 });

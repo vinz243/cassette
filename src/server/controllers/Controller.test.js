@@ -1,267 +1,162 @@
-import Controller from './Controller';
-import Model from '../models/Model';
+const {fetchable,
+        createable,
+        removeable,
+        updateable,
+        oneToMany} = require('./Controller');
+const Model = require("../models/Model");
 
-import test from 'ava';
+const test = require("ava");
+const sinon = require("sinon");
 
-
-test('Controller should map routes correctly', t => {
-  let Person = new Model('person')
-    .field('name')
-    .done()
-  .done();
-
-  let routes = new Controller(Person).done();
-
-  // console.log(routes);
-  t.not(routes['/v1/people'].get, undefined);
-  t.not(routes['/v1/people/:id'].get, undefined);
-});
-test('Controller should support prefix', t => {
-  let Person = new Model('block')
-    .field('name')
-    .done()
-  .done();
-
-  let routes = new Controller(Person).prefix('/foo').done();
-
-  t.not(routes['/v1/foo/blocks'].get, undefined);
-  t.not(routes['/v1/foo/blocks/:id'].get, undefined);
-});
-
-
-test('Controller should be able to query', async t => {
-  let Pet = new Model('pet')
-    .field('name')
-      .string()
-      .required()
-      .done()
-    .field('legs')
-      .int()
-      .done()
-    .done();
-
-  await (new Pet({name: 'cat', legs: 4})).create();
-  await (new Pet({name: 'dog', legs: 4})).create();
-  await (new Pet({name: 'mice', legs: 4})).create();
-
-  let routes = new Controller(Pet).done();
+test('fetchable - fetch multiple document', async t => {
+  let find = sinon.spy(() => Promise.resolve([{
+    props: {
+      name: 'Jon',
+      sword: 'Longclaw'
+    }
+  }, {
+    props: {
+      name: 'Jon',
+      sword: 'Oathkeeper'
+    }
+  }]));
   let ctx = {
-    params: {}
-  }
-
-  await routes['/v1/pets'].get(ctx);
-  t.is(ctx.body.length, 3);
-  t.is(ctx.body.data.length, 3);
-  t.is(ctx.body.status, 'success');
-
-  for (let pet of ctx.body.data) {
-    t.not(pet.name, undefined);
-    t.not(pet.legs, undefined);
-  }
-
-  ctx = {
-    params:  {},
+    status: 42,
+    body: 'foo',
     query: {
       limit: 2
     }
-  };
-
-  await routes['/v1/pets'].get(ctx);
-  t.is(ctx.body.length, 2, 'does not support limit parameter');
-  t.is(ctx.body.data.length, 2);
-  t.is(ctx.body.status, 'success');
-
-  ctx = {
-    params:  {},
-    query: {
-      limit: 1337
-    }
-  };
-
-  await routes['/v1/pets'].get(ctx);
-
-  t.is(ctx.body.length, 3, 'does not support limit parameter');
-  t.is(ctx.body.data.length, 3);
-  t.is(ctx.body.payload.query.limit, 500,
-    'does not set a maximum value for limit');
-  t.is(ctx.body.status, 'success');
+  }
+  await fetchable('character', find)['/api/v2/characters'].get(ctx);
+  t.is(ctx.status, 200);
+  t.deepEqual(ctx.body, [{
+    name: 'Jon',
+    sword: 'Longclaw'
+  }, {
+    name: 'Jon',
+    sword: 'Oathkeeper'
+  }]);
+  t.deepEqual(find.args[0], [{limit: 2}]);
 });
-test('Controller should be able to find one by id', async t => {
-  let Vehicule = new Model('vehicule')
-    .field('name')
-      .string()
-      .required()
-      .done()
-    .field('wheels')
-      .int()
-      .done()
-    .done();
-  let car = new Vehicule({name: 'car', wheels: 4});
-  await car.create();
-  await (new Vehicule({name: 'moto', wheels: 2})).create();
 
-  let routes = new Controller(Vehicule).done();
+test('fetchable - fetch one document', async t => {
+  let findById = sinon.spy(() => Promise.resolve({props: {
+    name: 'Ser Arthur Dayne',
+    sword: 'Dawn'
+  }}));
 
   let ctx = {
-    params:  {
-      id: car._id
-    },
-    query: {}
+    params: {id: 1337}
   };
-
-  await routes['/v1/vehicules/:id'].get(ctx);
-
-  t.is(ctx.body.data.wheels, 4);
-  t.is(ctx.body.data.name, 'car');
-
-  ctx = {
-    params:  {
-      id: '42'
-    },
-    query: {}
-  };
-
-  await routes['/v1/vehicules/:id'].get(ctx);
-
-  t.is(ctx.status, 404);
-  t.is(ctx.body.payload.params.id, '42');
+  await fetchable('character', null, findById)['/api/v2/characters/:id'].get(ctx);
+  t.is(ctx.status, 200);
+  t.deepEqual(ctx.body, {
+    name: 'Ser Arthur Dayne',
+    sword: 'Dawn'
+  });
+  t.deepEqual(findById.args[0], [1337]);
 });
 
-
-test('should support searches', async t => {
-  let Weapon = new Model('weapon')
-    .field('name')
-      .string()
-      .required()
-      .done()
-    .field('type')
-      .string()
-      .done()
-    .field('fireRate')
-      .int()
-      .done()
-    .done();
-
-  let ctrller = new Controller(Weapon).done();
-
-  await (new Weapon({
-    name: 'Famas',
-    fireRate: 1000,
-    type: 'AssaultRifle'
-  })).create();
-  await (new Weapon({
-    name: 'AEK-971',
-    fireRate: 900,
-    type: 'AssaultRifle'
-  })).create();
-  await (new Weapon({
-    name: 'M16A1',
-    fireRate: 700,
-    type: 'AssaultRifle'
-  })).create();
-  await (new Weapon({
-    name: 'M16A2',
-    fireRate: 700,
-    type: 'AssaultRifle'
-  })).create();
-  await (new Weapon({
-    name: 'M16A4',
-    fireRate: 750,
-    type: 'AssaultRifle'
-  })).create();
-  await (new Weapon({
-    name: 'MK Mod 11',
-    type: 'DMR'
-  })).create();
-  await (new Weapon({
-    name: 'MK Mod 8',
-    type: 'DMR'
-  })).create();
-
-  let ctx = {body: {}, request: {}};
-  ctx.request.fields = {
-    name: 'Famas'
+test('fetchable - return 404 when document not found', async t => {
+  let findById = sinon.spy(() => Promise.resolve());
+  let throws = sinon.spy();
+  let ctx = {
+    params: {id: 42},
+    throw: throws
   };
+  await fetchable('character', null, findById)['/api/v2/characters/:id'].get(ctx);
 
-  let search = ctrller['/v1/weapons/searches'].post;
-
-  await search(ctx);
-  t.is(ctx.body.length, 1);
-  t.is(ctx.body.data[0].fireRate, 1000);
-
-  ctx.request.fields = {
-    fireRate: 700
-  };
-  await search(ctx);
-  t.is(ctx.body.length, 2);
-  t.is(ctx.body.data[0].fireRate, 700)
-  t.is(ctx.body.data[1].fireRate, 700)
-
-  ctx.request.fields = {
-    name: '/16A/'
-  };
-  await search(ctx);
-  t.is(ctx.body.length, 3);
+  t.deepEqual(throws.args[0], [404, 'Object not found in database']);
+  t.deepEqual(findById.args[0], [42]);
 });
 
-
-test('should support allowPost, put and del', async t => {
-  let Object = new Model('object')
-    .field('name').string().required().done().done();
-
-  let routes = new Controller(Object)
-    .allowPost().allowPut().allowDel().allowSearches()
-  .done();
-
-});
-
-test('supports oneToMany relations', async t => {
-
-    let Parent = (new Model('parent'))
-      .field('name')
-        .string()
-        .required()
-        .defaultParam()
-        .done()
-      .field('childId')
-        .string()
-        .done()
-      .done();
-
-    let Child = (new Model('child'))
-      .field('name')
-        .string()
-        .required()
-        .defaultParam()
-        .done()
-      .oneToMany(Parent, 'childId')
-      .done();
-    let bruce = new Child('Bruce');
-    await bruce.create();
-
-    let thomas = new Parent('Thomas');
-    thomas.data.childId = bruce.data._id;
-    await thomas.create();
-
-    let martha = new Parent('Martha');
-    martha.data.childId = bruce.data._id;
-    await martha.create();
-
-    let yourMother = new Parent('Lady of the night'); // :D :D :D
-    await yourMother.create();
-
-    let routes = new Controller(Child).done();
-    let ctx = {
-      params: {
-        id: bruce._id
-      },
-      query: {}
+test('creatable - create an object from fields', async t => {
+  let create = sinon.spy(() => Promise.resolve());
+  let model = sinon.spy((props) => ({
+    props: Object.assign({}, props, {_id: 42}),
+    create
+  }));
+  let ctx = {
+    request: {
+      fields: {
+        name: 'Ser Ulrick Dayne',
+        sword: 'Dawn'
+      }
     }
-    await routes['/v1/children/:id/parents'].get(ctx);
-    t.is(ctx.body.data.length, 2);
+  }
+  await createable('character', model)['/api/v2/characters'].post(ctx);
 
-    ctx.query.name = 'Thomas';
-    await routes['/v1/children/:id/parents'].get(ctx);
-    t.is(ctx.body.data.length, 1);
-    t.is(ctx.body.data[0].name, 'Thomas');
+  t.is(ctx.status, 201);
+  t.deepEqual(ctx.body, {
+    _id: 42,
+    name: 'Ser Ulrick Dayne',
+    sword: 'Dawn'
+  });
+  t.deepEqual(create.args, [[]]);
+  t.deepEqual(model.args[0], [{
+    name: 'Ser Ulrick Dayne',
+    sword: 'Dawn'
+  }]);
+});
+
+
+test('removeable - removes an object', async t => {
+  let remove = sinon.spy(() => Promise.resolve());
+  let findById = sinon.spy(() => Promise.resolve({
+    props: {
+      name: 'Ser Ulrick Dayne',
+      sword: 'Dawn'
+    }, remove
+  }));
+  let ctx = {
+    params: {id: 42}
+  }
+
+  await removeable('character', findById)['/api/v2/characters/:id'].del(ctx);
+  t.is(ctx.status, 200);
+  t.deepEqual(remove.args, [[]]);
+  t.deepEqual(findById.args, [[42]]);
+});
+
+test('updateable - updates an object', async t => {
+  let set = sinon.spy();
+  let update = sinon.spy(() => Promise.resolve());
+
+  let findById = sinon.spy(() => Promise.resolve({
+    set, update
+  }));
+  let ctx = {
+    request: {body: {
+      dead: true,
+      killedBy: 'Howland Reed'
+    }},
+    params: {
+      id: 42
+    }
+  }
+  await updateable('character', findById)['/api/v2/characters/:id'].put(ctx);
+
+  t.deepEqual(set.args, [['dead', true], ['killedBy', 'Howland Reed']]);
+  t.deepEqual(update.args, [[]]);
+  t.is(ctx.status, 200);
+});
+
+test('oneToMany - allows fetch child', async t => {
+  let find = sinon.spy(() => Promise.resolve([{props: {
+   name: 'Jon Snow', sword: 'Longclaw'
+  }}]));
+
+  let ctx = {
+    params: {
+      id: 0x2A
+    }
+  };
+  let controller = oneToMany('character', 'son', find);
+  await controller['/api/v2/characters/:id/sons'].get(ctx);
+
+  t.deepEqual(ctx.body, [{
+    name: 'Jon Snow',
+    sword: 'Longclaw'
+  }]);
+  t.is(ctx.status, 200);
 })

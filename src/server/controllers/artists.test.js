@@ -1,64 +1,69 @@
-import {Artist, Album, Track} from '../models';
-import supertest from 'supertest-as-promised';
-import app from '../server.js';
+const Artist = require('../models/Artist');
+const Album = require('../models/Album');
+const Track = require('../models/Track');
+const supertest = require("supertest-as-promised");
+const app = require("../server.js");
 
-import test from 'ava';
+const test = require("ava");
 
 
-const request = supertest((app));
+const request = supertest(app);
 
 
-test('/v1/artists', async t => {
-  let res = await request.get('/v1/artists');
+test.serial('/api/v2/artists', async t => {
+  let res = await request.get('/api/v2/artists');
   t.is(res.body.length, 0);
-  t.is(res.body.data.length, 0);
+  t.is(res.body.length, 0);
 
-  await (new Artist({name: 'Foo'})).create();
+  await (Artist({name: 'Foo'})).create();
 
-  res = await request.get('/v1/artists');
-  for(let artist of res.body.data) {
+  res = await request.get('/api/v2/artists');
+  for(let artist of res.body) {
     if ((artist || {}).name === 'Foo') return;
   }
   t.fail('created artist not found');
 });
 
-test('/v1/artists/:id', async t => {
-  let systemOfADown = new Artist('System Of A Dawn');
-  systemOfADown.data.genre = 'Alt Metal';
+test.serial('/api/v2/artists/:id', async t => {
+  let systemOfADown = Artist({
+    name: 'System Of A Down',
+    genre: 'Alt Metal'
+  });
   await systemOfADown.create();
 
-  let res = await request.get('/v1/artists/' + systemOfADown._id);
-  t.is(res.body.data.name, 'System Of A Dawn');
-  t.is(res.body.data.genre, 'Alt Metal');
+  let res = await request.get('/api/v2/artists/' + systemOfADown.props._id);
+  t.is(res.body.name, 'System Of A Down');
+  t.is(res.body.genre, 'Alt Metal');
 });
 
-test('/v1/artists/:id/searches', async t => {
-  await (new Artist('TestA')).create();
-  await (new Artist('TestB')).create();
-  await (new Artist('TestC')).create();
-  await (new Artist('JesdD')).create();
+// test.serial('/api/v2/artists/:id/searches', async t => {
+//   await (new Artist('TestA')).create();
+//   await (new Artist('TestB')).create();
+//   await (new Artist('TestC')).create();
+//   await (new Artist('JesdD')).create();
+//
+//   let res = await request.post('/api/v2/artists/searches').send({
+//     name: '/test/'
+//   });
+//   t.is(res.body.length, 3);
+// });
 
-  let res = await request.post('/v1/artists/searches').send({
-    name: '/test/'
-  });
-  t.is(res.body.length, 3);
-});
-test('/v1/artists/:id/albums and tracks', async t => {
-  let alborosie = new Artist({
+test.serial('/api/v2/artists/:id/albums and tracks', async t => {
+  let alborosie = Artist({
     name: 'Alborosie',
     genre: 'Reggae'
   });
   await alborosie.create();
 
-  let soulPirate = new Album({
+  let soulPirate = Album({
     name: 'Soul Pirate',
-    artistId: alborosie._id
+    artist: alborosie.props._id
   });
   await soulPirate.create();
 
   let freedomFyah = new Album({
     name: 'Freedom & Fyah',
-    artistId: alborosie._id
+    artist: alborosie.props._id
   });
   await freedomFyah.create()
 
@@ -71,24 +76,24 @@ test('/v1/artists/:id/albums and tracks', async t => {
 
   let ghostStories = new Album({
     name: 'Ghost Stories',
-    artistId: coldplay._id
+    artist: coldplay.props._id
   });
   await ghostStories.create();
 
-  let res = await request.get('/v1/artists/'+alborosie._id+'/albums')
+  let res = await request.get('/api/v2/artists/'+alborosie.props._id+'/albums')
     .expect(200);
+
   t.is(res.body.length, 2);
-  t.is(res.body.data.length, 2);
+  t.is(res.body.length, 2);
 
-  t.not(res.body.data[0].name, undefined);
-  t.not(res.body.data[1].name, undefined);
+  t.not(res.body[0].name, undefined);
+  t.not(res.body[1].name, undefined);
+  // t.deepEqual(res.body[0].artist, alborosie.doc);
+  // t.deepEqual(res.body[1].artist, alborosie.doc);
 
-  t.is(res.body.data[0].artistId, alborosie._id);
-  t.is(res.body.data[1].artistId, alborosie._id);
+  await (new Track({name: 'Herbalist', artist: alborosie.props._id})).create();
 
-  await (new Track({name: 'Herbalist', artistId: alborosie._id})).create();
-
-  res = await request.get('/v1/artists/'+alborosie._id+'/tracks');
+  res = await request.get('/api/v2/artists/'+alborosie.props._id+'/tracks');
   t.is(res.body.length, 1);
-  t.is(res.body.data[0].name, 'Herbalist');
+  t.is(res.body[0].name, 'Herbalist');
 });

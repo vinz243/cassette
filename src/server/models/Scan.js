@@ -1,137 +1,144 @@
-import child_process from 'child_process';
-import Library from './Library';
-import Album from './Album';
-import Artist from './Artist';
-import Track from './Track';
-import File from './File';
-import Model from './Model';
-import process from 'process';
-import chalk from 'chalk';
-import { mainStory } from 'storyboard';
+const child_process = require("child_process");
+const chalk         = require("chalk");
+const Library       = require('./Library');
 
-export const processResult = async (res) => {
-  if(res.status === 'done') {
-    let data = res.data;
-    for (let artistName of Object.keys(data)) {
-      let artist = (await Artist.find({name: artistName}))[0];
-      if (!artist) {
-        artist = new Artist(artistName);
-        await artist.create();
-      }
-      for (let albumName of Object.keys(data[artistName])) {
-        let album = (await Album.find({name: albumName}))[0];
-        if (!album) {
-          album = new Album(albumName);
-          album.data.artistId = artist.data._id;
-          await album.create();
-        }
-        for (let t of data[artistName][albumName]) {
-          let track = (await Track.find({name: t.trackTitle}))[0];
-          if (!track) {
-            track = new Track(t.trackTitle);
-            track.data.artistId = artist.data._id;
-            track.data.albumId = album.data._id;
-            track.data.duration = t.duration;
-            // console.log("ADDING TRACK", t.trackNumber);
-            if(t.trackNumber) {
-              track.data.trackNumber = (t.trackNumber + '').match(/^\d+/)[0] - 0;
-            }
-            await track.create();
-          }
-          let dup = await File.find({path: t.path});
+const {scan}      = require('../features/scanner/scanner');
+const {mainStory} = require('storyboard');
+const {
+  assignFunctions,
+  defaultFunctions,
+  manyToOne,
+  legacySupport,
+  updateable,
+  createable,
+  removeable,
+  databaseLoader,
+  publicProps,
+  findOneFactory,
+  findFactory,
+  findOrCreateFactory
+} = require('./Model');
+const emitter = require('emitter');
 
-          if (dup.length === 0){
-            let file = new File({
-              path: t.path,
-              duration: t.duration, // TODO: Bitrate and everything
-              bitrate: t.bitrate,
-              artistId: artist.data._id,
-              albumId: album.data._id,
-              trackId: track.data._id
+const Scan = module.exports.Scan = function(props) {
+  if (typeof props === 'string') {
+    props = {
+      name: props
+    };
+  }
+  let state = {
+    name: 'scan',
+    fields: [
+      'statusCode',
+      'statusMessage',
+      'library',
+      'dryRun',
+      'mode',
+      'duration',
+      'date'
+    ],
+    functions: {},
+    populated: {},
+    props
+  };
+  return assignFunctions(
+    state.functions,
+    defaultFunctions(state),
+    updateable(state),
+    createable(state),
+    databaseLoader(state),
+    publicProps(state),
+    legacySupport(state), {
+      postCreate: () => {
+        setTimeout(() => {
+          if ((state.props.mode || '').toLowerCase() === 'all') {
+            emitter.emit(['scanner', 'scanstarted', state.props._id], {
+              scanId: state.props._id
             });
-            await file.create();
+
+            let time = 0;
+            let hasErrors = false;
+
+            return Library.find({}).then((libs) => {
+              time = Date.now();
+              return Promise.all(libs.map(lib => scan(lib.props._id)));
+            }).then(() => {
+              if (hasErrors) {
+                state.functions.set('statusCode', 'FAILED');
+                state.functions.set('statusMessage',
+                  'At least one scan failed with errors. ' +
+                  'Please check the logs for more details...');
+                state.functions.update().catch(err => {
+                  mainStory.fatal('scanner', 'Could not update scan', {attach: err});
+                });
+                return;
+              }
+              mainStory.info('scanner', 'All scans finished without raising error.');
+              state.functions.set('statusCode', 'DONE');
+              state.functions.set('statusMessage', 'Scan finished without error.');
+              state.functions.set('duration', Date.now() - time);
+
+              emitter.emit(['scanner', 'scanfinished', state.props._id], {
+                scanId: state.props._id
+              });
+              return state.functions.update();
+            }).catch((e) => {
+              hasErrors = true;
+
+              emitter.emit(['scanner', 'scanfinished', state.props._id], {
+                scanId: state.props._id,
+                hasErrors
+              });
+
+              mainStory.error('scanner', 'One scan failed with errors', {attach: e});
+            });
           }
-        }
+          if (!state.props._id) {
+            mainStory.warn('scanner', 'Scan wasn\'t created. Aborting');
+            return;
+          }
+          try {
+            emitter.emit(['scanner', 'scanstarted', state.props._id], {
+              scanId: state.props._id
+            });
+            scan(state.props.library).then(() => {
+              mainStory.info('scanner', 'Scan finished without raising errors');
+              state.functions.set('statusCode', 'DONE');
+              state.functions.set('statusMessage', 'Scan finished without errors.');
+
+              emitter.emit(['scanner', 'scanfinished', state.props._id], {
+                scanId: state.props._id
+              });
+
+              return;
+            }).catch((err) => {
+              mainStory.error('scanner', 'Scan failed with errors', {attach: err});
+              state.functions.set('statusCode', 'FAILED');
+              state.functions.set('statusMessage', 'Scan failed with errors. Please check the logs for more details...');
+              state.functions.update().catch(err => {
+                mainStory.fatal('scanner', 'Could not update scan', {attach: err});
+              });
+
+              emitter.emit(['scanner', 'scanfinished', state.props._id], {
+                scanId: state.props._id,
+                hasErrors: true
+              });
+            });
+          } catch (err) {
+            mainStory.fatal('scanner', 'Scanner crashed unexpectedly.', {attach: err});
+
+          }
+        }, 2500);
+
       }
     }
-  }
+  );
 }
 
-let Scan = new Model('scan')
-  .field('startDate')
-    .int()
-    .done()
-  .field('dryRun')
-    .defaultValue(false)
-    .boolean()
-    .done()
-  .field('libraryId')
-    .string()
-    .required()
-    .defaultParam()
-    .done()
-  .field('statusMessage')
-    .string()
-    .done()
-  .field('statusCode')
-    .string()
-    .done()
-  .implement('startScan', async function () {
-    // console.log('start');
-    this.data.statusCode = 'STARTED';
-    this.data.statusMessage = 'Scan started...';
-    let story = mainStory.child({
-      src: 'libscan',
-      title: 'Library scan',
-      level: 'info'
-    });
-    story.debug('Running scan on `nextTick()`');
-    process.nextTick(() => {
-      if (this.data.dryRun) {
-        this.data.statusCode = 'DONE';
-        this.data.statusMessage = 'Scan was a dry run';
-        story.warn(`${chalk.bold('dryRun')} flag was set`);
-        story.close();
-      } else {
-        Library.findById(this.data.libraryId).then((dir) => {
-          let child = child_process.fork(require.resolve('../scripts/music_scanner'));
-          story.debug('Child process forked');
+const findOne = module.exports.findOne = findOneFactory(Scan);
 
-          story.debug(`${chalk.dim('Executing action ')} 'set_config'`, {
-            dir: dir.data.path
-          });
+const findById = module.exports.findById = (_id) => findOne({
+  _id
+});
 
-          child.send({
-            action: 'set_config',
-            data: {
-              dir: dir.data.path
-            }
-          });
-          story.debug(`${chalk.dim('Executing action ')} 'execute'`);
-          child.send({action: 'execute'});
-
-          child.on('message', (res) => {
-            if (res.status === 'LOG') {
-              story.info(res.msg);
-              return;
-            }
-            processResult(res).then(() => {
-              this.data.statusCode = 'DONE';
-              this.data.statusMessage = 'Scan finished without errors';
-              this.update();
-              story.info('Scan finished !');
-              story.close();
-            }).catch((err) => {
-              this.data.statusCode = 'FAILED';
-              this.data.statusMessage = err;
-              story.error('Scan errored', err);
-              story.close();
-            });
-          });
-        });
-
-
-      }
-    });
-  }).done();
-export default Scan;
+const find = module.exports.find = findFactory(Scan, 'scan');

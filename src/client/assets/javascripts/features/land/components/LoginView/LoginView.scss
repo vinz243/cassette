@@ -1,0 +1,17 @@
+div.login-content {
+  div.login-header {
+    margin: 3em 4em;
+    h3 {
+      font-size: 24px;
+    }
+  }
+  div.login-content {
+    margin: 3em 5em;
+    width: 650px;
+    div.login-button {
+      margin: 2em 0;
+      width: 30%;
+      text-align: right;
+    }
+  }
+}
